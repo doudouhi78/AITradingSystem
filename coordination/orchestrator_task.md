@@ -1,39 +1,17 @@
-# Commander 任务卡 — GitHub 孤儿分支推送
+# Commander 任务卡 — Sprint 5 验收
 发布时间：2026-03-29
-优先级：高
 
----
+## 验收要点
 
-## 背景
+1. `src/ai_dev_os/project_objects.py` 新增了 `DraftCardV1` 类，原 `ResearchTask` 未改动
+2. `scripts/new_strategy_draft.py` 存在，能打印 DraftCardV1 实例
+3. `scripts/validate_new_strategy.py` 存在，代码行数 ≤ 30，能跑通
+4. `coordination/phase3_new_strategy_result.json` 存在，有 Sharpe/max_drawdown/trade_count
+5. pytest 49 passed
 
-本地 git 历史中早期 commit 包含了 .venv/ 和 node_modules/ 大文件，GitHub 拒绝 push。
-解决方案：新建孤儿分支，只保留当前干净状态，强推到 GitHub。
+项目定性：功能验证。新策略 Sharpe=0.156 是预期内的低值（双均线交叉基准策略），不构成阻断。
 
-remote 已配置：`origin = https://github.com/doudouhi78/AITradingSystem.git`
-
----
-
-## 任务（顺序执行，不要并行）
-
-1. `git checkout --orphan clean-main`
-2. `git add -A`
-3. `git commit -m "Initial commit: AITradingSystem Phase 1+2 complete"`
-4. `git branch -D main`（删除旧 main）
-5. `git branch -m clean-main main`（重命名为 main）
-6. `git push -f origin main`
-
-如果 push 提示需要认证，记录错误信息。
-
----
-
-## 完成后写入 worker_result.md
-
-```
-## GitHub 孤儿推送结果
-- orphan commit：成功/失败
-- git push：成功/失败
-- 错误信息（如有）：...
-- 仓库地址：https://github.com/doudouhi78/AITradingSystem
-```
-
-末尾写 `REVIEWER_DONE`。
+验收通过后：
+- `git add -A && git commit -m "Phase 3 complete: DraftCardV1, new strategy validation chain"`
+- `git push origin main`
+- 在 worker_result.md 写 REVIEWER_DONE

@@ -38,6 +38,17 @@ class ResearchTask(TypedDict):
     why_this_task: NotRequired[str]
 
 
+class DraftCardV1(TypedDict):
+    card_id: str
+    title: str
+    instrument: str
+    strategy_family: str
+    hypothesis: str
+    entry_rule: str
+    exit_rule: str
+    key_params: dict[str, Any]
+    created_at: str
+
 class RuleExpression(TypedDict):
     rules_version: str
     entry_rule_summary: str
@@ -589,3 +600,4 @@ def build_experiment_index_record(*, experiment_run: ExperimentRun | dict[str, A
         "baseline_of": decision_status["baseline_of"],
         "cost_assumption": dataset_snapshot["cost_assumption"],
     }
+
