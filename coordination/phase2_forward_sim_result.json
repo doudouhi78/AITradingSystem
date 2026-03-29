@@ -1,0 +1,20 @@
+{
+  "phase": 2,
+  "cutoff_date": "2025-12-23",
+  "sim_start": "2025-12-24",
+  "sim_end": "2026-03-27",
+  "trading_days": 60,
+  "total_return": 0.0003156081818183054,
+  "max_drawdown": -0.016343779747200027,
+  "trade_count": 2,
+  "gate_blocked_count": 0,
+  "avg_position_fraction": 0.17158912303727655,
+  "avg_slippage": -0.0004566506406235723,
+  "slippage_exceed_count": 43,
+  "comparison_vs_phase1": {
+    "total_return_diff": -8.439181818169461e-05,
+    "max_drawdown_diff": 0.0046562202527999745,
+    "trade_count_diff": 0,
+    "gate_blocked": 0
+  }
+}
