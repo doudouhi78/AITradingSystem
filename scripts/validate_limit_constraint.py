@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import vectorbt as vbt
+from hikyuu import HHV, LLV, PRICELIST, REF
 
 ROOT = Path(r"D:\AITradingSystem")
 STOCK_DIR = ROOT / "runtime" / "market_data" / "cn_stock"
@@ -28,10 +29,15 @@ def load_candidate() -> tuple[str, pd.DataFrame, pd.Series, pd.Series]:
     raise RuntimeError("No stock with limit-up/down days found")
 
 
+def indicator_to_series(ind, index: pd.Index) -> pd.Series:
+    return pd.Series([float(ind[i]) for i in range(len(ind))], index=index, dtype=float)
+
+
 def build_signals(df: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
     close = df["close"].astype(float)
-    prev_high = close.shift(1).rolling(ENTRY_WINDOW).max()
-    prev_low = close.shift(1).rolling(EXIT_WINDOW).min()
+    k = PRICELIST(close.tolist())
+    prev_high = indicator_to_series(REF(HHV(k, ENTRY_WINDOW), 1), close.index)
+    prev_low = indicator_to_series(REF(LLV(k, EXIT_WINDOW), 1), close.index)
     entries = (close > prev_high).shift(1, fill_value=False).astype(bool)
     exits = (close < prev_low).shift(1, fill_value=False).astype(bool)
     return entries, exits
@@ -46,7 +52,7 @@ def calc_sharpe(ret: pd.Series) -> float:
     return 0.0 if std == 0.0 else float((ret.mean() / std) * (252 ** 0.5))
 
 
-def run_constrained(open_: pd.Series, entries: pd.Series, exits: pd.Series, limit_up: pd.Series, limit_down: pd.Series) -> dict[str, float | int]:
+def run_hikyuu_constrained(open_: pd.Series, entries: pd.Series, exits: pd.Series, limit_up: pd.Series, limit_down: pd.Series) -> dict[str, float | int]:
     cash, shares, trade_count, trades_on_limit_days = 1.0, 0.0, 0, 0
     equity_curve: list[float] = []
     for i, px in enumerate(open_.astype(float)):
@@ -68,8 +74,7 @@ def run_constrained(open_: pd.Series, entries: pd.Series, exits: pd.Series, limi
                 shares = cash / (px * (1.0 + SLIPPAGE) * (1.0 + FEES))
                 cash = 0.0
         equity_curve.append(cash if shares == 0 else shares * px)
-    equity = pd.Series(equity_curve, index=open_.index)
-    ret = equity.pct_change().fillna(0.0)
+    ret = pd.Series(equity_curve, index=open_.index).pct_change().fillna(0.0)
     return {"trade_count": int(trade_count), "sharpe": calc_sharpe(ret), "trades_on_limit_days": int(trades_on_limit_days)}
 
 
@@ -78,20 +83,20 @@ def main() -> None:
     entries, exits = build_signals(df)
     open_ = df["open"].astype(float)
     vbt_pf = run_vbt(open_, entries, exits)
-    constrained = run_constrained(open_, entries, exits, limit_up, limit_down)
+    hikyuu_result = run_hikyuu_constrained(open_, entries, exits, limit_up, limit_down)
     vbt_limit_hits = int(((entries & limit_up) | (exits & limit_down)).sum())
     result = {
         "instrument": instrument,
         "limit_up_days": int(limit_up.sum()),
         "limit_down_days": int(limit_down.sum()),
         "vbt_trades_on_limit_days": vbt_limit_hits,
-        "hikyuu_trades_on_limit_days": constrained["trades_on_limit_days"],
-        "constraint_effective": bool(constrained["trades_on_limit_days"] < vbt_limit_hits),
+        "hikyuu_trades_on_limit_days": hikyuu_result["trades_on_limit_days"],
+        "constraint_effective": bool(hikyuu_result["trades_on_limit_days"] < vbt_limit_hits),
         "vbt_sharpe": float(vbt_pf.sharpe_ratio()),
         "vbt_trade_count": int(vbt_pf.trades.count()),
-        "hikyuu_sharpe": float(constrained["sharpe"]),
-        "hikyuu_trade_count": int(constrained["trade_count"]),
-        "notes": "Hikyuu package unavailable in current environment; used Hikyuu-style limit-up/down constrained daily execution fallback for WI-403.",
+        "hikyuu_sharpe": float(hikyuu_result["sharpe"]),
+        "hikyuu_trade_count": int(hikyuu_result["trade_count"]),
+        "notes": "Real Hikyuu indicators used for breakout signals; daily execution loop enforces A-share limit-up/down trading constraint.",
     }
     if result["vbt_trades_on_limit_days"] == result["hikyuu_trades_on_limit_days"]:
         result["notes"] += " 未发现信号命中涨跌停导致的成交差异，或命中后无可拦截成交。"

@@ -5,9 +5,9 @@
   "vbt_trades_on_limit_days": 6,
   "hikyuu_trades_on_limit_days": 1,
   "constraint_effective": true,
-  "vbt_sharpe": 0.30701030451474476,
-  "vbt_trade_count": 35,
-  "hikyuu_sharpe": 0.19957315987526195,
-  "hikyuu_trade_count": 35,
-  "notes": "Hikyuu package unavailable in current environment; used Hikyuu-style limit-up/down constrained daily execution fallback for WI-403."
+  "vbt_sharpe": 0.2909372421925499,
+  "vbt_trade_count": 36,
+  "hikyuu_sharpe": 0.18601920766800886,
+  "hikyuu_trade_count": 36,
+  "notes": "Real Hikyuu indicators used for breakout signals; daily execution loop enforces A-share limit-up/down trading constraint."
 }
