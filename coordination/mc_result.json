@@ -2,9 +2,9 @@
   "position_fraction": 0.5,
   "n_simulations": 1000,
   "p_max_drawdown_gt_18pct": 0.005,
-  "drawdown_mean": -0.09428604802048178,
-  "drawdown_p5": -0.1429124049721236,
-  "drawdown_p95": -0.058958391757266936,
+  "drawdown_mean": -0.09679012803896202,
+  "drawdown_p5": -0.14586787668888607,
+  "drawdown_p95": -0.05987488947096864,
   "passed_lt_20pct": true,
   "target_probability": 0.2,
   "all_trials": [
@@ -12,9 +12,9 @@
       "position_fraction": 0.5,
       "n_simulations": 1000,
       "p_max_drawdown_gt_18pct": 0.005,
-      "drawdown_mean": -0.09428604802048178,
-      "drawdown_p5": -0.1429124049721236,
-      "drawdown_p95": -0.058958391757266936,
+      "drawdown_mean": -0.09679012803896202,
+      "drawdown_p5": -0.14586787668888607,
+      "drawdown_p95": -0.05987488947096864,
       "passed_lt_20pct": true
     }
   ]

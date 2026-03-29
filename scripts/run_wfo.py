@@ -25,8 +25,8 @@ def main() -> None:
         train_idx, test_idx = sets
         train_df = df.iloc[list(train_idx)].reset_index(drop=True)
         test_df = df.iloc[list(test_idx)].reset_index(drop=True)
-        train_metrics = run_breakout_backtest(train_df, entry_window=25, exit_window=20, ma_filter_window=None, fees=0.001, slippage=0.0005, position_fraction=1.0, entry_split_steps=1)
-        test_metrics = run_breakout_backtest(test_df, entry_window=25, exit_window=20, ma_filter_window=None, fees=0.001, slippage=0.0005, position_fraction=1.0, entry_split_steps=1)
+        train_metrics = run_breakout_backtest(train_df, entry_window=25, exit_window=20, ma_filter_window=None, fees=0.001, slippage=0.001, position_fraction=1.0, entry_split_steps=1)
+        test_metrics = run_breakout_backtest(test_df, entry_window=25, exit_window=20, ma_filter_window=None, fees=0.001, slippage=0.001, position_fraction=1.0, entry_split_steps=1)
         windows.append({
             "window_id": len(windows) + 1,
             "train_start": train_df["date"].iloc[0].strftime("%Y-%m-%d"),
@@ -59,3 +59,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

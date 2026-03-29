@@ -1,0 +1,11 @@
+{
+  "signal_count": 291,
+  "mean_position_fraction": 0.3524862345360825,
+  "min_position_fraction": 0.13479486999999998,
+  "max_position_fraction": 0.58783439,
+  "p25_position_fraction": 0.27755780500000005,
+  "p75_position_fraction": 0.409715905,
+  "over_60pct_count": 0,
+  "atr_self_test_passed": true,
+  "position_self_test_passed": true
+}

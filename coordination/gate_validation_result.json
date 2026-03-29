@@ -1,0 +1,114 @@
+{
+  "date_range": [
+    "2018-01-01",
+    "2018-12-31"
+  ],
+  "trading_days": 243,
+  "trend_gate_trigger_days": 202,
+  "drawdown_gate_trigger_days": 193,
+  "breadth_gate_trigger_days": 109,
+  "vol_gate_trigger_days": 153,
+  "total_blocked_days": 231,
+  "sample_blocked_days": [
+    {
+      "date": "2018-01-02",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0123 > p80=0.0099"
+    },
+    {
+      "date": "2018-01-03",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0123 > p80=0.0099"
+    },
+    {
+      "date": "2018-01-04",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0121 > p80=0.0099"
+    },
+    {
+      "date": "2018-01-05",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0116 > p80=0.0099"
+    },
+    {
+      "date": "2018-01-08",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0114 > p80=0.0099"
+    },
+    {
+      "date": "2018-01-09",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=39.23% < 40.00%"
+    },
+    {
+      "date": "2018-01-10",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=24.79% < 40.00%"
+    },
+    {
+      "date": "2018-01-12",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=29.20% < 40.00%"
+    },
+    {
+      "date": "2018-01-15",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=15.12% < 40.00%"
+    },
+    {
+      "date": "2018-01-26",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=35.24% < 40.00%"
+    },
+    {
+      "date": "2018-01-29",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=21.53% < 40.00%"
+    },
+    {
+      "date": "2018-01-31",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=18.60% < 40.00%"
+    },
+    {
+      "date": "2018-02-01",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=12.12% < 40.00%"
+    },
+    {
+      "date": "2018-02-05",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=36.79% < 40.00%"
+    },
+    {
+      "date": "2018-02-06",
+      "blocked_by": "BreadthGate",
+      "reason": "adv_ratio=3.90% < 40.00%"
+    },
+    {
+      "date": "2018-02-07",
+      "blocked_by": "VolGate",
+      "reason": "vol=0.0130 > p80=0.0098"
+    },
+    {
+      "date": "2018-02-08",
+      "blocked_by": "TrendGate",
+      "reason": "close=3.4000 < ma120=3.4110"
+    },
+    {
+      "date": "2018-02-09",
+      "blocked_by": "DrawdownGate",
+      "reason": "drawdown=-14.92%"
+    },
+    {
+      "date": "2018-02-12",
+      "blocked_by": "DrawdownGate",
+      "reason": "drawdown=-13.47%"
+    },
+    {
+      "date": "2018-02-13",
+      "blocked_by": "DrawdownGate",
+      "reason": "drawdown=-12.23%"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>Strategy Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fff; color: #111; margin: 24px; }
+    h1,h2 { margin-bottom: 8px; }
+    .block { border: 1px solid #ddd; padding: 16px; margin-bottom: 16px; }
+    .ok { color: #0a7a28; font-weight: bold; }
+    .bad { color: #b00020; font-weight: bold; }
+    table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .metric { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>510300 趋势突破（entry=25, exit=20）</h1>
+  <div class="block">
+    <h2>区块1：策略基本信息</h2>
+    <p><span class="metric">当前状态：</span>仿真中</p>
+    <p><span class="metric">报告生成时间：</span>2026-03-29 20:10:09</p>
+  </div>
+
+  <div class="block">
+    <h2>区块2：回测核心指标（修正后口径）</h2>
+    <table>
+      <tr><th>指标</th><th>数值</th></tr>
+      <tr><td>Sharpe</td><td><strong>0.5204</strong></td></tr>
+      <tr><td>最大回撤</td><td><strong>-16.27%</strong></td></tr>
+      <tr><td>年化收益</td><td><strong>4.72%</strong></td></tr>
+      <tr><td>交易次数</td><td><strong>29</strong></td></tr>
+      <tr><td>胜率</td><td><strong>55.17%</strong></td></tr>
+      <tr><td>WFO ratio</td><td><strong>0.6707</strong></td></tr>
+      <tr><td>MC P(max_dd&gt;18%)</td><td><strong>0.005</strong></td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>区块3：Gate 系统状态（当日）</h2>
+    <p>今日是否允许入场：
+      <span class="bad">阻断</span>
+    </p>
+    <table>
+      <tr><th>Gate</th><th>状态</th><th>原因</th></tr>
+      
+      <tr>
+        <td>DrawdownGate</td>
+        <td><span class="ok">允许</span></td>
+        <td>-</td>
+      </tr>
+      
+      <tr>
+        <td>TrendGate</td>
+        <td><span class="bad">阻断</span></td>
+        <td>close=4.5080 < ma120=4.6321</td>
+      </tr>
+      
+      <tr>
+        <td>BreadthGate</td>
+        <td><span class="ok">允许</span></td>
+        <td>-</td>
+      </tr>
+      
+      <tr>
+        <td>VolGate</td>
+        <td><span class="ok">允许</span></td>
+        <td>-</td>
+      </tr>
+      
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>区块4：仓位管理参数</h2>
+    <p><span class="metric">ATR period：</span>14</p>
+    <p><span class="metric">ATR multiplier：</span>2.0</p>
+    <p><span class="metric">risk_per_trade：</span>1.0%</p>
+    <p><span class="metric">当前建议仓位：</span>0.0%（0股）</p>
+    <p><span class="metric">当前建议止损：</span>-</p>
+  </div>
+
+  <div class="block">
+    <h2>区块5：仿真日志摘要</h2>
+    
+    <p>当前无 `paper_trade_log.csv`，仅完成信号级仿真。</p>
+    
+  </div>
+</body>
+</html>

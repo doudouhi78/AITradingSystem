@@ -28,7 +28,7 @@ def simulate(position_fraction: float) -> dict[str, float | int | bool]:
     prev_low = close.shift(1).rolling(20).min()
     entries = (close > prev_high).shift(1, fill_value=False).astype(bool)
     exits = (close < prev_low).shift(1, fill_value=False).astype(bool)
-    pf = vbt.Portfolio.from_signals(open_, entries=entries, exits=exits, init_cash=1.0, size=position_fraction, size_type="percent", fees=0.001, slippage=0.0005, freq="1D", direction="longonly", accumulate=False)
+    pf = vbt.Portfolio.from_signals(open_, entries=entries, exits=exits, init_cash=1.0, size=position_fraction, size_type="percent", fees=0.001, slippage=0.001, freq="1D", direction="longonly", accumulate=False)
     trade_returns = pf.trades.records_readable["Return"].astype(float).to_numpy() * position_fraction
     rng = np.random.default_rng(42)
     sims = [compute_max_drawdown_from_trade_returns(rng.permutation(trade_returns)) for _ in range(1000)]
@@ -64,3 +64,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -16,7 +16,7 @@ CREATED_AT = "2026-03-29T00:00:00+08:00"
 INSTRUMENT = "510300"
 START_DATE = "2016-01-01"
 FEES = 0.001
-SLIPPAGE = 0.0005
+SLIPPAGE = 0.001
 ENTRY_WINDOW = 25
 EXIT_WINDOW = 20
 
@@ -40,7 +40,7 @@ def main() -> None:
         ma_filter_window=None,
         fees=FEES,
         slippage=SLIPPAGE,
-        position_fraction=1.0,
+        position_fraction=0.5,
         entry_split_steps=1,
     )
 
@@ -49,7 +49,7 @@ def main() -> None:
 
     rule_expression["rules_version"] = EXPERIMENT_ID
     rule_expression["created_at"] = CREATED_AT
-    rule_expression["execution_assumption"] = "信号收盘生成，次日开盘执行，单标的满仓，费用0.1%，滑点0.05%，本地Parquet口径"
+    rule_expression["execution_assumption"] = "信号收盘生成，次日开盘执行，单标的半仓，费用0.1%，滑点0.1%，本地Parquet口径"
     rule_expression["notes"] = [
         "entry_window=25",
         "exit_window=20",
@@ -80,16 +80,16 @@ def main() -> None:
         "rule_expression": rule_expression,
         "metrics_summary": metrics,
         "risk_position_note": {
-            "position_sizing_method": "single_instrument_full_position",
-            "max_position": 1.0,
-            "risk_budget": "基线重建阶段按满仓固定比较口径",
+            "position_sizing_method": "capped_fractional_position",
+            "max_position": 0.5,
+            "risk_budget": "基线重建阶段按半仓固定比较口径",
             "drawdown_tolerance": "not_recorded",
             "exit_after_signal_policy": "signal_on_close_execute_next_open",
             "notes": [
-                "Commander 指定满仓重建基线",
+                "Commander 指定半仓重建基线",
                 "该结果替代 exp-20260328-007 作为当前本地 Parquet 口径基线",
             ],
-            "reasoning": "本阶段目标是重建统一口径下的 VectorBT 基线，不在此步骤加入仓位收缩。",
+            "reasoning": "本阶段目标是按修正滑点与半仓口径重建统一 VectorBT 基线。",
         },
         "review_outcome": {
             "review_status": "reviewed",
@@ -122,7 +122,8 @@ def main() -> None:
         "opportunity_source": opportunity_source,
     }
 
-    notes_markdown = """# 510300 Parquet 基线重建\n\n- replaces: exp-20260328-007-manual-entry25-exit20\n- source_data: D:\\AITradingSystem\\runtime\\market_data\\cn_etf\\510300.parquet\n- params: entry=25, exit=20, ma=0\n- execution: signal_on_close_execute_next_open\n- costs: fee=0.1%, slippage=0.05%\n\n## result\n- total_return: {total_return:.6f}\n- annual_return: {annual_return:.6f}\n- max_drawdown: {max_drawdown:.6f}\n- sharpe: {sharpe:.6f}\n- trade_count: {trade_count}\n- win_rate: {win_rate:.6f}\n\n## note\n- Commander 已要求以本地 Parquet 为唯一数据口径\n- 本实验用于替换 exp-007，作为后续交叉验证的新基线\n""".format(**metrics)
+    notes_markdown = """# 510300 Parquet 基线重建\n\n- replaces: exp-20260328-007-manual-entry25-exit20\n- source_data: D:\\AITradingSystem\\runtime\\market_data\\cn_etf\\510300.parquet\n- params: entry=25, exit=20, ma=0\n- execution: signal_on_close_execute_next_open\n- position: 50%
+- costs: fee=0.1%, slippage=0.1%\n\n## result\n- total_return: {total_return:.6f}\n- annual_return: {annual_return:.6f}\n- max_drawdown: {max_drawdown:.6f}\n- sharpe: {sharpe:.6f}\n- trade_count: {trade_count}\n- win_rate: {win_rate:.6f}\n\n## note\n- Commander 已要求以本地 Parquet 为唯一数据口径\n- 本实验用于替换 exp-007，作为后续交叉验证的新基线\n""".format(**metrics)
 
     artifacts = write_experiment_artifacts(
         research_task=research_task,
@@ -134,4 +135,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 

@@ -16,7 +16,7 @@ def run_experiment(
     exit_window: int,
     date_start: str = "2016-01-01",
     fees: float = 0.001,
-    slippage: float = 0.0005,
+    slippage: float = 0.001,
     position_fraction: float = 1.0,
 ) -> dict:
     """从Parquet加载数据，跑VectorBT，返回metrics dict。"""
@@ -40,3 +40,4 @@ def print_metrics(metrics: dict) -> None:
             **metrics
         )
     )
+

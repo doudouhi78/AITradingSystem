@@ -1,0 +1,19 @@
+{
+  "module": "A",
+  "slippage_old": 0.0005,
+  "slippage_new": 0.001,
+  "backtest_comparison": {
+    "sharpe_old": 0.5753,
+    "sharpe_new": 0.5203991465623149,
+    "max_dd_old": -0.2876,
+    "max_dd_new": -0.16268994784737256,
+    "annual_return_old": 0.094,
+    "annual_return_new": 0.047213612258210524
+  },
+  "wfo_ratio_old": 0.682,
+  "wfo_ratio_new": 0.6706868951187792,
+  "mc_p_old": 0.005,
+  "mc_p_new": 0.005,
+  "module_a_passed": true,
+  "notes": "滑点从 0.05% 修正到 0.1% 后，基线 Sharpe/WFO 小幅下降，MC 风险约束仍通过。"
+}
