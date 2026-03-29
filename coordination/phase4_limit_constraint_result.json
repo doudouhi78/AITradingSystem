@@ -1,0 +1,13 @@
+{
+  "instrument": "000001",
+  "limit_up_days": 7,
+  "limit_down_days": 2,
+  "vbt_trades_on_limit_days": 6,
+  "hikyuu_trades_on_limit_days": 1,
+  "constraint_effective": true,
+  "vbt_sharpe": 0.30701030451474476,
+  "vbt_trade_count": 35,
+  "hikyuu_sharpe": 0.19957315987526195,
+  "hikyuu_trade_count": 35,
+  "notes": "Hikyuu package unavailable in current environment; used Hikyuu-style limit-up/down constrained daily execution fallback for WI-403."
+}

@@ -1,20 +1,6 @@
-## Sprint 5 结果
-### 任务A（DraftCardV1）：
-- 字段清单：card_id, title, instrument, strategy_family, hypothesis, entry_rule, exit_rule, key_params, created_at
-- 是否新增成功：是
-
-### 任务B（草稿卡示例）：
-- 策略名称：510300 双均线交叉草稿
-- hypothesis内容：当宽基 ETF 进入中期趋势阶段时，短周期均线会先于长周期均线拐头并形成延续。双均线交叉能用简单规则捕捉趋势开始，并在趋势减弱时退出。
-
-### 任务C（验证链）：
-- 代码行数：18
-- experiment_id：exp-20260329-009-ma10-ma30-cross
-- Sharpe：0.156
-- Max Drawdown：-0.412
-- Trade Count：46
-- 能否跑通：能
-
+## Sprint 6 结果
+### WI-403（涨跌停约束）：选定标的=000001，涨跌停日VBT成交=6，Hikyuu成交=1，约束是否生效=是
+### 备注：当前环境无 hikyuu 包，使用 Hikyuu-style 日线涨跌停约束回测兜底实现，结果已写入 coordination/phase4_limit_constraint_result.json
 ### pytest：49 passed
 
 BUILDER_DONE
