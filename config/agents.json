@@ -1,0 +1,24 @@
+{
+  "market_architect": {
+    "mode": "live",
+    "backend": "codex",
+    "provider": "custom_codex",
+    "model": "gpt-5.4",
+    "temperature": 0.1,
+    "workspace_root": "d:\\AITradingSystem\\runtime\\workspaces\\project_workspace",
+    "memory_root": "d:\\AITradingSystem\\runtime\\role_memory\\market_architect",
+    "base_url": "",
+    "api_key": ""
+  },
+  "strategy_operator": {
+    "mode": "live",
+    "backend": "codex",
+    "provider": "custom_codex",
+    "model": "gpt-5.4",
+    "temperature": 0.1,
+    "workspace_root": "d:\\AITradingSystem\\runtime\\workspaces\\project_workspace",
+    "memory_root": "d:\\AITradingSystem\\runtime\\role_memory\\strategy_operator",
+    "base_url": "",
+    "api_key": ""
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "experiment_id": "exp-20260329-008-parquet-entry25-exit20",
+  "wfo_summary": {
+    "window_count": 6,
+    "train_sharpe_mean": 0.444350126913631,
+    "test_sharpe_mean": 0.3032596743781786,
+    "ratio": 0.6824790992737212,
+    "ratio_gt_0_5": true,
+    "all_test_sharpes_gt_0": false
+  },
+  "mc_summary": {
+    "n_simulations": 1000,
+    "p_max_drawdown_gt_18pct": 0.493,
+    "drawdown_mean": -0.18286133417892228,
+    "drawdown_p5": -0.26987868698594314,
+    "drawdown_p95": -0.11633203271457682
+  },
+  "param_search_summary": "entry25/exit20 Sharpe=0.575，在 49 组参数中排名第 1，周边局部范围 Sharpe [0.329, 0.575]。",
+  "generated_at": "2026-03-29T14:27:23.255266+08:00"
+}

@@ -1,0 +1,16 @@
+{
+  "method": "手写纯Python（Sharpe按VectorBT口径）",
+  "data_start": "2016-01-04",
+  "data_end": "2026-03-27",
+  "trade_count": 29,
+  "sharpe": 0.5753406198372503,
+  "max_drawdown": -0.2876209126043312,
+  "total_return": 0.8427283329077342,
+  "annual_return": 0.06159721617748759,
+  "vectorbt_sharpe": 0.5753406198372503,
+  "vectorbt_max_drawdown": -0.28762091260433165,
+  "vectorbt_total_return": 0.8427283329077355,
+  "sharpe_gap": 0.0,
+  "max_drawdown_gap": 4.440892098500626e-16,
+  "passed": true
+}

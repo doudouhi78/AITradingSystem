@@ -1,0 +1,7 @@
+{
+  "n_simulations": 1000,
+  "p_max_drawdown_gt_18pct": 0.493,
+  "drawdown_mean": -0.18286133417892228,
+  "drawdown_p5": -0.26987868698594314,
+  "drawdown_p95": -0.11633203271457682
+}

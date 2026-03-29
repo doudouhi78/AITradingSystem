@@ -1,0 +1,12 @@
+akshare
+vectorbt
+mlflow
+pyqlib
+fastapi
+uvicorn
+pandas
+pandera
+optuna
+pytest
+yfinance
+pyarrow
