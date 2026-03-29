@@ -47,6 +47,10 @@ class GateScheduler:
                 "reason": first["reason"],
                 "gate_details": details,
             }
+        if self.config.merge_strategy != "strict":
+            raise NotImplementedError(
+                f"merge_strategy='{self.config.merge_strategy}' is not implemented. Only 'strict' is supported."
+            )
         return {
             "allowed": True,
             "blocked_by": None,

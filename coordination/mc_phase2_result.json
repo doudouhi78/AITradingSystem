@@ -1,0 +1,10 @@
+{
+  "position_fraction": 0.3524862345360825,
+  "n_simulations": 1000,
+  "p_max_drawdown_gt_18pct": 0.0,
+  "drawdown_mean": -0.06887949475884424,
+  "drawdown_p5": -0.10463860005062463,
+  "drawdown_p95": -0.04237716192358794,
+  "passed_lt_20pct": true,
+  "note": "Dynamic position MC using mean_position_fraction=0.352 from R-based sizing"
+}

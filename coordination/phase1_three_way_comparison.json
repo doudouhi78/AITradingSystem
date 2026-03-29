@@ -1,0 +1,23 @@
+{
+  "experiment": "exp-007 / entry=25 exit=20 / 510300",
+  "vectorbt": {
+    "sharpe": 0.5753,
+    "max_drawdown": -0.2876,
+    "total_return": 0.8427,
+    "annual_return": 0.0592
+  },
+  "hikyuu": {
+    "sharpe": 0.5571,
+    "max_drawdown": -0.2876,
+    "total_return": 0.8015,
+    "annual_return": 0.0592,
+    "sharpe_gap_vs_vbt": 0.0183
+  },
+  "quantstats": {
+    "sharpe": 0.4324,
+    "max_drawdown": -0.1627,
+    "annual_return": 0.0324
+  },
+  "cross_validation_passed": true,
+  "notes": "VBT vs Hikyuu gap=0.018 < 0.05 threshold, passed"
+}

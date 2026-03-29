@@ -89,6 +89,11 @@ def main() -> None:
     print(f"日期: {run_date}")
     print(f"信号: {signal}")
     print(f"依据: {rationale}")
+    print(
+        "Gate状态: "
+        f"{'允许' if gate_result['allowed'] else '阻断'}"
+        f"（blocked_by={gate_result['blocked_by']}, reason={gate_result['reason']}）"
+    )
     if gate_block_message:
         print(gate_block_message)
     if signal == "BUY":

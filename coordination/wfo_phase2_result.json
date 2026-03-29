@@ -1,0 +1,82 @@
+{
+  "window_count": 6,
+  "train_sharpe_mean": 0.41908660860753627,
+  "test_sharpe_mean": -0.6971380454594387,
+  "ratio": -1.6634701065151198,
+  "ratio_gt_0_5": false,
+  "gate_blocked_total": 36,
+  "windows": [
+    {
+      "window_id": 1,
+      "train_start": "2016-01-04",
+      "train_end": "2019-02-12",
+      "test_start": "2019-02-13",
+      "test_end": "2020-02-25",
+      "train_sharpe": 0.46015987096232536,
+      "test_sharpe": -0.19691042906059344,
+      "gate_blocked": 0,
+      "trade_count": 8,
+      "test_total_return": -0.017640331598401504
+    },
+    {
+      "window_id": 2,
+      "train_start": "2017-01-13",
+      "train_end": "2020-02-25",
+      "test_start": "2020-02-26",
+      "test_end": "2021-03-09",
+      "train_sharpe": 0.22496615148172408,
+      "test_sharpe": 1.1272931203327046,
+      "gate_blocked": 3,
+      "trade_count": 6,
+      "test_total_return": 0.07552412375624384
+    },
+    {
+      "window_id": 3,
+      "train_start": "2018-01-24",
+      "train_end": "2021-03-09",
+      "test_start": "2021-03-10",
+      "test_end": "2022-03-22",
+      "train_sharpe": 0.5311499389617335,
+      "test_sharpe": -0.7966452996861166,
+      "gate_blocked": 1,
+      "trade_count": 4,
+      "test_total_return": -0.019917606963036905
+    },
+    {
+      "window_id": 4,
+      "train_start": "2019-02-13",
+      "train_end": "2022-03-22",
+      "test_start": "2022-03-23",
+      "test_end": "2023-04-04",
+      "train_sharpe": 0.12963074859952928,
+      "test_sharpe": -0.14091650040228146,
+      "gate_blocked": 14,
+      "trade_count": 4,
+      "test_total_return": -0.0029555078521478206
+    },
+    {
+      "window_id": 5,
+      "train_start": "2020-02-26",
+      "train_end": "2023-04-04",
+      "test_start": "2023-04-06",
+      "test_end": "2024-04-19",
+      "train_sharpe": 1.1472709009454487,
+      "test_sharpe": -2.9282453126031873,
+      "gate_blocked": 11,
+      "trade_count": 6,
+      "test_total_return": -0.058240488031967796
+    },
+    {
+      "window_id": 6,
+      "train_start": "2021-03-10",
+      "train_end": "2024-04-19",
+      "test_start": "2024-04-22",
+      "test_end": "2025-05-08",
+      "train_sharpe": 0.02134204069445669,
+      "test_sharpe": -1.247403851337158,
+      "gate_blocked": 7,
+      "trade_count": 6,
+      "test_total_return": -0.031227774985014722
+    }
+  ]
+}
