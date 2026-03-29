@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
-from ai_dev_os.etf_breakout_runtime import run_breakout_backtest
+import pandas as pd
 import vectorbt as vbt
+
+from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
 EXPERIMENT_ID = "exp-20260329-008-parquet-entry25-exit20"
 EXPERIMENT_ROOT = Path(r"D:\AITradingSystem\runtime\experiments") / EXPERIMENT_ID
@@ -20,26 +21,17 @@ def build_portfolio():
     prev_low = close.shift(1).rolling(20).min()
     entries = (close > prev_high).shift(1, fill_value=False).astype(bool)
     exits = (close < prev_low).shift(1, fill_value=False).astype(bool)
-    pf = vbt.Portfolio.from_signals(
-        open_,
-        entries=entries,
-        exits=exits,
-        init_cash=1.0,
-        size=float("inf"),
-        fees=0.001,
-        slippage=0.0005,
-        freq="1D",
-        direction="longonly",
-        accumulate=False,
-    )
-    return df, pf
+    pf = vbt.Portfolio.from_signals(open_, entries=entries, exits=exits, init_cash=1.0, size=float("inf"), fees=0.001, slippage=0.0005, freq="1D", direction="longonly", accumulate=False)
+    returns = pd.Series(pf.returns().values, index=pd.to_datetime(df["date"]), name="returns")
+    return pf, returns
 
 
-def render_fallback_html(metrics: dict[str, float]) -> None:
+def render_fallback_html(metrics: dict[str, float], reason: str) -> None:
     html = f"""<html><head><meta charset=\"utf-8\"><title>{EXPERIMENT_ID} Tearsheet</title></head>
 <body>
 <h1>{EXPERIMENT_ID} Tearsheet</h1>
-<p>quantstats 不可用，已生成降级版本地 HTML 报告。</p>
+<p>quantstats 失败，已生成降级版本地 HTML 报告。</p>
+<p>reason: {reason}</p>
 <ul>
 <li>Sharpe: {metrics['sharpe']:.6f}</li>
 <li>Sortino: {metrics['sortino']:.6f}</li>
@@ -52,8 +44,7 @@ def render_fallback_html(metrics: dict[str, float]) -> None:
 
 
 def main() -> None:
-    _, pf = build_portfolio()
-    returns = pf.returns()
+    pf, returns = build_portfolio()
     metrics = {
         "sharpe": float(pf.sharpe_ratio()),
         "sortino": float(pf.sortino_ratio()),
@@ -67,11 +58,13 @@ def main() -> None:
 
         qs.reports.html(returns, output=str(TEARSHEET_PATH), title=EXPERIMENT_ID)
         backend = "quantstats"
-    except Exception:
-        render_fallback_html(metrics)
+        reason = ""
+    except Exception as exc:
+        render_fallback_html(metrics, str(exc))
         backend = "fallback_html"
+        reason = str(exc)
 
-    print(json.dumps({"tearsheet_path": str(TEARSHEET_PATH), "backend": backend, "metrics": metrics}, ensure_ascii=False, indent=2))
+    print(json.dumps({"tearsheet_path": str(TEARSHEET_PATH), "backend": backend, "reason": reason, "metrics": metrics}, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

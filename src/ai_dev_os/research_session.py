@@ -17,6 +17,7 @@ def run_experiment(
     date_start: str = "2016-01-01",
     fees: float = 0.001,
     slippage: float = 0.0005,
+    position_fraction: float = 1.0,
 ) -> dict:
     """从Parquet加载数据，跑VectorBT，返回metrics dict。"""
     df = load_etf_from_parquet(instrument, date_start, "2100-01-01")
@@ -27,7 +28,7 @@ def run_experiment(
         ma_filter_window=None,
         fees=fees,
         slippage=slippage,
-        position_fraction=1.0,
+        position_fraction=position_fraction,
         entry_split_steps=1,
     )
 
