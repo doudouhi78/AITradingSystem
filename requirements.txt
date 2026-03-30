@@ -10,3 +10,5 @@ optuna
 pytest
 yfinance
 pyarrow
+alphalens-reloaded
+pandas_ta
