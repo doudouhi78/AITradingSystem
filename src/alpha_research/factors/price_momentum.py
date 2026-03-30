@@ -34,7 +34,20 @@ def factor_momentum_60d(prices: pd.DataFrame) -> pd.Series:
     return _stack_factor(momentum, "momentum_60d")
 
 
+def factor_momentum_120d(prices: pd.DataFrame) -> pd.Series:
+    prices = prices.sort_index()
+    momentum = prices.pct_change(120, fill_method=None).shift(1)
+    return _stack_factor(momentum, "momentum_120d")
+
+
 def factor_momentum_1d_reversal(prices: pd.DataFrame) -> pd.Series:
     prices = prices.sort_index()
     reversal = -prices.pct_change(1, fill_method=None).shift(1)
     return _stack_factor(reversal, "momentum_1d_reversal")
+
+
+def factor_52wk_high(prices: pd.DataFrame) -> pd.Series:
+    prices = prices.sort_index()
+    rolling_high = prices.rolling(252).max()
+    proximity = (prices / rolling_high).shift(1)
+    return _stack_factor(proximity, "factor_52wk_high")

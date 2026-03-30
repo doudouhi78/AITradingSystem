@@ -1,0 +1,102 @@
+{
+  "research_task": {
+    "task_id": "RTS-ALPHA-021",
+    "title": "Alpha 因子组合 v1",
+    "goal": "将成交活跃与价量背离两个 ETF 因子合成为可接 Gate 的候选信号。",
+    "instrument_pool": [
+      "512050",
+      "510300",
+      "159338",
+      "159352",
+      "513330",
+      "588000",
+      "159351",
+      "563360",
+      "513130",
+      "510050",
+      "513090",
+      "159361",
+      "513120",
+      "563800",
+      "159915",
+      "510500",
+      "512880",
+      "588200",
+      "563220",
+      "513060",
+      "159605",
+      "159949",
+      "159509",
+      "512100",
+      "159792",
+      "512480",
+      "560610",
+      "159329",
+      "159920",
+      "512000",
+      "159995",
+      "159919",
+      "159845",
+      "159570",
+      "510900",
+      "510330",
+      "159217",
+      "159629",
+      "560010",
+      "510310",
+      "588080",
+      "515790",
+      "159740",
+      "520500",
+      "159353",
+      "563880",
+      "159529",
+      "513010",
+      "159567",
+      "512760"
+    ],
+    "strategy_family": "alpha_factor_combo",
+    "hypothesis": "成交活跃与价量背离的复合因子在 ETF 横截面上存在可迁移的 10 日 IC。",
+    "constraints": [
+      "cn_etf_top50_liquidity",
+      "train_2020_2024H1_test_2024H2_2025Q3",
+      "top_decile_signal"
+    ],
+    "success_criteria": [
+      "out_sample_ic_positive",
+      "gate_integration_available"
+    ],
+    "created_at": "2026-03-31T00:27:49+08:00",
+    "why_this_task": "Sprint 20 的 ETF 种子因子已经明确，Sprint 21 需要把它们接入组合信号与 Gate。"
+  },
+  "rule_expression": {
+    "rules_version": "alpha_combo_v1",
+    "entry_rule_summary": "每日按复合因子评分选取前 10% ETF 作为多头候选。",
+    "exit_rule_summary": "每日再平衡，跌出前 10% 即退出。",
+    "filters": [
+      "GateScheduler(strict)"
+    ],
+    "execution_assumption": "收盘后计算横截面因子分数，次日执行，Gate 允许才放行。",
+    "created_at": "2026-03-31T00:27:49+08:00",
+    "price_field": "close",
+    "notes": [
+      "weights={\"factor_turnover_20d\": 0.05423, \"factor_volume_price_divergence\": 0.94577}",
+      "gate_status=integrated_via_GateScheduler.evaluate(date, equity_series, etf_df)"
+    ],
+    "method_summary": "成交活跃 + 价量背离双因子复合，配合 Gate 做市场状态过滤。",
+    "design_rationale": "先用 Sprint 20 中 ETF 侧最优两个种子因子做最小组合验证，再决定是否扩展更多因子。"
+  },
+  "dataset_snapshot": {
+    "dataset_version": "cn_market_v1",
+    "data_source": "runtime.market_data.cn_etf/*.parquet",
+    "instrument": "cn_etf_top50",
+    "date_range_start": "2020-01-01",
+    "date_range_end": "2025-09-30",
+    "adjustment_mode": "qfq",
+    "cost_assumption": "not_applicable_for_ic_research",
+    "missing_value_policy": "warmup_only_else_error",
+    "created_at": "2026-03-31T00:27:49+08:00",
+    "selection_reason": "选取中国 ETF 流动性前 50 名，降低信号噪声。",
+    "validation_method": "Optuna 训练期权重搜索 + 样本外 WFO 10 日 Spearman IC。"
+  }
+}

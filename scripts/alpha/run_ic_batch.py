@@ -10,7 +10,7 @@ from alpha_research.data_loader import load_factor_input, load_prices, select_to
 from alpha_research.evaluation.correlation import deduplicate_factors
 from alpha_research.evaluation.ic_pipeline import batch_evaluate
 from alpha_research.evaluation.screening import screen_factor
-from alpha_research.factors import price_momentum, technical, volume_liquidity
+from alpha_research.factors import fundamental, price_momentum, technical, volume_liquidity
 
 ROOT = Path(r"D:\AITradingSystem")
 OUT_PATH = ROOT / "runtime" / "alpha_research" / "phase2" / "ic_batch_result.json"
@@ -20,7 +20,7 @@ UNIVERSES = {
     "etf_top10": ("etf", 10),
     "stock_top50": ("stock", 50),
 }
-MODULES = [price_momentum, volume_liquidity, technical]
+MODULES = [price_momentum, volume_liquidity, fundamental, technical]
 
 
 def load_factor_functions() -> dict[str, callable]:
@@ -49,6 +49,8 @@ def main() -> None:
     result_payload = {
         "start": START,
         "end": END,
+        "candidate_factor_count": len(factor_functions),
+        "candidate_factors": list(factor_functions.keys()),
         "universes": {},
         "summary": {},
     }
@@ -68,7 +70,6 @@ def main() -> None:
                 continue
 
         batch_results = batch_evaluate(factor_series_map, prices, n_jobs=4)
-        result_map = {item["factor_name"]: item for item in batch_results}
         screened = {}
         for item in batch_results:
             passed, reason = screen_factor(item)

@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 import akshare as ak
+import numpy as np
 import pandas as pd
 
 
 def probe_pb_interfaces() -> list[dict[str, Any]]:
     probes: list[dict[str, Any]] = []
-    # market-level only, not stock-specific daily PB
     try:
         df = ak.stock_a_all_pb()
         probes.append({
@@ -93,3 +93,14 @@ def factor_pb_ratio_approx(instruments: list[str], start: str, end: str) -> pd.S
     result.index.names = ['date', 'asset']
     result.name = 'pb_ratio'
     return result
+
+
+def factor_log_market_cap(factor_input: pd.DataFrame) -> pd.Series:
+    close = factor_input['close'].astype(float).unstack('asset')
+    volume = factor_input['volume'].astype(float).unstack('asset')
+    approx_market_cap = (close * volume).replace(0, np.nan)
+    factor = -np.log(approx_market_cap).shift(1)
+    factor = factor.stack(future_stack=True)
+    factor.index.names = ['date', 'asset']
+    factor.name = 'log_market_cap'
+    return factor.replace([np.inf, -np.inf], np.nan).dropna()
