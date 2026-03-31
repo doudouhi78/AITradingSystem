@@ -51,12 +51,12 @@
     "strategy_id": "strat_factor_momentum_v1",
     "strategy_name": "截面动量因子选股",
     "strategy_type": "factor",
-    "status": "pending",
+    "status": "research",
     "created_date": "2026-03-31",
     "last_updated": "2026-03-31",
-    "sharpe": null,
+    "sharpe": 0.904676,
     "wfo_ratio": null,
-    "notes": "factor_registry is empty, strategy4 kept pending by Phase 6 rule",
+    "notes": "Phase 7A factor registry完成，完整回测已生成",
     "retire_reason": null
   }
 ]

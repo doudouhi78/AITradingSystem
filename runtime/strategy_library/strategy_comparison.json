@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-31T12:59:30.467612+08:00",
+  "generated_at": "2026-03-31T15:26:45.272988+08:00",
   "status_filter": [],
   "strategies": [
     {
@@ -8,12 +8,12 @@
       "strategy_type": "trend",
       "status": "observation",
       "sharpe": 0.520399,
-      "max_drawdown": -0.16268994784737256,
-      "annual_return": 0.047213612258210524,
-      "win_rate": 0.5517241379310345,
-      "trade_count": 29,
+      "max_drawdown": null,
+      "annual_return": null,
+      "win_rate": null,
+      "trade_count": null,
       "correlation_with_baseline": null,
-      "notes": "Parquet 口径当前旧突破基线，保留 observation；指标补全自 exp-20260329-008-parquet-entry25-exit20"
+      "notes": "Parquet 口径当前旧突破基线，保留 observation"
     },
     {
       "strategy_id": "strat_ma_cross_v1",
@@ -58,31 +58,40 @@
       "strategy_id": "strat_factor_momentum_v1",
       "strategy_name": "截面动量因子选股",
       "strategy_type": "factor",
-      "status": "pending",
-      "sharpe": null,
-      "max_drawdown": null,
-      "annual_return": null,
-      "win_rate": null,
-      "trade_count": null,
-      "correlation_with_baseline": null,
-      "notes": "factor_registry is empty, strategy4 kept pending by Phase 6 rule"
+      "status": "research",
+      "sharpe": 0.9046763425841814,
+      "max_drawdown": 0.2797143642711561,
+      "annual_return": 0.1985430787591249,
+      "win_rate": 0.5240143369175627,
+      "trade_count": 69,
+      "correlation_with_baseline": 0.1619128279506118,
+      "notes": "Phase 7A factor registry完成，完整回测已生成"
     }
   ],
   "correlation_matrix": {
     "strat_ma_cross_v1": {
       "strat_ma_cross_v1": 1.0,
       "strat_rsi_reversion_v1": 0.258288,
-      "strat_vol_breakout_v1": 0.152299
+      "strat_vol_breakout_v1": 0.152299,
+      "strat_factor_momentum_v1": 0.117037
     },
     "strat_rsi_reversion_v1": {
       "strat_ma_cross_v1": 0.258288,
       "strat_rsi_reversion_v1": 1.0,
-      "strat_vol_breakout_v1": 0.721076
+      "strat_vol_breakout_v1": 0.721076,
+      "strat_factor_momentum_v1": 0.08503
     },
     "strat_vol_breakout_v1": {
       "strat_ma_cross_v1": 0.152299,
       "strat_rsi_reversion_v1": 0.721076,
-      "strat_vol_breakout_v1": 1.0
+      "strat_vol_breakout_v1": 1.0,
+      "strat_factor_momentum_v1": 0.09309
+    },
+    "strat_factor_momentum_v1": {
+      "strat_ma_cross_v1": 0.117037,
+      "strat_rsi_reversion_v1": 0.08503,
+      "strat_vol_breakout_v1": 0.09309,
+      "strat_factor_momentum_v1": 1.0
     }
   },
   "warnings": [

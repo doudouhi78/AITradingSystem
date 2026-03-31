@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "factor_name": "factor_turnover_20d",
+    "status": "seed",
+    "ic_mean_10d": -0.020689360230295845,
+    "icir_10d": -0.05168095968029803,
+    "decay_halflife_days": 1,
+    "universe": "etf_top10",
+    "combo_membership": ["factor_combo_v1"],
+    "combo_weight": 0.007848,
+    "in_sample_ic": -0.007750689393417923,
+    "out_of_sample_ic": 0.004099635324619592,
+    "registered_date": "2026-03-31",
+    "notes": "Phase 3 WFO 选出的种子因子，换手率20日因子，ICIR低但被WFO优化器选入combo，权重极小(0.78%)"
+  },
+  {
+    "factor_name": "factor_volume_price_divergence",
+    "status": "seed",
+    "ic_mean_10d": -0.004307909718919416,
+    "icir_10d": -0.00987126983441584,
+    "decay_halflife_days": 1,
+    "universe": "etf_top10",
+    "combo_membership": ["factor_combo_v1"],
+    "combo_weight": 0.992152,
+    "in_sample_ic": -0.007750689393417923,
+    "out_of_sample_ic": 0.004099635324619592,
+    "registered_date": "2026-03-31",
+    "notes": "Phase 3 WFO 选出的主要种子因子，量价背离因子，占combo权重99.2%，样本外IC正值(0.0041)"
+  }
+]
