@@ -8,6 +8,16 @@ import vectorbt as vbt
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+if not (REPO_ROOT / "runtime" / "market_data").exists():
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "runtime" / "market_data"
+        if candidate.exists():
+            REPO_ROOT = parent
+            break
+    else:
+        fallback_root = Path(r"D:\AITradingSystem")
+        if (fallback_root / "runtime" / "market_data").exists():
+            REPO_ROOT = fallback_root
 MARKET_DATA_ROOT = REPO_ROOT / "runtime" / "market_data"
 
 
@@ -157,3 +167,4 @@ def run_breakout_backtest(
             f"slippage={slippage}",
         ],
     }
+

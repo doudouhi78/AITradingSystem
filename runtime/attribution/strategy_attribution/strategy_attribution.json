@@ -1,9 +1,10 @@
 {
-  "annual_return": 0.2864340443761524,
-  "sharpe": 2.4227816305614908e+16,
-  "max_drawdown": 0.0,
-  "alpha": NaN,
-  "beta": NaN,
-  "benchmark_annual_return": 0.16317653888658268,
-  "excess_return": 0.12325750548956971
+  "annual_return": 0.03236334478155123,
+  "sharpe": 0.43240470794131797,
+  "max_drawdown": -0.1626899478473726,
+  "alpha": 0.0303955809346681,
+  "beta": 0.07115168846270921,
+  "benchmark_annual_return": 0.05060881097719294,
+  "excess_return": -0.018245466195641713,
+  "note": null
 }

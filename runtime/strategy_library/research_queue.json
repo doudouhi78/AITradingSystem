@@ -1,0 +1,29 @@
+[
+  {
+    "hypothesis_id": "hyp_001",
+    "hypothesis": "A股北向资金持续净买入的行业，会在接下来2-4周获得超额收益",
+    "factor_candidate": "northbound_sector_flow",
+    "status": "pending",
+    "priority": 1,
+    "data_requirement": "northbound_flow（已有）+ 行业分类（已有）",
+    "created_date": "2026-03-31"
+  },
+  {
+    "hypothesis_id": "hyp_002",
+    "hypothesis": "融资余额扩张最快的行业在拥挤后会出现短期均值回归机会",
+    "factor_candidate": "margin_balance_acceleration",
+    "status": "pending",
+    "priority": 2,
+    "data_requirement": "margin_balance（已有）+ 行业分类（已有）",
+    "created_date": "2026-03-31"
+  },
+  {
+    "hypothesis_id": "hyp_003",
+    "hypothesis": "成交额放大且价格背离的强势 ETF 在后续 10 个交易日延续概率更高",
+    "factor_candidate": "volume_price_divergence_etf",
+    "status": "pending",
+    "priority": 2,
+    "data_requirement": "ETF parquet（已有）+ factor_combo 种子因子（已有）",
+    "created_date": "2026-03-31"
+  }
+]

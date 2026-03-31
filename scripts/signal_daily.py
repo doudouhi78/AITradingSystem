@@ -1,15 +1,23 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
+ROOT = Path(r"D:\AITradingSystem")
+SRC = ROOT / 'src'
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from ai_dev_os.gate import GateScheduler
 from ai_dev_os.risk import compute_quantity, compute_stop_price, wilder_atr
+from attribution.report_generator import generate_monthly_report
 
-ROOT = Path(r"D:\AITradingSystem")
 DATA_PATH = ROOT / "runtime" / "market_data" / "cn_etf" / "510300.parquet"
 SIGNAL_DIR = ROOT / "runtime" / "paper_trading" / "signals"
 FORWARD_SIM_PATH = ROOT / "runtime" / "paper_trading" / "forward_sim_equity.csv"
@@ -26,11 +34,43 @@ def load_equity_series() -> list[float]:
     return [1.0]
 
 
+def load_trading_dates(data_path: Path = DATA_PATH) -> pd.DatetimeIndex:
+    df = pd.read_parquet(data_path, columns=['trade_date']).dropna()
+    dates = pd.to_datetime(df['trade_date']).sort_values().drop_duplicates()
+    return pd.DatetimeIndex(dates)
+
+
+
+def is_month_end(today: str | pd.Timestamp | datetime, trading_dates: pd.DatetimeIndex | None = None) -> bool:
+    trade_date = pd.Timestamp(today).normalize()
+    schedule = trading_dates if trading_dates is not None else load_trading_dates()
+    if len(schedule) == 0:
+        return False
+    normalized = pd.DatetimeIndex(pd.to_datetime(schedule)).normalize().sort_values().unique()
+    month_dates = normalized[(normalized.year == trade_date.year) & (normalized.month == trade_date.month)]
+    if len(month_dates) == 0:
+        return False
+    return trade_date == month_dates[-1]
+
+
+
+def maybe_generate_monthly_attribution_report(today: str | pd.Timestamp | datetime) -> str | None:
+    trade_date = pd.Timestamp(today).normalize()
+    if not is_month_end(trade_date):
+        return None
+    output = generate_monthly_report(trade_date.year, trade_date.month)
+    relative_output = f"runtime/attribution/reports/attribution_report_{trade_date:%Y%m}.html"
+    print(f"月度归因报告已生成：{relative_output}")
+    return output
+
+
+
 def main() -> None:
     SIGNAL_DIR.mkdir(parents=True, exist_ok=True)
     run_date = datetime.now().strftime("%Y-%m-%d")
     df = pd.read_parquet(DATA_PATH).sort_values("trade_date").reset_index(drop=True)
     latest = df.iloc[-1]
+    trade_date = pd.Timestamp(latest['trade_date']).normalize()
     close = df["close"].astype(float)
     entry_threshold = float(close.shift(1).rolling(ENTRY_WINDOW).max().iloc[-1])
     exit_threshold = float(close.shift(1).rolling(EXIT_WINDOW).min().iloc[-1])
@@ -103,6 +143,7 @@ def main() -> None:
             print(f"建议仓位：{position_frac:.1%}（{suggested_qty}股），止损价：{stop_price:.3f}，ATR：{atr_value:.4f}")
     print("建议执行价: 次日开盘价（需人工填入）")
     print(f"信号文件: {out_path}")
+    maybe_generate_monthly_attribution_report(trade_date)
 
 
 if __name__ == "__main__":
@@ -119,4 +160,3 @@ if __name__ == "__main__":
         print("报告已更新：runtime/reports/strategy_report.html")
     except Exception as e:
         print(f"报告生成失败（不影响信号）：{e}")
-

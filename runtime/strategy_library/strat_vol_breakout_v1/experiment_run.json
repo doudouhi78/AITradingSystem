@@ -1,0 +1,83 @@
+{
+  "experiment_id": "exp-strat_vol_breakout_v1",
+  "task_id": "task-strat_vol_breakout_v1",
+  "run_id": "run-strat_vol_breakout_v1",
+  "title": "布林带波动突破 标准回测",
+  "strategy_family": "reversion",
+  "variant_name": "strat_vol_breakout_v1",
+  "instrument": "510300",
+  "dataset_snapshot": {
+    "dataset_version": "phase6_v1",
+    "data_source": "D:\\AITradingSystem\\runtime\\market_data\\cn_etf\\510300.parquet",
+    "instrument": "510300",
+    "date_range_start": "2016-01-04",
+    "date_range_end": "2026-03-27",
+    "adjustment_mode": "post_adjusted_local_parquet",
+    "cost_assumption": "fees=0.001, slippage=0.001",
+    "missing_value_policy": "drop_missing_bars",
+    "created_at": "2026-03-31T12:58:14.695866+08:00",
+    "validation_method": "vectorbt_single_instrument_backtest"
+  },
+  "rule_expression": {
+    "rules_version": "phase6_v1",
+    "entry_rule_summary": "价格前一日重新站上布林下轨（20, 2.0），当日开盘入场",
+    "exit_rule_summary": "价格前一日触及布林上轨（20, 2.0），当日开盘出场",
+    "filters": [],
+    "execution_assumption": "signal_on_close_execute_next_open",
+    "created_at": "2026-03-31T12:58:14.695866+08:00",
+    "method_summary": "布林带波动突破"
+  },
+  "metrics_summary": {
+    "total_return": 0.05257022909838227,
+    "annual_return": 0.0075569042302738865,
+    "annualized_return": 0.0075569042302738865,
+    "max_drawdown": -0.33934352836655457,
+    "sharpe": 0.1270590147865586,
+    "trade_count": 25,
+    "trades": 25,
+    "win_rate": 0.72,
+    "notes": [
+      "strategy_id=strat_vol_breakout_v1",
+      "instrument=510300",
+      "fees=0.001",
+      "slippage=0.001",
+      "signal_on_close_execute_next_open"
+    ]
+  },
+  "risk_position_note": {
+    "position_sizing_method": "full_allocation_single_strategy",
+    "max_position": 1.0,
+    "risk_budget": "Phase 6 标准横向比较，不套用 R-based 仓位",
+    "drawdown_tolerance": "not_set",
+    "exit_after_signal_policy": "signal_on_close_execute_next_open",
+    "notes": [
+      "Phase 6 标准化比较口径"
+    ],
+    "reasoning": "先比较策略逻辑本身，再接多策略分配。"
+  },
+  "review_outcome": {
+    "review_status": "pending",
+    "review_outcome": "research_generated",
+    "key_risks": [
+      "尚未完成 WFO / 前向模拟验证"
+    ],
+    "gaps": [
+      "当前仅完成单标的标准回测"
+    ],
+    "recommended_next_step": "纳入策略横向比较与候选管理",
+    "reviewed_at": "2026-03-31T12:58:14.695866+08:00",
+    "review_method": "phase6_standard_backtest",
+    "review_reasoning": "Phase 6 先产出可比较的底库策略。"
+  },
+  "decision_status": {
+    "decision_status": "research",
+    "is_baseline": false,
+    "baseline_of": "",
+    "decision_reason": "作为 Phase 6 新策略候选纳入底库。",
+    "decided_at": "2026-03-31T12:58:14.695866+08:00"
+  },
+  "artifact_root": "D:\\AITradingSystem\\.claude\\worktrees\\youthful-boyd\\runtime\\strategy_library\\strat_vol_breakout_v1",
+  "memory_note_path": "D:\\AITradingSystem\\.claude\\worktrees\\youthful-boyd\\runtime\\strategy_library\\strat_vol_breakout_v1\\notes.md",
+  "status_code": "completed",
+  "created_at": "2026-03-31T12:58:14.695866+08:00"
+}

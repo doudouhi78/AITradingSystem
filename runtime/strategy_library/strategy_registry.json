@@ -1,0 +1,62 @@
+[
+  {
+    "strategy_id": "strat_breakout_v1",
+    "strategy_name": "价格突破策略（entry25/exit20）",
+    "strategy_type": "trend",
+    "status": "observation",
+    "created_date": "2026-01-01",
+    "last_updated": "2026-03-31",
+    "sharpe": 0.520399,
+    "wfo_ratio": -1.663,
+    "notes": "Parquet 口径当前旧突破基线，保留 observation",
+    "retire_reason": null
+  },
+  {
+    "strategy_id": "strat_ma_cross_v1",
+    "strategy_name": "双均线趋势跟随",
+    "strategy_type": "trend",
+    "status": "research",
+    "created_date": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "sharpe": 0.121455,
+    "wfo_ratio": null,
+    "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
+    "retire_reason": null
+  },
+  {
+    "strategy_id": "strat_rsi_reversion_v1",
+    "strategy_name": "RSI 均值回归",
+    "strategy_type": "reversion",
+    "status": "research",
+    "created_date": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "sharpe": 0.084824,
+    "wfo_ratio": null,
+    "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
+    "retire_reason": null
+  },
+  {
+    "strategy_id": "strat_vol_breakout_v1",
+    "strategy_name": "布林带波动突破",
+    "strategy_type": "reversion",
+    "status": "research",
+    "created_date": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "sharpe": 0.127059,
+    "wfo_ratio": null,
+    "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
+    "retire_reason": null
+  },
+  {
+    "strategy_id": "strat_factor_momentum_v1",
+    "strategy_name": "截面动量因子选股",
+    "strategy_type": "factor",
+    "status": "pending",
+    "created_date": "2026-03-31",
+    "last_updated": "2026-03-31",
+    "sharpe": null,
+    "wfo_ratio": null,
+    "notes": "factor_registry is empty, strategy4 kept pending by Phase 6 rule",
+    "retire_reason": null
+  }
+]
