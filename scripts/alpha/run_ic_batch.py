@@ -10,17 +10,17 @@ from alpha_research.data_loader import load_factor_input, load_prices, select_to
 from alpha_research.evaluation.correlation import deduplicate_factors
 from alpha_research.evaluation.ic_pipeline import batch_evaluate
 from alpha_research.evaluation.screening import screen_factor
-from alpha_research.factors import fundamental, price_momentum, technical, volume_liquidity
+from alpha_research.factors import fundamental, price_momentum, sentiment, technical, volume_liquidity
 
 ROOT = Path(r"D:\AITradingSystem")
 OUT_PATH = ROOT / "runtime" / "alpha_research" / "phase2" / "ic_batch_result.json"
-START = "2020-01-01"
-END = "2025-09-30"
+TRAIN_START = "2020-01-01"
+TRAIN_END = "2024-06-30"
 UNIVERSES = {
     "etf_top10": ("etf", 10),
-    "stock_top50": ("stock", 50),
+    "stock_csi300_top200": ("stock", 200),
 }
-MODULES = [price_momentum, volume_liquidity, fundamental, technical]
+MODULES = [price_momentum, volume_liquidity, fundamental, technical, sentiment]
 
 
 def load_factor_functions() -> dict[str, callable]:
@@ -28,7 +28,6 @@ def load_factor_functions() -> dict[str, callable]:
     for module in MODULES:
         for name, obj in inspect.getmembers(module, inspect.isfunction):
             if name.startswith("factor_"):
-                # 排除：pb_ratio_approx 缺少公告延迟处理，存在前向偏差风险，待 Phase 2 修复后重新纳入
                 if name == "factor_pb_ratio_approx":
                     continue
                 factor_functions[name] = obj
@@ -50,8 +49,8 @@ def main() -> None:
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     factor_functions = load_factor_functions()
     result_payload = {
-        "start": START,
-        "end": END,
+        "start": TRAIN_START,
+        "end": TRAIN_END,
         "candidate_factor_count": len(factor_functions),
         "candidate_factors": list(factor_functions.keys()),
         "universes": {},
@@ -59,14 +58,14 @@ def main() -> None:
     }
 
     for universe_name, (asset_type, top_n) in UNIVERSES.items():
-        instruments = select_top_n_by_liquidity(asset_type, START, END, top_n=top_n)
-        prices = load_prices(instruments, START, END, asset_type=asset_type)
-        factor_input = load_factor_input(instruments, START, END, asset_type=asset_type)
+        instruments = select_top_n_by_liquidity(asset_type, TRAIN_START, TRAIN_END, top_n=top_n)
+        prices = load_prices(instruments, TRAIN_START, TRAIN_END, asset_type=asset_type)
+        factor_input = load_factor_input(instruments, TRAIN_START, TRAIN_END, asset_type=asset_type)
 
         factor_series_map = {}
         for factor_name, func in factor_functions.items():
             try:
-                series = build_factor_series(func, prices, factor_input, instruments, START, END)
+                series = build_factor_series(func, prices, factor_input, instruments, TRAIN_START, TRAIN_END)
                 if isinstance(series, pd.Series) and not series.empty:
                     factor_series_map[factor_name] = series
             except Exception:

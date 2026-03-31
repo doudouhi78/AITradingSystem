@@ -1,0 +1,42 @@
+[
+  {
+    "factor_name": "factor_momentum_120d",
+    "ic_mean_10d": -0.09041268224608166,
+    "icir_10d": -0.18064289122399863,
+    "decay_halflife_days": 1,
+    "passed_screening": false,
+    "fail_reason": "ICIR不足：0.1806 <= 0.5"
+  },
+  {
+    "factor_name": "factor_bbands_position",
+    "ic_mean_10d": 0.07701078672854737,
+    "icir_10d": 0.15097257233425362,
+    "decay_halflife_days": 1,
+    "passed_screening": false,
+    "fail_reason": "ICIR不足：0.1510 <= 0.5"
+  },
+  {
+    "factor_name": "factor_atr_14_normalized",
+    "ic_mean_10d": -0.06586200804980359,
+    "icir_10d": -0.12611066462865725,
+    "decay_halflife_days": 20,
+    "passed_screening": false,
+    "fail_reason": "ICIR不足：0.1261 <= 0.5"
+  },
+  {
+    "factor_name": "factor_turnover_20d",
+    "ic_mean_10d": -0.061899699613899635,
+    "icir_10d": -0.3679237518245249,
+    "decay_halflife_days": 1,
+    "passed_screening": false,
+    "fail_reason": "ICIR不足：0.3679 <= 0.5"
+  },
+  {
+    "factor_name": "factor_log_market_cap",
+    "ic_mean_10d": 0.05975368008649873,
+    "icir_10d": 0.373138933632588,
+    "decay_halflife_days": 1,
+    "passed_screening": false,
+    "fail_reason": "ICIR不足：0.3731 <= 0.5"
+  }
+]
