@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-03-31T12:59:30.467612+08:00",
+  "status_filter": [],
+  "strategies": [
+    {
+      "strategy_id": "strat_breakout_v1",
+      "strategy_name": "价格突破策略（entry25/exit20）",
+      "strategy_type": "trend",
+      "status": "observation",
+      "sharpe": 0.520399,
+      "max_drawdown": null,
+      "annual_return": null,
+      "win_rate": null,
+      "trade_count": null,
+      "correlation_with_baseline": null,
+      "notes": "Parquet 口径当前旧突破基线，保留 observation"
+    },
+    {
+      "strategy_id": "strat_ma_cross_v1",
+      "strategy_name": "双均线趋势跟随",
+      "strategy_type": "trend",
+      "status": "research",
+      "sharpe": 0.12145463534766104,
+      "max_drawdown": -0.4191290890931053,
+      "annual_return": 0.004728090882610614,
+      "win_rate": 0.43478260869565216,
+      "trade_count": 46,
+      "correlation_with_baseline": 0.8569395232423862,
+      "notes": "Phase 6 标准回测已完成，待进入 observation 评估。"
+    },
+    {
+      "strategy_id": "strat_rsi_reversion_v1",
+      "strategy_name": "RSI 均值回归",
+      "strategy_type": "reversion",
+      "status": "research",
+      "sharpe": 0.08482420340063172,
+      "max_drawdown": -0.32111395282750754,
+      "annual_return": -0.001138064046720011,
+      "win_rate": 0.5,
+      "trade_count": 10,
+      "correlation_with_baseline": 0.1710623557877299,
+      "notes": "Phase 6 标准回测已完成，待进入 observation 评估。"
+    },
+    {
+      "strategy_id": "strat_vol_breakout_v1",
+      "strategy_name": "布林带波动突破",
+      "strategy_type": "reversion",
+      "status": "research",
+      "sharpe": 0.1270590147865586,
+      "max_drawdown": -0.33934352836655457,
+      "annual_return": 0.0075569042302738865,
+      "win_rate": 0.72,
+      "trade_count": 25,
+      "correlation_with_baseline": 0.061086774890443285,
+      "notes": "Phase 6 标准回测已完成，待进入 observation 评估。"
+    },
+    {
+      "strategy_id": "strat_factor_momentum_v1",
+      "strategy_name": "截面动量因子选股",
+      "strategy_type": "factor",
+      "status": "pending",
+      "sharpe": null,
+      "max_drawdown": null,
+      "annual_return": null,
+      "win_rate": null,
+      "trade_count": null,
+      "correlation_with_baseline": null,
+      "notes": "factor_registry is empty, strategy4 kept pending by Phase 6 rule"
+    }
+  ],
+  "correlation_matrix": {
+    "strat_ma_cross_v1": {
+      "strat_ma_cross_v1": 1.0,
+      "strat_rsi_reversion_v1": 0.258288,
+      "strat_vol_breakout_v1": 0.152299
+    },
+    "strat_rsi_reversion_v1": {
+      "strat_ma_cross_v1": 0.258288,
+      "strat_rsi_reversion_v1": 1.0,
+      "strat_vol_breakout_v1": 0.721076
+    },
+    "strat_vol_breakout_v1": {
+      "strat_ma_cross_v1": 0.152299,
+      "strat_rsi_reversion_v1": 0.721076,
+      "strat_vol_breakout_v1": 1.0
+    }
+  },
+  "warnings": [
+    "warning: strat_rsi_reversion_v1 and strat_vol_breakout_v1 daily return correlation > 0.7 (0.721)"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "task-strat_rsi_reversion_v1",
+  "title": "RSI 均值回归 标准回测",
+  "goal": "用 510300 标准化测试 RSI 均值回归 的横向表现。",
+  "instrument_pool": [
+    "510300"
+  ],
+  "strategy_family": "reversion",
+  "hypothesis": "RSI(14) 从超卖阈值 30 上穿，次日开盘入场",
+  "constraints": [
+    "T日收盘计算，T+1日开盘执行",
+    "默认参数，不做调参",
+    "统一手续费和滑点口径"
+  ],
+  "success_criteria": [
+    "生成标准 ExperimentRun",
+    "可参与横向比较"
+  ],
+  "created_at": "2026-03-31T12:58:14.669768+08:00",
+  "why_this_task": "Phase 6 底库策略压测：2016-01-01 ~ 2026-03-30"
+}

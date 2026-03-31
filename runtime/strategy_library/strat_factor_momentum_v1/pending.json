@@ -1,0 +1,6 @@
+{
+  "strategy_id": "strat_factor_momentum_v1",
+  "status": "pending",
+  "reason": "factor_registry is empty, strategy4 kept pending by Phase 6 rule",
+  "updated_at": "2026-03-31T12:58:14.701866+08:00"
+}
