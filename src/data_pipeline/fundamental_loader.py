@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
+import baostock as bs
 import pandas as pd
 import pandera as pa
 from pandera import Check, Column, DataFrameSchema
 
-from akshare.stock_feature.stock_classify_sina import stock_classify_sina
 from akshare.stock_fundamental.stock_finance_sina import stock_financial_analysis_indicator
 
 ROOT = Path(r"D:\AITradingSystem")
@@ -34,17 +36,99 @@ VALUATION_SCHEMA = DataFrameSchema(
 )
 
 
-def _load_stock_snapshot() -> pd.DataFrame:
-    df = stock_classify_sina(symbol="申万二级").copy()
-    df["instrument_code"] = df["code"].astype(str).str.zfill(6)
-    for col in ["trade", "per", "pb", "mktcap", "nmc"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-    return df
-
-
 def _available_stock_instruments() -> list[str]:
     return sorted(path.stem for path in MARKET_DATA_STOCK_DIR.glob("*.parquet") if not path.name.startswith("_"))
+
+
+def _load_valuation_instruments() -> list[str]:
+    stock_meta_path = CLASSIFICATION_DIR / "stock_meta.parquet"
+    if not stock_meta_path.exists():
+        return _available_stock_instruments()
+
+    stock_meta = pd.read_parquet(stock_meta_path, columns=["instrument_code", "delist_date"])
+    stock_meta["instrument_code"] = stock_meta["instrument_code"].astype(str).str.zfill(6)
+    active = stock_meta[stock_meta["delist_date"].isna()]["instrument_code"].tolist() if "delist_date" in stock_meta.columns else stock_meta["instrument_code"].tolist()
+    available = set(_available_stock_instruments())
+    return sorted(code for code in active if code in available)
+
+
+def _to_baostock_code(instrument_code: str) -> str:
+    code = str(instrument_code).zfill(6)
+    if code.startswith(("600", "601", "603", "605", "688")):
+        return f"sh.{code}"
+    if code.startswith(("000", "001", "002", "003", "300", "301")):
+        return f"sz.{code}"
+    if code.startswith(("430", "440", "830", "831", "832", "833", "834", "835", "836", "837", "838", "839", "870", "871", "872", "873", "874", "875", "876", "877", "878", "879", "880", "881", "882", "883", "884", "885", "886", "887", "888", "889", "920")):
+        return f"bj.{code}"
+    raise ValueError(f"unsupported instrument code for baostock: {code}")
+
+
+def _query_baostock_valuation(bs_code: str, start_date: str, end_date: str) -> pd.DataFrame:
+    rs = bs.query_history_k_data_plus(
+        bs_code,
+        "date,code,peTTM,pbMRQ,psTTM",
+        start_date=start_date,
+        end_date=end_date,
+        frequency="d",
+        adjustflag="2",
+    )
+    if rs.error_code != "0":
+        raise RuntimeError(f"baostock query failed: {rs.error_code} {rs.error_msg}")
+
+    rows: list[list[str]] = []
+    while rs.error_code == "0" and rs.next():
+        rows.append(rs.get_row_data())
+    if not rows:
+        return pd.DataFrame(columns=["date", "code", "peTTM", "pbMRQ", "psTTM"])
+
+    df = pd.DataFrame(rows, columns=rs.fields)
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    for col in ["peTTM", "pbMRQ", "psTTM"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df.dropna(subset=["date"])
+
+
+def _build_valuation_chunk(codes: list[str], start_date: str, end_date: str) -> tuple[pd.DataFrame, list[dict[str, str]]]:
+    frames: list[pd.DataFrame] = []
+    failed: list[dict[str, str]] = []
+    login_result = bs.login()
+    if login_result.error_code != "0":
+        raise RuntimeError(f"baostock login failed: {login_result.error_code} {login_result.error_msg}")
+
+    try:
+        for instrument_code in codes:
+            try:
+                bs_code = _to_baostock_code(instrument_code)
+                df = _query_baostock_valuation(bs_code, start_date=start_date, end_date=end_date)
+                if df.empty:
+                    failed.append({"instrument_code": instrument_code, "reason": "empty_result"})
+                    continue
+                out = pd.DataFrame(
+                    {
+                        "date": df["date"],
+                        "instrument_code": instrument_code,
+                        "pe_ttm": df["peTTM"],
+                        "pb": df["pbMRQ"].where(df["pbMRQ"] > 0),
+                        "ps_ttm": df["psTTM"],
+                    }
+                )
+                out = out[(out["date"] >= pd.Timestamp(start_date)) & out["date"].notna()]
+                if out.empty:
+                    failed.append({"instrument_code": instrument_code, "reason": "empty_after_filter"})
+                    continue
+                frames.append(out)
+            except Exception as exc:
+                failed.append({"instrument_code": instrument_code, "reason": repr(exc)})
+    finally:
+        bs.logout()
+
+    if frames:
+        return pd.concat(frames, ignore_index=True), failed
+    return pd.DataFrame(columns=["date", "instrument_code", "pe_ttm", "pb", "ps_ttm"]), failed
+
+
+def _chunked(items: list[str], chunk_size: int) -> list[list[str]]:
+    return [items[i : i + chunk_size] for i in range(0, len(items), chunk_size)]
 
 
 def validate_valuation_daily(df: pd.DataFrame) -> pd.DataFrame:
@@ -53,58 +137,40 @@ def validate_valuation_daily(df: pd.DataFrame) -> pd.DataFrame:
 
 def build_valuation_daily(instruments: list[str] | None = None) -> pd.DataFrame:
     """
-    Build daily valuation table in long format.
-
-    Fallback note:
-    - Current AkShare package in this repo does not expose `stock_a_lg_indicator`.
-    - V1 implementation uses Sina snapshot valuation (`per`, `pb`) and projects them
-      across historical prices by inferring current EPS/BPS anchors.
-    - `ps_ttm` is reserved and currently left null until a stable daily sales valuation
-      source is introduced.
+    拉取全A股历史每日估值数据（PE/PB/PS）。
+    数据源：baostock `query_history_k_data_plus`，使用原生历史字段 peTTM/pbMRQ/psTTM。
+    返回：DataFrame，写入 runtime/fundamental_data/valuation_daily.parquet
+    schema：date / instrument_code / pe_ttm / pb / ps_ttm
     """
     FUNDAMENTAL_DIR.mkdir(parents=True, exist_ok=True)
-    snapshot = _load_stock_snapshot()
     if instruments is None:
-        instruments = _available_stock_instruments()
-    instruments = [code for code in instruments if code in set(snapshot["instrument_code"])]
+        instruments = _load_valuation_instruments()
+
+    start_date = "2015-01-01"
+    end_date = pd.Timestamp.today().strftime("%Y-%m-%d")
+    chunk_size = 20
+    chunks = _chunked(instruments, chunk_size)
+    max_workers = min(8, max(2, (os.cpu_count() or 4) // 2))
 
     failed: list[dict[str, str]] = []
     frames: list[pd.DataFrame] = []
-    snapshot_map = snapshot.drop_duplicates(subset=["instrument_code"]).set_index("instrument_code")
-    for idx, code in enumerate(instruments, start=1):
-        try:
-            row = snapshot_map.loc[code]
-            price_now = float(row.get("trade", float("nan")))
-            pe_now = float(row.get("per", float("nan")))
-            pb_now = float(row.get("pb", float("nan")))
-            path = MARKET_DATA_STOCK_DIR / f"{code}.parquet"
-            price_df = pd.read_parquet(path, columns=["trade_date", "close"]).copy()
-            price_df["trade_date"] = pd.to_datetime(price_df["trade_date"])
-            price_df["close"] = pd.to_numeric(price_df["close"], errors="coerce")
-            price_df = price_df.dropna(subset=["trade_date", "close"])
-            if price_df.empty:
-                failed.append({"instrument_code": code, "reason": "empty_price_df"})
-                continue
+    processed = 0
+    total = len(instruments)
 
-            eps_ttm = price_now / pe_now if pd.notna(price_now) and pd.notna(pe_now) and pe_now > 0 else math.nan
-            book_value = price_now / pb_now if pd.notna(price_now) and pd.notna(pb_now) and pb_now > 0 else math.nan
-
-            out = pd.DataFrame({
-                "date": price_df["trade_date"],
-                "instrument_code": code,
-                "pe_ttm": price_df["close"] / eps_ttm if pd.notna(eps_ttm) and eps_ttm != 0 else math.nan,
-                "pb": price_df["close"] / book_value if pd.notna(book_value) and book_value > 0 else math.nan,
-                "ps_ttm": math.nan,
-            })
-            frames.append(out)
-            if idx % 200 == 0:
-                print(f"valuation progress: {idx}/{len(instruments)}")
-            time.sleep(0.02)
-        except Exception as e:
-            failed.append({"instrument_code": code, "reason": repr(e)})
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(_build_valuation_chunk, chunk, start_date, end_date): chunk for chunk in chunks}
+        for future in as_completed(futures):
+            df_chunk, failed_chunk = future.result()
+            if not df_chunk.empty:
+                frames.append(df_chunk)
+                processed += df_chunk["instrument_code"].nunique()
+            processed += len(failed_chunk)
+            failed.extend(failed_chunk)
+            print(f"valuation progress: {min(processed, total)}/{total}")
 
     if not frames:
         raise RuntimeError("valuation_daily build produced no rows")
+
     result = pd.concat(frames, ignore_index=True)
     result = result.sort_values(["date", "instrument_code"]).reset_index(drop=True)
     validate_valuation_daily(result)
@@ -114,12 +180,6 @@ def build_valuation_daily(instruments: list[str] | None = None) -> pd.DataFrame:
 
 
 def _infer_announce_date(report_date: pd.Timestamp) -> pd.Timestamp:
-    # announce_date 近似规则（缺乏精确公告日数据时的保守估计）：
-    # Q1（3月31日报告期）→ +25天 → 4月25日
-    # Q2（6月30日报告期）→ +45天 → 8月14日
-    # Q3（9月30日报告期）→ +30天 → 10月30日
-    # Q4（12月31日报告期）→ +90天 → 次年3月31日
-    # ⚠️ 这是保守近似，实际公告可能更早，但不会更晚（通常）
     month_day = (report_date.month, report_date.day)
     if month_day == (3, 31):
         return report_date + pd.Timedelta(days=25)
@@ -185,10 +245,6 @@ def build_financial_quarterly(instruments: list[str] | None = None) -> list[str]
 
 
 def get_latest_financial(instrument: str, signal_date: str) -> dict:
-    """
-    返回 signal_date 之前最新已公告的季报数据。
-    使用 announce_date 而非 report_date 做过滤，防止前向偏差。
-    """
     path = FINANCIAL_DIR / f"{instrument}.parquet"
     if not path.exists():
         return {}
@@ -206,3 +262,4 @@ def get_latest_financial(instrument: str, signal_date: str) -> dict:
         if pd.notna(row.get(key)):
             row[key] = pd.Timestamp(row[key]).strftime("%Y-%m-%d")
     return row
+
