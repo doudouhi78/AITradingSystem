@@ -9,11 +9,25 @@ import plotly.graph_objects as go
 ROOT = Path(__file__).resolve().parents[2]
 ATTR_ROOT = ROOT / 'runtime' / 'attribution'
 REPORT_DIR = ATTR_ROOT / 'reports'
+TRADE_DIAGNOSTICS_DIR = ATTR_ROOT / 'trade_diagnostics'
+TRADE_DIAGNOSTIC_FILES = {
+    'gate_status': ['attribution_by_gate.json', 'gate_status.json'],
+    'holding_bucket': ['attribution_by_holding.json', 'holding_bucket.json'],
+    'vol_bucket': ['attribution_by_vol.json', 'vol_bucket.json'],
+    'entry_month': ['attribution_by_month.json', 'entry_month.json'],
+}
 
 
 def _read_json(path: Path, fallback: Any):
     if path.exists():
         return json.loads(path.read_text(encoding='utf-8'))
+    return fallback
+
+
+def _read_first_json(paths: list[Path], fallback: Any):
+    for path in paths:
+        if path.exists():
+            return json.loads(path.read_text(encoding='utf-8'))
     return fallback
 
 
@@ -64,10 +78,8 @@ def _build_factor_drift_plot(reports: list[dict[str, Any]]) -> str:
 
 def generate_monthly_report(year: int, month: int) -> str:
     trade_diag = {
-        'gate_status': _read_json(ATTR_ROOT / 'trade_diagnostics' / 'gate_status.json', []),
-        'holding_bucket': _read_json(ATTR_ROOT / 'trade_diagnostics' / 'holding_bucket.json', []),
-        'vol_bucket': _read_json(ATTR_ROOT / 'trade_diagnostics' / 'vol_bucket.json', []),
-        'entry_month': _read_json(ATTR_ROOT / 'trade_diagnostics' / 'entry_month.json', []),
+        key: _read_first_json([TRADE_DIAGNOSTICS_DIR / name for name in filenames], [])
+        for key, filenames in TRADE_DIAGNOSTIC_FILES.items()
     }
     strategy = _read_json(ATTR_ROOT / 'strategy_attribution' / 'strategy_attribution.json', {})
     rolling_alpha = _read_json(ATTR_ROOT / 'strategy_attribution' / 'rolling_alpha.json', [])
@@ -75,7 +87,7 @@ def generate_monthly_report(year: int, month: int) -> str:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = REPORT_DIR / f'attribution_report_{year}{month:02d}.html'
     gate_rows = ''.join(
-        f"<tr><td>{row['gate_status']}</td><td>{row['count']}</td><td>{row['win_rate']:.2%}</td><td>{row['avg_pnl_pct']:.2f}</td><td>{row['sharpe']:.3f}</td></tr>"
+        f"<tr><td>{row['gate_status']}</td><td>{row['count']}</td><td>{row['win_rate']:.2%}</td><td>{row.get('avg_pnl', row.get('avg_pnl_pct', 0.0)):.2f}</td><td>{row['sharpe']:.3f}</td><td>{row.get('avg_holding', 0.0):.1f}</td></tr>"
         for row in trade_diag['gate_status']
     )
     alpha_value = _safe_number(strategy.get('alpha'))
@@ -85,7 +97,7 @@ def generate_monthly_report(year: int, month: int) -> str:
         f"<html><head><meta charset='utf-8'><title>Attribution Report {year}{month:02d}</title></head><body>"
         f"<h1>Attribution Report {year}-{month:02d}</h1>"
         f"<h2>1. 系统健康仪表盘</h2>{_health_dashboard(strategy, factor_drift.get('reports', []), trade_diag)}"
-        f"<h2>2. 交易诊断表格</h2><table border='1' cellspacing='0' cellpadding='6'><tr><th>Gate</th><th>Count</th><th>Win Rate</th><th>Avg PnL %</th><th>Sharpe</th></tr>{gate_rows}</table>"
+        f"<h2>2. 交易诊断表格</h2><table border='1' cellspacing='0' cellpadding='6'><tr><th>Gate</th><th>Count</th><th>Win Rate</th><th>Avg PnL %</th><th>Sharpe</th><th>Avg Holding</th></tr>{gate_rows}</table>"
         f"<h2>3. 策略层归因</h2><p>Alpha={alpha_value:.4f} / Beta={beta_value:.4f} / Excess Return={excess_return:.4f}</p>{_build_rolling_alpha_plot(rolling_alpha)}"
         f"<h2>4. 因子状态</h2>{_build_factor_drift_plot(factor_drift.get('reports', []))}</body></html>"
     )

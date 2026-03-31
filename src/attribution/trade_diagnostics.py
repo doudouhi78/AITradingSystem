@@ -19,6 +19,18 @@ BENCHMARK_PATH = INPUT_ROOT / 'runtime' / 'market_data' / 'cn_etf' / '510300.par
 OUTPUT_DIR = ROOT / 'runtime' / 'attribution' / 'trade_diagnostics'
 DEFAULT_FEES = 0.001
 DEFAULT_SLIPPAGE = 0.001
+OUTPUT_FILE_MAP = {
+    'gate_status': 'attribution_by_gate.json',
+    'holding_bucket': 'attribution_by_holding.json',
+    'vol_bucket': 'attribution_by_vol.json',
+    'entry_month': 'attribution_by_month.json',
+}
+LEGACY_OUTPUT_FILE_MAP = {
+    'gate_status': 'gate_status.json',
+    'holding_bucket': 'holding_bucket.json',
+    'vol_bucket': 'vol_bucket.json',
+    'entry_month': 'entry_month.json',
+}
 
 
 def _parse_notes(notes: list[str] | None) -> dict[str, str]:
@@ -201,21 +213,32 @@ def load_trades(experiment_id: str) -> pd.DataFrame:
     return pd.DataFrame(records)
 
 
-def _summarize_group(df: pd.DataFrame, group_col: str) -> list[dict[str, Any]]:
+def analyze_by_dimension(trade_df: pd.DataFrame, group_col: str, min_samples: int = 10) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
-    for value, group in df.groupby(group_col, dropna=False):
+    for value, group in trade_df.groupby(group_col, dropna=False):
         returns = group['pnl_pct'].astype(float) / 100.0
         sharpe = float(empyrical.sharpe_ratio(returns, annualization=252)) if len(returns) >= 2 else 0.0
         count = int(len(group))
+        avg_pnl = float(group['pnl_pct'].mean()) if count else 0.0
+        avg_holding = float(group['holding_days'].mean()) if count else 0.0
         output.append({
             group_col: 'unknown' if pd.isna(value) else str(value),
             'count': count,
             'win_rate': float((group['pnl_pct'] > 0).mean()) if count else 0.0,
-            'avg_pnl_pct': float(group['pnl_pct'].mean()) if count else 0.0,
+            'avg_pnl': avg_pnl,
+            'avg_pnl_pct': avg_pnl,
             'sharpe': 0.0 if pd.isna(sharpe) else sharpe,
-            'insufficient_sample': count < 10,
+            'avg_holding': avg_holding,
+            'insufficient_sample': count < min_samples,
         })
     return sorted(output, key=lambda item: item[group_col])
+
+
+def _write_dimension_payload(dimension: str, payload: list[dict[str, Any]]) -> None:
+    canonical_name = OUTPUT_FILE_MAP[dimension]
+    (OUTPUT_DIR / canonical_name).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+    legacy_name = LEGACY_OUTPUT_FILE_MAP[dimension]
+    (OUTPUT_DIR / legacy_name).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
 
 
 def run_trade_diagnostics(trade_df: pd.DataFrame) -> dict[str, Any]:
@@ -224,11 +247,11 @@ def run_trade_diagnostics(trade_df: pd.DataFrame) -> dict[str, Any]:
         result = {'gate_status': [], 'holding_bucket': [], 'vol_bucket': [], 'entry_month': []}
     else:
         result = {
-            'gate_status': _summarize_group(trade_df, 'gate_status'),
-            'holding_bucket': _summarize_group(trade_df, 'holding_bucket'),
-            'vol_bucket': _summarize_group(trade_df, 'vol_bucket'),
-            'entry_month': _summarize_group(trade_df, 'entry_month'),
+            'gate_status': analyze_by_dimension(trade_df, 'gate_status'),
+            'holding_bucket': analyze_by_dimension(trade_df, 'holding_bucket'),
+            'vol_bucket': analyze_by_dimension(trade_df, 'vol_bucket'),
+            'entry_month': analyze_by_dimension(trade_df, 'entry_month'),
         }
     for key, payload in result.items():
-        (OUTPUT_DIR / f'{key}.json').write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+        _write_dimension_payload(key, payload)
     return result
