@@ -9,7 +9,14 @@
     "sharpe": 0.520399,
     "wfo_ratio": -1.663,
     "notes": "Parquet 口径当前旧突破基线，保留 observation",
-    "retire_reason": null
+    "retire_reason": null,
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null,
+    "promotion_criteria": {
+      "research_to_observation": "回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日",
+      "observation_to_active": "前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%",
+      "active_to_retired": "连续 60 日 Sharpe < 0，或 最大回撤突破 30%"
+    }
   },
   {
     "strategy_id": "strat_ma_cross_v1",
@@ -21,7 +28,14 @@
     "sharpe": 0.121455,
     "wfo_ratio": null,
     "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
-    "retire_reason": null
+    "retire_reason": null,
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null,
+    "promotion_criteria": {
+      "research_to_observation": "回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日",
+      "observation_to_active": "前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%",
+      "active_to_retired": "连续 60 日 Sharpe < 0，或 最大回撤突破 30%"
+    }
   },
   {
     "strategy_id": "strat_rsi_reversion_v1",
@@ -33,7 +47,14 @@
     "sharpe": 0.084824,
     "wfo_ratio": null,
     "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
-    "retire_reason": null
+    "retire_reason": null,
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null,
+    "promotion_criteria": {
+      "research_to_observation": "回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日",
+      "observation_to_active": "前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%",
+      "active_to_retired": "连续 60 日 Sharpe < 0，或 最大回撤突破 30%"
+    }
   },
   {
     "strategy_id": "strat_vol_breakout_v1",
@@ -45,7 +66,14 @@
     "sharpe": 0.127059,
     "wfo_ratio": null,
     "notes": "Phase 6 标准回测已完成，待进入 observation 评估。",
-    "retire_reason": null
+    "retire_reason": null,
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null,
+    "promotion_criteria": {
+      "research_to_observation": "回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日",
+      "observation_to_active": "前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%",
+      "active_to_retired": "连续 60 日 Sharpe < 0，或 最大回撤突破 30%"
+    }
   },
   {
     "strategy_id": "strat_factor_momentum_v1",
@@ -57,6 +85,13 @@
     "sharpe": 0.904676,
     "wfo_ratio": null,
     "notes": "Phase 7A factor registry完成，完整回测已生成",
-    "retire_reason": null
+    "retire_reason": null,
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null,
+    "promotion_criteria": {
+      "research_to_observation": "回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日",
+      "observation_to_active": "前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%",
+      "active_to_retired": "连续 60 日 Sharpe < 0，或 最大回撤突破 30%"
+    }
   }
 ]

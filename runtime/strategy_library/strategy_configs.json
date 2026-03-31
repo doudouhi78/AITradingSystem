@@ -1,0 +1,42 @@
+[
+  {
+    "strategy_id": "strat_breakout_v1",
+    "strategy_name": "价格突破策略（entry25/exit20）",
+    "is_active": true,
+    "max_capital_pct": 0.30,
+    "priority": 1,
+    "rebalance_freq": "daily"
+  },
+  {
+    "strategy_id": "strat_ma_cross_v1",
+    "strategy_name": "双均线趋势跟随",
+    "is_active": false,
+    "max_capital_pct": 0.25,
+    "priority": 2,
+    "rebalance_freq": "daily"
+  },
+  {
+    "strategy_id": "strat_rsi_reversion_v1",
+    "strategy_name": "RSI 均值回归",
+    "is_active": false,
+    "max_capital_pct": 0.20,
+    "priority": 3,
+    "rebalance_freq": "daily"
+  },
+  {
+    "strategy_id": "strat_vol_breakout_v1",
+    "strategy_name": "布林带波动突破",
+    "is_active": false,
+    "max_capital_pct": 0.25,
+    "priority": 4,
+    "rebalance_freq": "daily"
+  },
+  {
+    "strategy_id": "strat_factor_momentum_v1",
+    "strategy_name": "截面动量因子选股",
+    "is_active": false,
+    "max_capital_pct": 0.30,
+    "priority": 5,
+    "rebalance_freq": "daily"
+  }
+]

@@ -4,6 +4,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -15,23 +16,34 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ai_dev_os.gate import GateScheduler
-from ai_dev_os.risk import compute_quantity, compute_stop_price, wilder_atr
 from attribution.report_generator import generate_monthly_report
+from strategies import MACrossStrategy, RSIReversionStrategy, VolBreakoutStrategy
+from strategy_engine.signal_aggregator import aggregate_daily_signals
+from strategy_engine.strategy_config import StrategyConfig
 
-DATA_PATH = ROOT / "runtime" / "market_data" / "cn_etf" / "510300.parquet"
-SIGNAL_DIR = ROOT / "runtime" / "paper_trading" / "signals"
-FORWARD_SIM_PATH = ROOT / "runtime" / "paper_trading" / "forward_sim_equity.csv"
+DATA_PATH = ROOT / 'runtime' / 'market_data' / 'cn_etf' / '510300.parquet'
+SIGNAL_DIR = ROOT / 'runtime' / 'paper_trading' / 'signals'
+FORWARD_SIM_PATH = ROOT / 'runtime' / 'paper_trading' / 'forward_sim_equity.csv'
+STRATEGY_LIBRARY_DIR = ROOT / 'runtime' / 'strategy_library'
+STRATEGY_CONFIG_PATH = STRATEGY_LIBRARY_DIR / 'strategy_configs.json'
+STRATEGY_REGISTRY_PATH = STRATEGY_LIBRARY_DIR / 'strategy_registry.json'
 ENTRY_WINDOW = 25
 EXIT_WINDOW = 20
 ACCOUNT_EQUITY = 100000.0
+PROMOTION_CRITERIA = {
+    'research_to_observation': '回测 Sharpe > 0 且 前向模拟信号累计 >= 20 交易日',
+    'observation_to_active': '前向期 Sharpe(年化) > 0.3（>=60日）且 前向最大回撤 < 25%',
+    'active_to_retired': '连续 60 日 Sharpe < 0，或 最大回撤突破 30%',
+}
 
 
 def load_equity_series() -> list[float]:
     if FORWARD_SIM_PATH.exists():
         df = pd.read_csv(FORWARD_SIM_PATH)
-        if "equity" in df.columns and not df.empty:
-            return df["equity"].astype(float).tolist()
+        if 'equity' in df.columns and not df.empty:
+            return df['equity'].astype(float).tolist()
     return [1.0]
+
 
 
 def load_trading_dates(data_path: Path = DATA_PATH) -> pd.DatetimeIndex:
@@ -59,104 +71,260 @@ def maybe_generate_monthly_attribution_report(today: str | pd.Timestamp | dateti
     if not is_month_end(trade_date):
         return None
     output = generate_monthly_report(trade_date.year, trade_date.month)
-    relative_output = f"runtime/attribution/reports/attribution_report_{trade_date:%Y%m}.html"
-    print(f"月度归因报告已生成：{relative_output}")
+    relative_output = f'runtime/attribution/reports/attribution_report_{trade_date:%Y%m}.html'
+    print(f'月度归因报告已生成：{relative_output}')
     return output
+
+
+
+def default_strategy_configs_payload() -> list[dict[str, Any]]:
+    return [
+        {
+            'strategy_id': 'strat_breakout_v1',
+            'strategy_name': '价格突破策略（entry25/exit20）',
+            'is_active': True,
+            'max_capital_pct': 0.30,
+            'priority': 1,
+            'rebalance_freq': 'daily',
+        },
+        {
+            'strategy_id': 'strat_ma_cross_v1',
+            'strategy_name': '双均线趋势跟随',
+            'is_active': False,
+            'max_capital_pct': 0.25,
+            'priority': 2,
+            'rebalance_freq': 'daily',
+        },
+        {
+            'strategy_id': 'strat_rsi_reversion_v1',
+            'strategy_name': 'RSI 均值回归',
+            'is_active': False,
+            'max_capital_pct': 0.20,
+            'priority': 3,
+            'rebalance_freq': 'daily',
+        },
+        {
+            'strategy_id': 'strat_vol_breakout_v1',
+            'strategy_name': '布林带波动突破',
+            'is_active': False,
+            'max_capital_pct': 0.25,
+            'priority': 4,
+            'rebalance_freq': 'daily',
+        },
+        {
+            'strategy_id': 'strat_factor_momentum_v1',
+            'strategy_name': '截面动量因子选股',
+            'is_active': False,
+            'max_capital_pct': 0.30,
+            'priority': 5,
+            'rebalance_freq': 'daily',
+        },
+    ]
+
+
+
+def initialize_strategy_configs_file(config_path: Path = STRATEGY_CONFIG_PATH) -> list[dict[str, Any]]:
+    payload = default_strategy_configs_payload()
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return payload
+
+
+
+def load_strategy_configs(config_path: Path = STRATEGY_CONFIG_PATH) -> list[StrategyConfig]:
+    if not config_path.exists():
+        raw_configs = initialize_strategy_configs_file(config_path)
+    else:
+        raw_configs = json.loads(config_path.read_text(encoding='utf-8'))
+    return [StrategyConfig(**item) for item in raw_configs]
+
+
+
+def ensure_strategy_registry_metadata(registry_path: Path = STRATEGY_REGISTRY_PATH) -> list[dict[str, Any]]:
+    if not registry_path.exists():
+        return []
+    payload = json.loads(registry_path.read_text(encoding='utf-8'))
+    updated = False
+    for item in payload:
+        if item.get('days_in_forward_sim') != item.get('days_in_forward_sim', 0):
+            pass
+        if 'days_in_forward_sim' not in item:
+            item['days_in_forward_sim'] = 0
+            updated = True
+        if 'forward_sharpe' not in item:
+            item['forward_sharpe'] = None
+            updated = True
+        if item.get('promotion_criteria') != PROMOTION_CRITERIA:
+            item['promotion_criteria'] = PROMOTION_CRITERIA
+            updated = True
+    if updated:
+        registry_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    return payload
+
+
+
+def load_market_data(data_path: Path = DATA_PATH) -> pd.DataFrame:
+    frame = pd.read_parquet(data_path).sort_values('trade_date').reset_index(drop=True)
+    frame['trade_date'] = pd.to_datetime(frame['trade_date'])
+    for column in ['open', 'high', 'low', 'close', 'volume']:
+        if column in frame.columns:
+            frame[column] = frame[column].astype(float)
+    return frame
+
+
+
+def generate_breakout_signal(data: pd.DataFrame) -> tuple[int, dict[str, Any]]:
+    close = data['close'].astype(float)
+    latest = data.iloc[-1]
+    entry_threshold = float(close.shift(1).rolling(ENTRY_WINDOW).max().iloc[-1])
+    exit_threshold = float(close.shift(1).rolling(EXIT_WINDOW).min().iloc[-1])
+    last_close = float(latest['close'])
+    if last_close > entry_threshold:
+        signal = 1
+        state = 'entry'
+    elif last_close < exit_threshold:
+        signal = -1
+        state = 'exit'
+    else:
+        signal = 0
+        state = 'hold'
+    rationale = (
+        f"收盘价={last_close:.4f}，{ENTRY_WINDOW}日高点={entry_threshold:.4f}，"
+        f"{EXIT_WINDOW}日低点={exit_threshold:.4f}，breakout_state={state}"
+    )
+    return signal, {
+        'signal': signal,
+        'state': state,
+        'rationale': rationale,
+        'entry_threshold': entry_threshold,
+        'exit_threshold': exit_threshold,
+        'close': last_close,
+    }
+
+
+
+def _series_signal_payload(strategy: Any, signal: int, rationale: str) -> dict[str, Any]:
+    return {
+        'signal': signal,
+        'rationale': rationale,
+        'strategy_name': strategy.strategy_name,
+        'strategy_type': strategy.strategy_type,
+    }
+
+
+
+def build_strategy_signal_details(data: pd.DataFrame, configs: list[StrategyConfig]) -> dict[str, dict[str, Any]]:
+    config_map = {config.strategy_id: config for config in configs}
+    details: dict[str, dict[str, Any]] = {}
+
+    breakout_signal, breakout_meta = generate_breakout_signal(data)
+    details['strat_breakout_v1'] = {
+        **breakout_meta,
+        'strategy_name': '价格突破策略（entry25/exit20）',
+        'strategy_type': 'trend',
+    }
+
+    strategies = [MACrossStrategy(), RSIReversionStrategy(), VolBreakoutStrategy()]
+    for strategy in strategies:
+        series = strategy.generate_signals(data).reindex(data.index).fillna(0).astype(int)
+        signal = int(series.iloc[-1])
+        details[strategy.strategy_id] = _series_signal_payload(
+            strategy,
+            signal,
+            f'{strategy.strategy_name} 最新执行信号={signal}（基于收盘后计算，次日开盘执行）',
+        )
+
+    details['strat_factor_momentum_v1'] = {
+        'signal': 0,
+        'rationale': 'Phase 8A 暂不接入截面选股调仓逻辑，先记录占位信号。',
+        'strategy_name': '截面动量因子选股',
+        'strategy_type': 'factor',
+    }
+
+    for strategy_id, payload in details.items():
+        config = config_map.get(strategy_id)
+        payload['is_active'] = bool(config.is_active) if config else False
+        payload['max_capital_pct'] = float(config.max_capital_pct) if config else 0.0
+        payload['priority'] = int(config.priority) if config else 99
+    return details
+
+
+
+def enrich_aggregated_trades(aggregated_trades: list[dict[str, Any]], configs: list[StrategyConfig]) -> list[dict[str, Any]]:
+    config_map = {config.strategy_id: config for config in configs}
+    enriched: list[dict[str, Any]] = []
+    for trade in aggregated_trades:
+        config = config_map.get(str(trade.get('strategy_id', '')))
+        enriched.append({
+            **trade,
+            'max_capital_pct': float(config.max_capital_pct) if config else 0.0,
+        })
+    return enriched
 
 
 
 def main() -> None:
     SIGNAL_DIR.mkdir(parents=True, exist_ok=True)
-    run_date = datetime.now().strftime("%Y-%m-%d")
-    df = pd.read_parquet(DATA_PATH).sort_values("trade_date").reset_index(drop=True)
+    strategy_configs = load_strategy_configs()
+    ensure_strategy_registry_metadata()
+
+    df = load_market_data()
     latest = df.iloc[-1]
     trade_date = pd.Timestamp(latest['trade_date']).normalize()
-    close = df["close"].astype(float)
-    entry_threshold = float(close.shift(1).rolling(ENTRY_WINDOW).max().iloc[-1])
-    exit_threshold = float(close.shift(1).rolling(EXIT_WINDOW).min().iloc[-1])
-    last_close = float(latest["close"])
-    if last_close > entry_threshold:
-        signal = "BUY"
-    elif last_close < exit_threshold:
-        signal = "SELL"
-    else:
-        signal = "HOLD"
+    run_date = datetime.now().astimezone().isoformat()
 
     scheduler = GateScheduler()
     gate_result = scheduler.evaluate(
-        date=str(latest["trade_date"])[:10],
+        date=str(trade_date.date()),
         equity_series=load_equity_series(),
         etf_df=df,
     )
-    gate_block_message = None
-    if signal == "BUY" and not gate_result["allowed"]:
-        signal = "HOLD"
-        gate_block_message = f"Gate 阻断入场信号：{gate_result['blocked_by']} — {gate_result['reason']}"
 
-    atr_value = None
-    stop_price = None
-    suggested_qty = 0
-    position_frac = 0.0
-    risk_warning = None
-    if signal == "BUY":
-        atr_series = wilder_atr(df["high"], df["low"], df["close"])
-        atr_last = float(atr_series.iloc[-1]) if pd.notna(atr_series.iloc[-1]) else None
-        if atr_last is None:
-            risk_warning = "ATR 数据不足，无法生成止损与仓位建议。"
-        else:
-            atr_value = atr_last
-            entry_price = float(latest["open"])
-            stop_price = compute_stop_price(entry_price, atr_value)
-            suggested_qty, position_frac = compute_quantity(ACCOUNT_EQUITY, entry_price, stop_price)
-
-    rationale = f"最新数据日={str(latest['trade_date'])[:10]}，收盘价={last_close:.4f}，25日高点={entry_threshold:.4f}，20日低点={exit_threshold:.4f}"
-    payload = {
-        "date": run_date,
-        "signal": signal,
-        "close": last_close,
-        "entry_threshold": entry_threshold,
-        "exit_threshold": exit_threshold,
-        "rationale": rationale,
-        "gate_result": gate_result,
-        "atr": atr_value,
-        "stop_price": stop_price,
-        "suggested_qty": suggested_qty,
-        "position_fraction": position_frac,
-        "risk_warning": risk_warning,
-    }
-    out_path = SIGNAL_DIR / f"{run_date.replace('-', '')}.json"
-    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"日期: {run_date}")
-    print(f"信号: {signal}")
-    print(f"依据: {rationale}")
-    print(
-        "Gate状态: "
-        f"{'允许' if gate_result['allowed'] else '阻断'}"
-        f"（blocked_by={gate_result['blocked_by']}, reason={gate_result['reason']}）"
+    strategy_signal_details = build_strategy_signal_details(df, strategy_configs)
+    strategy_signals = {strategy_id: int(payload['signal']) for strategy_id, payload in strategy_signal_details.items()}
+    aggregated_trades = aggregate_daily_signals(
+        strategy_signals=strategy_signals,
+        strategy_configs=strategy_configs,
+        gate_allowed=bool(gate_result['allowed']),
+        current_equity=ACCOUNT_EQUITY,
     )
-    if gate_block_message:
-        print(gate_block_message)
-    if signal == "BUY":
-        if risk_warning:
-            print(risk_warning)
-        else:
-            print(f"建议仓位：{position_frac:.1%}（{suggested_qty}股），止损价：{stop_price:.3f}，ATR：{atr_value:.4f}")
-    print("建议执行价: 次日开盘价（需人工填入）")
-    print(f"信号文件: {out_path}")
+    aggregated_trades = enrich_aggregated_trades(aggregated_trades, strategy_configs)
+
+    payload = {
+        'date': str(trade_date.date()),
+        'generated_at': run_date,
+        'instrument': '510300',
+        'account_equity': ACCOUNT_EQUITY,
+        'gate_result': gate_result,
+        'strategy_signals': strategy_signal_details,
+        'aggregated_trades': aggregated_trades,
+    }
+    out_path = SIGNAL_DIR / f'{trade_date:%Y%m%d}.json'
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    print(f'交易日: {trade_date:%Y-%m-%d}')
+    print(f"Gate状态: {'允许' if gate_result['allowed'] else '阻断'}（blocked_by={gate_result['blocked_by']}, reason={gate_result['reason']}）")
+    for strategy_id, detail in strategy_signal_details.items():
+        print(
+            f"{strategy_id}: signal={detail['signal']} active={detail['is_active']} "
+            f"max_capital_pct={detail['max_capital_pct']:.2f} rationale={detail['rationale']}"
+        )
+    print(f'aggregated_trades={len(aggregated_trades)}')
+    print(f'信号文件: {out_path}')
     maybe_generate_monthly_attribution_report(trade_date)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-    # 每日信号生成后自动更新报告
     try:
         import subprocess
 
         subprocess.run(
-            [str(ROOT / ".venv" / "Scripts" / "python.exe"), "scripts/generate_report.py"],
+            [str(ROOT / '.venv' / 'Scripts' / 'python.exe'), 'scripts/generate_report.py'],
             cwd=str(ROOT),
             check=True,
         )
-        print("报告已更新：runtime/reports/strategy_report.html")
+        print('报告已更新：runtime/reports/strategy_report.html')
     except Exception as e:
-        print(f"报告生成失败（不影响信号）：{e}")
+        print(f'报告生成失败（不影响信号）：{e}')
+
