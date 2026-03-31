@@ -9,8 +9,9 @@ from hikyuu import HHV, LLV, PRICELIST, REF
 
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
-BASELINE_RESULTS_PATH = Path(r"D:\AITradingSystem\runtime\experiments\exp-20260329-008-parquet-entry25-exit20\results.json")
-RESULT_PATH = Path(r"D:\AITradingSystem\coordination\phase1_hikyuu_cross_validate_result.json")
+_ROOT = Path(__file__).resolve().parents[1]
+BASELINE_RESULTS_PATH = _ROOT / "runtime" / "experiments" / "exp-20260329-008-parquet-entry25-exit20" / "results.json"
+RESULT_PATH = _ROOT / "coordination" / "phase1_hikyuu_cross_validate_result.json"
 
 ENTRY_WINDOW = 25
 EXIT_WINDOW = 20

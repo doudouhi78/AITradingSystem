@@ -4,7 +4,7 @@ import argparse
 import csv
 from pathlib import Path
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 PAPER_DIR = ROOT / "runtime" / "paper_trading"
 LOG_PATH = PAPER_DIR / "trade_log.csv"
 

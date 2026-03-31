@@ -15,9 +15,9 @@ if not (REPO_ROOT / "runtime" / "market_data").exists():
             REPO_ROOT = parent
             break
     else:
-        fallback_root = Path(r"D:\AITradingSystem")
-        if (fallback_root / "runtime" / "market_data").exists():
-            REPO_ROOT = fallback_root
+        _primary = Path(r"D:\AITradingSystem")
+        if (_primary / "runtime" / "market_data").exists():
+            REPO_ROOT = _primary
 MARKET_DATA_ROOT = REPO_ROOT / "runtime" / "market_data"
 
 

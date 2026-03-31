@@ -16,11 +16,12 @@ if str(SRC) not in sys.path:
 
 from ai_dev_os.project_objects import validate_experiment_run, validate_research_task  # noqa: E402
 
+_PRIMARY = Path(r'D:\AITradingSystem')
 MARKET_DATA_CANDIDATES = [
     ROOT / 'runtime' / 'market_data',
-    Path(r'D:\AITradingSystem\runtime\market_data'),
+    _PRIMARY / 'runtime' / 'market_data',
 ]
-BASELINE_RESULT_PATH = Path(r'D:\AITradingSystem\runtime\experiments\exp-20260329-008-parquet-entry25-exit20\results.json')
+BASELINE_RESULT_PATH = (_PRIMARY if (_PRIMARY / 'runtime' / 'experiments').exists() else ROOT) / 'runtime' / 'experiments' / 'exp-20260329-008-parquet-entry25-exit20' / 'results.json'
 OUTPUT_ROOT = ROOT / 'runtime' / 'strategy_library'
 DEFAULT_START = '2016-01-01'
 DEFAULT_END = '2026-03-30'

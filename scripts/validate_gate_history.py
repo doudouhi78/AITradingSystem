@@ -7,7 +7,7 @@ import pandas as pd
 
 from ai_dev_os.gate import GateScheduler
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 ETF_PATH = ROOT / "runtime" / "market_data" / "cn_etf" / "510300.parquet"
 RESULT_PATH = ROOT / "coordination" / "gate_validation_result.json"
 

@@ -8,16 +8,17 @@ from typing import Any
 import alphalens as al
 
 ROOT = Path(__file__).resolve().parents[2]
-PRIMARY_ROOT = Path(r'D:\AITradingSystem')
-PRIMARY_SRC = PRIMARY_ROOT / 'src'
+_PRIMARY = Path(r'D:\AITradingSystem')
+INPUT_ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'alpha_research').exists() else ROOT
+PRIMARY_SRC = INPUT_ROOT / 'src'
 if str(PRIMARY_SRC) not in sys.path:
     sys.path.insert(0, str(PRIMARY_SRC))
 
 from alpha_research.data_loader import load_factor_input, load_prices, select_top_n_by_liquidity  # noqa: E402
 from alpha_research.factors.volume_liquidity import factor_turnover_20d, factor_volume_price_divergence  # noqa: E402
 
-PHASE2_PATH = PRIMARY_ROOT / 'runtime' / 'alpha_research' / 'phase2' / 'ic_batch_result.json'
-PHASE3_PATH = PRIMARY_ROOT / 'runtime' / 'alpha_research' / 'phase3' / 'best_weights.json'
+PHASE2_PATH = INPUT_ROOT / 'runtime' / 'alpha_research' / 'phase2' / 'ic_batch_result.json'
+PHASE3_PATH = INPUT_ROOT / 'runtime' / 'alpha_research' / 'phase3' / 'best_weights.json'
 OUTPUT_DIR = ROOT / 'runtime' / 'attribution' / 'factor_attribution'
 
 

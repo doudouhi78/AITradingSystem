@@ -14,7 +14,7 @@ from pandera import Check, Column, DataFrameSchema
 
 from akshare.stock_fundamental.stock_finance_sina import stock_financial_analysis_indicator
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 CLASSIFICATION_DIR = ROOT / "runtime" / "classification_data"
 FUNDAMENTAL_DIR = ROOT / "runtime" / "fundamental_data"
 FINANCIAL_DIR = FUNDAMENTAL_DIR / "financial_quarterly"

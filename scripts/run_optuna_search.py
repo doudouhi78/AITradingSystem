@@ -5,7 +5,7 @@ from pathlib import Path
 
 from ai_dev_os.research_session import run_experiment
 
-RESULT_PATH = Path(r"D:\AITradingSystem\coordination\param_heatmap.json")
+RESULT_PATH = Path(__file__).resolve().parents[1] / "coordination" / "param_heatmap.json"
 
 
 def main() -> None:

@@ -8,7 +8,7 @@ import vectorbt as vbt
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 from ai_dev_os.etf_breakout_runtime import run_breakout_backtest
 
-RESULT_PATH = Path(r"D:\AITradingSystem\coordination\wfo_result.json")
+RESULT_PATH = Path(__file__).resolve().parents[1] / "coordination" / "wfo_result.json"
 
 
 def main() -> None:

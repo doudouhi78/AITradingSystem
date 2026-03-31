@@ -22,10 +22,11 @@ from strategies import FactorMomentumStrategy, MACrossStrategy, RSIReversionStra
 from strategy.compare_strategies import generate_comparison  # type: ignore  # noqa: E402
 from strategy.run_strategy_backtest import OUTPUT_ROOT, load_baseline_registry_record, run_single_instrument_strategy  # type: ignore  # noqa: E402
 
-PRIMARY_ROOT = Path(r'D:\AITradingSystem')
-FACTOR_REGISTRY_PATH = PRIMARY_ROOT / 'runtime' / 'alpha_research' / 'factor_registry.json'
-CSI300_PATH = PRIMARY_ROOT / 'runtime' / 'classification_data' / 'index_components' / 'csi300_latest.parquet'
-STOCK_DATA_DIR = PRIMARY_ROOT / 'runtime' / 'market_data' / 'cn_stock'
+_PRIMARY = Path(r'D:\AITradingSystem')
+INPUT_ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'market_data').exists() else ROOT
+FACTOR_REGISTRY_PATH = INPUT_ROOT / 'runtime' / 'alpha_research' / 'factor_registry.json'
+CSI300_PATH = INPUT_ROOT / 'runtime' / 'classification_data' / 'index_components' / 'csi300_latest.parquet'
+STOCK_DATA_DIR = INPUT_ROOT / 'runtime' / 'market_data' / 'cn_stock'
 
 
 def _factor_strategy_readiness() -> tuple[bool, str]:

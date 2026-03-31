@@ -8,10 +8,11 @@ from ai_dev_os.experiment_store import read_experiment_artifacts
 from ai_dev_os.validation_store import write_validation_record
 
 EXPERIMENT_ID = "exp-20260329-008-parquet-entry25-exit20"
-WFO_PATH = Path(r"D:\AITradingSystem\coordination\wfo_result.json")
-MC_PATH = Path(r"D:\AITradingSystem\coordination\mc_result.json")
-HEATMAP_PATH = Path(r"D:\AITradingSystem\coordination\param_heatmap.json")
-SUMMARY_PATH = Path(r"D:\AITradingSystem\coordination\phase2_validation_summary.json")
+_ROOT = Path(__file__).resolve().parents[1]
+WFO_PATH = _ROOT / "coordination" / "wfo_result.json"
+MC_PATH = _ROOT / "coordination" / "mc_result.json"
+HEATMAP_PATH = _ROOT / "coordination" / "param_heatmap.json"
+SUMMARY_PATH = _ROOT / "coordination" / "phase2_validation_summary.json"
 
 
 def build_relative_position_summary(grid: list[dict]) -> str:

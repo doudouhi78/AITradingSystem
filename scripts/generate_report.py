@@ -6,7 +6,7 @@ from pathlib import Path
 
 from jinja2 import Template
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 COORD = ROOT / "coordination"
 REPORT_DIR = ROOT / "runtime" / "reports"
 REPORT_PATH = REPORT_DIR / "strategy_report.html"

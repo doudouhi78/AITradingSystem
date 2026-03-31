@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 IN_PATH = ROOT / "runtime" / "alpha_research" / "phase2" / "ic_batch_result.json"
 REGISTRY_PATH = ROOT / "runtime" / "alpha_research" / "factor_registry.json"
 LEGACY_REGISTRY_PATH = ROOT / "src" / "alpha_research" / "registry" / "factor_registry.json"

@@ -9,7 +9,7 @@ from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 from ai_dev_os.etf_breakout_runtime import run_breakout_backtest
 from ai_dev_os.experiment_store import write_experiment_artifacts
 
-SOURCE_EXPERIMENT = Path(r"D:\AITradingSystem\runtime\experiments\exp-20260328-007-manual-entry25-exit20")
+SOURCE_EXPERIMENT = Path(__file__).resolve().parents[1] / "runtime" / "experiments" / "exp-20260328-007-manual-entry25-exit20"
 EXPERIMENT_ID = "exp-20260329-008-parquet-entry25-exit20"
 RUN_ID = "run-20260329-008"
 CREATED_AT = "2026-03-29T00:00:00+08:00"

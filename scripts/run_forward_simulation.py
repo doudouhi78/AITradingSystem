@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "runtime" / "market_data" / "cn_etf" / "510300.parquet"
 RESULT_PATH = ROOT / "coordination" / "phase5_forward_sim_result.json"
 EQUITY_CSV = ROOT / "runtime" / "paper_trading" / "forward_sim_equity.csv"

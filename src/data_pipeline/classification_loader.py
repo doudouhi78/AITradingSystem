@@ -39,7 +39,7 @@ import akshare as ak  # noqa: E402
 import pandas as pd  # noqa: E402
 from akshare.stock_feature.stock_classify_sina import stock_classify_sina
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 CLASSIFICATION_DIR = ROOT / "runtime" / "classification_data"
 INDEX_DIR = CLASSIFICATION_DIR / "index_components"
 

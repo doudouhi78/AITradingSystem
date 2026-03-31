@@ -14,7 +14,7 @@ from alpha_research.factors.fundamental import factor_pb_ratio_approx, probe_pb_
 from alpha_research.factors.price_momentum import factor_momentum_20d
 from alpha_research.factors.volume_liquidity import factor_turnover_20d
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "runtime" / "alpha_research" / "phase1"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = OUT_DIR / "factor_log.json"

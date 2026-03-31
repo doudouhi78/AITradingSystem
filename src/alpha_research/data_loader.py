@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pandas as pd
 
-ROOT = Path(r"D:\AITradingSystem")
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_PRIMARY = Path(r'D:\AITradingSystem')
+ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'market_data').exists() else _REPO_ROOT
 ETF_DIR = ROOT / "runtime" / "market_data" / "cn_etf"
 STOCK_DIR = ROOT / "runtime" / "market_data" / "cn_stock"
 CSI300_PATH = ROOT / "runtime" / "classification_data" / "index_components" / "csi300_latest.parquet"

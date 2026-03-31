@@ -18,6 +18,27 @@ if str(SCRIPTS) not in sys.path:
 
 from strategy.run_strategy_backtest import OUTPUT_ROOT, load_baseline_reference_returns  # type: ignore  # noqa: E402
 
+# Fallback metrics for strategies without a strategy_library run directory.
+# Maps strategy_id -> experiment results path (relative to ROOT).
+_EXPERIMENT_FALLBACK: dict[str, Path] = {
+    'strat_breakout_v1': ROOT / 'runtime' / 'experiments' / 'exp-20260329-008-parquet-entry25-exit20' / 'results.json',
+}
+
+
+def _load_fallback_metrics(strategy_id: str) -> dict[str, Any] | None:
+    """Load metrics from a known experiment results file when no strategy run dir exists."""
+    path = _EXPERIMENT_FALLBACK.get(strategy_id)
+    if path is None or not path.exists():
+        return None
+    data = json.loads(path.read_text(encoding='utf-8'))
+    metrics = data.get('metrics_summary', {})
+    return {
+        'max_drawdown': metrics.get('max_drawdown'),
+        'annual_return': metrics.get('annual_return') or metrics.get('annualized_return'),
+        'win_rate': metrics.get('win_rate'),
+        'trade_count': metrics.get('trade_count') or metrics.get('trades'),
+    }
+
 
 def _load_registry() -> list[dict[str, Any]]:
     path = OUTPUT_ROOT / 'strategy_registry.json'
@@ -63,16 +84,17 @@ def generate_comparison(status_filter: list[str] | None = None) -> dict[str, Any
         strategy_id = item['strategy_id']
         run_payload = runs.get(strategy_id)
         if run_payload is None:
+            fallback = _load_fallback_metrics(strategy_id) or {}
             comparison_rows.append({
                 'strategy_id': strategy_id,
                 'strategy_name': item['strategy_name'],
                 'strategy_type': item['strategy_type'],
                 'status': item['status'],
                 'sharpe': item.get('sharpe'),
-                'max_drawdown': None,
-                'annual_return': None,
-                'win_rate': None,
-                'trade_count': None,
+                'max_drawdown': fallback.get('max_drawdown'),
+                'annual_return': fallback.get('annual_return'),
+                'win_rate': fallback.get('win_rate'),
+                'trade_count': fallback.get('trade_count'),
                 'correlation_with_baseline': None,
                 'notes': item.get('notes', ''),
             })

@@ -7,7 +7,7 @@ import pandas as pd
 import vectorbt as vbt
 from hikyuu import HHV, LLV, PRICELIST, REF
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 STOCK_DIR = ROOT / "runtime" / "market_data" / "cn_stock"
 RESULT_PATH = ROOT / "coordination" / "phase4_limit_constraint_result.json"
 ENTRY_WINDOW = 25

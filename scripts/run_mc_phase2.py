@@ -8,7 +8,7 @@ import vectorbt as vbt
 
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 POSITION_PATH = ROOT / "coordination" / "position_sizing_validation.json"
 RESULT_PATH = ROOT / "coordination" / "mc_phase2_result.json"
 TARGET = 0.20

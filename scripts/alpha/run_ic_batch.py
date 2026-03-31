@@ -12,7 +12,7 @@ from alpha_research.evaluation.ic_pipeline import batch_evaluate
 from alpha_research.evaluation.screening import screen_factor
 from alpha_research.factors import fundamental, price_momentum, sentiment, technical, volume_liquidity
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 OUT_PATH = ROOT / "runtime" / "alpha_research" / "phase2" / "ic_batch_result.json"
 TRAIN_START = "2020-01-01"
 TRAIN_END = "2024-06-30"

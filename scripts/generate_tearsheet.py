@@ -9,7 +9,7 @@ import vectorbt as vbt
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
 EXPERIMENT_ID = "exp-20260329-008-parquet-entry25-exit20"
-EXPERIMENT_ROOT = Path(r"D:\AITradingSystem\runtime\experiments") / EXPERIMENT_ID
+EXPERIMENT_ROOT = Path(__file__).resolve().parents[1] / "runtime" / "experiments" / EXPERIMENT_ID
 TEARSHEET_PATH = EXPERIMENT_ROOT / "tearsheet.html"
 
 

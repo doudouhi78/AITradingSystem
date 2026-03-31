@@ -8,7 +8,7 @@ import vectorbt as vbt
 
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
-RESULT_PATH = Path(r"D:\AITradingSystem\coordination\mc_result.json")
+RESULT_PATH = Path(__file__).resolve().parents[1] / "coordination" / "mc_result.json"
 TARGET = 0.20
 CANDIDATES = [0.5, 0.4, 0.3, 0.2]
 

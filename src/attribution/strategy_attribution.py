@@ -15,8 +15,8 @@ except ModuleNotFoundError:
 from attribution.trade_diagnostics import _rebuild_breakout_portfolio
 
 ROOT = Path(__file__).resolve().parents[2]
-PRIMARY_ROOT = Path(r'D:\AITradingSystem')
-INPUT_ROOT = PRIMARY_ROOT if (PRIMARY_ROOT / 'runtime' / 'experiments').exists() else ROOT
+_PRIMARY = Path(r'D:\AITradingSystem')
+INPUT_ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'experiments').exists() else ROOT
 EXPERIMENTS_DIR = INPUT_ROOT / 'runtime' / 'experiments'
 BENCHMARK_PATH = INPUT_ROOT / 'runtime' / 'market_data' / 'cn_etf' / '510300.parquet'
 OUTPUT_DIR = ROOT / 'runtime' / 'attribution' / 'strategy_attribution'

@@ -11,8 +11,8 @@ import vectorbt as vbt
 from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet
 
 ROOT = Path(__file__).resolve().parents[2]
-PRIMARY_ROOT = Path(r'D:\AITradingSystem')
-INPUT_ROOT = PRIMARY_ROOT if (PRIMARY_ROOT / 'runtime' / 'experiments').exists() else ROOT
+_PRIMARY = Path(r'D:\AITradingSystem')
+INPUT_ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'experiments').exists() else ROOT
 EXPERIMENTS_DIR = INPUT_ROOT / 'runtime' / 'experiments'
 SIGNAL_DIR = INPUT_ROOT / 'runtime' / 'paper_trading' / 'signals'
 BENCHMARK_PATH = INPUT_ROOT / 'runtime' / 'market_data' / 'cn_etf' / '510300.parquet'

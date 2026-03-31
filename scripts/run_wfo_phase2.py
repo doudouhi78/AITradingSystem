@@ -10,7 +10,7 @@ from ai_dev_os.etf_breakout_runtime import load_etf_from_parquet, run_breakout_b
 from ai_dev_os.gate import GateScheduler
 from ai_dev_os.risk import compute_quantity, compute_stop_price, wilder_atr
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 RESULT_PATH = ROOT / "coordination" / "wfo_phase2_result.json"
 TRAIN_DAYS = 252 * 3
 TEST_DAYS = 252

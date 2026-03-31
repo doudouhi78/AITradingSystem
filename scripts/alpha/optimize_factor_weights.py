@@ -14,7 +14,7 @@ from ai_dev_os.experiment_store import write_experiment_artifacts
 from ai_dev_os.project_objects import build_experiment_index_record
 from ai_dev_os.system_db import record_experiment_run
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 PHASE3_ROOT = ROOT / "runtime" / "alpha_research" / "phase3"
 BEST_WEIGHTS_PATH = PHASE3_ROOT / "best_weights.json"
 WFO_RESULT_PATH = PHASE3_ROOT / "wfo_result.json"

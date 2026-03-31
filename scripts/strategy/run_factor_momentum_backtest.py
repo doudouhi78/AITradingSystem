@@ -30,13 +30,14 @@ for p in [str(ROOT), str(SRC), str(SCRIPTS)]:
 
 warnings.filterwarnings('ignore')
 
-PRIMARY_ROOT = Path(r'D:\AITradingSystem')
-FACTOR_REGISTRY_PATH = PRIMARY_ROOT / 'runtime' / 'alpha_research' / 'factor_registry.json'
-BEST_WEIGHTS_PATH = PRIMARY_ROOT / 'runtime' / 'alpha_research' / 'phase3' / 'best_weights.json'
-CSI300_PATH = PRIMARY_ROOT / 'runtime' / 'classification_data' / 'index_components' / 'csi300_latest.parquet'
-STOCK_DATA_DIR = PRIMARY_ROOT / 'runtime' / 'market_data' / 'cn_stock'
-OUTPUT_DIR = PRIMARY_ROOT / 'runtime' / 'strategy_library' / 'strat_factor_momentum_v1'
-STRATEGY_REGISTRY_PATH = PRIMARY_ROOT / 'runtime' / 'strategy_library' / 'strategy_registry.json'
+_PRIMARY = Path(r'D:\AITradingSystem')
+INPUT_ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'market_data').exists() else ROOT
+FACTOR_REGISTRY_PATH = INPUT_ROOT / 'runtime' / 'alpha_research' / 'factor_registry.json'
+BEST_WEIGHTS_PATH = INPUT_ROOT / 'runtime' / 'alpha_research' / 'phase3' / 'best_weights.json'
+CSI300_PATH = INPUT_ROOT / 'runtime' / 'classification_data' / 'index_components' / 'csi300_latest.parquet'
+STOCK_DATA_DIR = INPUT_ROOT / 'runtime' / 'market_data' / 'cn_stock'
+OUTPUT_DIR = INPUT_ROOT / 'runtime' / 'strategy_library' / 'strat_factor_momentum_v1'
+STRATEGY_REGISTRY_PATH = INPUT_ROOT / 'runtime' / 'strategy_library' / 'strategy_registry.json'
 
 IN_SAMPLE_START = '2020-01-01'
 IN_SAMPLE_END = '2024-06-30'

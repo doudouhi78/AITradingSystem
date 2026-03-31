@@ -11,7 +11,7 @@ from alpha_research.factors.volume_liquidity import factor_turnover_20d, factor_
 from alpha_research.signal_composer import compose_signal, generate_top_n_signal
 from ai_dev_os.gate.gate_scheduler import GateScheduler
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 PHASE3_ROOT = ROOT / "runtime" / "alpha_research" / "phase3"
 ETF_DATA_DIR = ROOT / "runtime" / "market_data" / "cn_etf"
 DEFAULT_START = "2020-01-01"

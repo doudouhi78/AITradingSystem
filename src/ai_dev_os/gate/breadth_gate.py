@@ -7,7 +7,9 @@ import pandas as pd
 from ai_dev_os.gate import GateDecision
 from ai_dev_os.gate.gate_config import BreadthGateConfig
 
-ROOT = Path(r"D:\AITradingSystem")
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_PRIMARY = Path(r'D:\AITradingSystem')
+ROOT = _PRIMARY if (_PRIMARY / 'runtime' / 'market_data').exists() else _REPO_ROOT
 STOCK_DIR = ROOT / "runtime" / "market_data" / "cn_stock"
 _BREADTH_CACHE: pd.DataFrame | None = None
 

@@ -9,7 +9,7 @@ from ai_dev_os.risk.atr_stop import _self_test as atr_self_test
 from ai_dev_os.risk import compute_quantity, compute_stop_price, wilder_atr
 from ai_dev_os.risk.position_sizing import _self_test as sizing_self_test
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "runtime" / "market_data" / "cn_etf" / "510300.parquet"
 RESULT_PATH = ROOT / "coordination" / "position_sizing_validation.json"
 ENTRY_WINDOW = 25

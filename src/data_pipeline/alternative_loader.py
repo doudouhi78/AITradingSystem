@@ -5,7 +5,7 @@ from pathlib import Path
 import akshare as ak
 import pandas as pd
 
-ROOT = Path(r"D:\AITradingSystem")
+ROOT = Path(__file__).resolve().parents[2]
 ALTERNATIVE_DIR = ROOT / "runtime" / "alternative_data"
 NORTHBOUND_PATH = ALTERNATIVE_DIR / "northbound_flow.parquet"
 MARGIN_PATH = ALTERNATIVE_DIR / "margin_balance.parquet"
