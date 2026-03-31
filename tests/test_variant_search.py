@@ -1,3 +1,7 @@
+import pytest
+
+pytest.importorskip("optuna", reason="optuna not installed; skipping variant search tests")
+
 from ai_dev_os.variant_search import run_variant_search
 
 from tests.test_project_objects import sample_variant_search_spec

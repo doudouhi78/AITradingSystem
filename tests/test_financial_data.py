@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("baostock", reason="baostock not installed; skipping financial data tests")
+
 import pandas as pd
 
 from data_pipeline.fundamental_loader import FINANCIAL_DIR, build_financial_quarterly, get_latest_financial

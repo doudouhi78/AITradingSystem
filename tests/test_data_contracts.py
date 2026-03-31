@@ -1,5 +1,9 @@
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("pandera", reason="pandera not installed; skipping data contracts tests")
+
 import pandas as pd
 
 from ai_dev_os.data_contracts import build_default_data_contract_spec

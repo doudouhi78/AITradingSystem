@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("baostock", reason="baostock not installed; skipping fundamental loader tests")
+
 import pandas as pd
 
 from data_pipeline.fundamental_loader import (

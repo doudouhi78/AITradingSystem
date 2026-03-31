@@ -8,12 +8,12 @@
       "strategy_type": "trend",
       "status": "observation",
       "sharpe": 0.520399,
-      "max_drawdown": null,
-      "annual_return": null,
-      "win_rate": null,
-      "trade_count": null,
+      "max_drawdown": -0.16268994784737256,
+      "annual_return": 0.047213612258210524,
+      "win_rate": 0.5517241379310345,
+      "trade_count": 29,
       "correlation_with_baseline": null,
-      "notes": "Parquet 口径当前旧突破基线，保留 observation"
+      "notes": "Parquet 口径当前旧突破基线，保留 observation；指标补全自 exp-20260329-008-parquet-entry25-exit20"
     },
     {
       "strategy_id": "strat_ma_cross_v1",
@@ -86,6 +86,7 @@
     }
   },
   "warnings": [
-    "warning: strat_rsi_reversion_v1 and strat_vol_breakout_v1 daily return correlation > 0.7 (0.721)"
+    "warning: strat_rsi_reversion_v1 and strat_vol_breakout_v1 daily return correlation > 0.7 (0.721)",
+    "warning: strat_ma_cross_v1 and baseline daily return correlation > 0.7 (0.857)"
   ]
 }

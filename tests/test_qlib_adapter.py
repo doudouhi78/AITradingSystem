@@ -1,3 +1,7 @@
+import importlib
+
+import pytest
+
 from ai_dev_os.project_objects import FormalReviewRecord, ResearchTask, ValidationRecord
 from ai_dev_os.qlib_adapter import (
     build_qlib_dataset_config,
@@ -5,6 +9,8 @@ from ai_dev_os.qlib_adapter import (
     build_qlib_workflow_payload,
     ensure_qlib_available,
 )
+
+_qlib_available = importlib.util.find_spec("qlib") is not None
 
 
 def _research_task() -> ResearchTask:
@@ -139,6 +145,7 @@ def _formal_review() -> FormalReviewRecord:
     }
 
 
+@pytest.mark.skipif(not _qlib_available, reason="qlib not installed")
 def test_ensure_qlib_available():
     assert ensure_qlib_available()
 

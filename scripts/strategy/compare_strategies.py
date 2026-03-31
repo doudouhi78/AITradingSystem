@@ -113,6 +113,14 @@ def generate_comparison(status_filter: list[str] | None = None) -> dict[str, Any
                 if pd.notna(value) and float(value) > 0.7:
                     warnings.append(f'warning: {left} and {right} daily return correlation > 0.7 ({float(value):.3f})')
 
+    # Warn when a strategy has high correlation with baseline
+    for row in comparison_rows:
+        corr_val = row.get('correlation_with_baseline')
+        if corr_val is not None and float(corr_val) > 0.7:
+            warnings.append(
+                f"warning: {row['strategy_id']} and baseline daily return correlation > 0.7 ({float(corr_val):.3f})"
+            )
+
     payload = {
         'generated_at': datetime.now().astimezone().isoformat(),
         'status_filter': status_filter or [],

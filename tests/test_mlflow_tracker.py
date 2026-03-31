@@ -1,3 +1,7 @@
+import pytest
+
+pytest.importorskip("mlflow", reason="mlflow not installed; skipping mlflow tracker tests")
+
 from ai_dev_os.mlflow_tracker import configure_mlflow_tracking
 from ai_dev_os.mlflow_tracker import ensure_mlflow_experiment
 from ai_dev_os.mlflow_tracker import log_experiment_run_to_mlflow
