@@ -43,7 +43,7 @@ def _normalize_weights(weights: dict[str, float]) -> dict[str, float]:
 
 
 def _prepare_dataset() -> tuple[list[str], pd.DataFrame, dict[str, pd.Series], pd.Series, pd.Series]:
-    instruments = select_top_n_by_liquidity("etf", TRAIN_START, TEST_END, top_n=TOP_N)
+    instruments = select_top_n_by_liquidity("etf", TRAIN_START, TRAIN_END, top_n=TOP_N)
     prices = load_prices(instruments, TRAIN_START, TEST_END, asset_type="etf")
     factor_input = load_factor_input(instruments, TRAIN_START, TEST_END, asset_type="etf")
     factor_map = {

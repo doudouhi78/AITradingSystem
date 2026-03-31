@@ -45,6 +45,12 @@ def probe_pb_interfaces() -> list[dict[str, Any]]:
 
 
 def factor_pb_ratio_approx(instruments: list[str], start: str, end: str) -> pd.Series:
+    """
+    ⚠️ KNOWN ISSUE: No announcement lag handling.
+    Quarterly values are forward-filled but publication delay (~20 days) is not modeled.
+    This factor must NOT be used in any IC evaluation or WFO until fixed.
+    Status: excluded from run_ic_batch.py
+    """
     dfs = []
     for symbol in instruments:
         try:

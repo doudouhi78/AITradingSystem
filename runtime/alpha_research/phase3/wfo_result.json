@@ -7,9 +7,9 @@
     "start": "2024-07-01",
     "end": "2025-09-30"
   },
-  "in_sample_ic": -0.012906197522766942,
-  "out_of_sample_ic": 0.009241843060779395,
-  "ic_decay_ratio": -0.7160779187267583,
+  "in_sample_ic": -0.007750689393417923,
+  "out_of_sample_ic": 0.004099635324619592,
+  "ic_decay_ratio": -0.5289381520179488,
   "in_sample_days": 1067,
   "out_of_sample_days": 298
 }

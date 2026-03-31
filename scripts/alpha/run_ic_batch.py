@@ -28,6 +28,9 @@ def load_factor_functions() -> dict[str, callable]:
     for module in MODULES:
         for name, obj in inspect.getmembers(module, inspect.isfunction):
             if name.startswith("factor_"):
+                # 排除：pb_ratio_approx 缺少公告延迟处理，存在前向偏差风险，待 Phase 2 修复后重新纳入
+                if name == "factor_pb_ratio_approx":
+                    continue
                 factor_functions[name] = obj
     return dict(sorted(factor_functions.items()))
 

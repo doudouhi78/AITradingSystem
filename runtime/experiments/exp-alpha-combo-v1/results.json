@@ -1,21 +1,21 @@
 {
   "metrics_summary": {
-    "total_return": 0.009241843060779395,
-    "annual_return": -0.012906197522766942,
-    "annualized_return": 0.009241843060779395,
+    "total_return": 0.004099635324619592,
+    "annual_return": -0.007750689393417923,
+    "annualized_return": 0.004099635324619592,
     "max_drawdown": 0.0,
-    "sharpe": 0.009241843060779395,
+    "sharpe": 0.004099635324619592,
     "trade_count": 298,
     "trades": 298,
-    "win_rate": 0.5234899328859061,
+    "win_rate": 0.5369127516778524,
     "notes": [
-      "in_sample_ic=-0.012906",
-      "out_of_sample_ic=0.009242",
+      "in_sample_ic=-0.007751",
+      "out_of_sample_ic=0.004100",
       "gate_status=integrated_via_GateScheduler.evaluate(date, equity_series, etf_df)"
     ],
     "key_findings": [
-      "训练期 IC=-0.012906",
-      "样本外 IC=0.009242"
+      "训练期 IC=-0.007751",
+      "样本外 IC=0.004100"
     ]
   },
   "risk_position_note": {
@@ -26,7 +26,7 @@
     "exit_after_signal_policy": "rebalance_on_rank_change",
     "notes": [
       "本实验是 Alpha Research Phase 3，先验证信号质量，不直接做收益承诺。",
-      "best_weights={\"factor_turnover_20d\": 0.05423, \"factor_volume_price_divergence\": 0.94577}"
+      "best_weights={\"factor_turnover_20d\": 0.007848, \"factor_volume_price_divergence\": 0.992152}"
     ],
     "reasoning": "先用等权 top decile 作为最小执行假设，避免 Phase 3 过早引入复杂仓位逻辑。"
   },
@@ -42,7 +42,7 @@
       "尚未扩展股票 universe。"
     ],
     "recommended_next_step": "如果样本外 IC 仍为正，进入收益回测与约束验证；否则回到因子池重筛。",
-    "reviewed_at": "2026-03-31T00:27:49+08:00",
+    "reviewed_at": "2026-03-31T00:54:14+08:00",
     "judgement": "Sprint 21 先确认复合因子能否在样本外维持正 IC，并正确接入 Gate。",
     "review_method": "Optuna 50 次权重搜索 + WFO 样本外对照。",
     "review_reasoning": "Phase 3 目标是信号集成，不是直接上线，因此先以 IC 稳健性为主。"
@@ -52,6 +52,6 @@
     "is_baseline": false,
     "baseline_of": "",
     "decision_reason": "Alpha Phase 3 产物先作为候选组合保留，等待收益回测阶段继续判断。",
-    "decided_at": "2026-03-31T00:27:49+08:00"
+    "decided_at": "2026-03-31T00:54:14+08:00"
   }
 }
