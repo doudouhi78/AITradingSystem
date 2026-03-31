@@ -1,12 +1,58 @@
 [
   {
+    "factor_name": "factor_margin_balance_change_5d",
+    "status": "weak",
+    "ic_mean_10d": 0.10421299595870005,
+    "icir_10d": 0.4020785557142746,
+    "decay_halflife_days": 20,
+    "universe": "stock_csi300_latest",
+    "registered_date": "2026-03-31",
+    "evaluation_type": "market_timing",
+    "notes": "Phase 8B newly registered factor"
+  },
+  {
+    "factor_name": "factor_northbound_flow_5d",
+    "status": "failed",
+    "ic_mean_10d": -0.046245155734608745,
+    "icir_10d": -0.1833381621109205,
+    "decay_halflife_days": 1,
+    "universe": "stock_csi300_latest",
+    "registered_date": "2026-03-31",
+    "evaluation_type": "market_timing",
+    "notes": "Phase 8B newly registered factor"
+  },
+  {
+    "factor_name": "factor_pb_ratio",
+    "status": "failed",
+    "ic_mean_10d": 0.024143032548976973,
+    "icir_10d": 0.08040911771289204,
+    "decay_halflife_days": 20,
+    "universe": "stock_csi300_latest",
+    "registered_date": "2026-03-31",
+    "evaluation_type": "cross_sectional",
+    "notes": "Phase 8B newly registered factor"
+  },
+  {
+    "factor_name": "factor_pe_ttm",
+    "status": "failed",
+    "ic_mean_10d": 0.01991334076854697,
+    "icir_10d": 0.07155121091505064,
+    "decay_halflife_days": 20,
+    "universe": "stock_csi300_latest",
+    "registered_date": "2026-03-31",
+    "evaluation_type": "cross_sectional",
+    "notes": "Phase 8B newly registered factor"
+  },
+  {
     "factor_name": "factor_turnover_20d",
     "status": "seed",
     "ic_mean_10d": -0.020689360230295845,
     "icir_10d": -0.05168095968029803,
     "decay_halflife_days": 1,
     "universe": "etf_top10",
-    "combo_membership": ["factor_combo_v1"],
+    "combo_membership": [
+      "factor_combo_v1"
+    ],
     "combo_weight": 0.007848,
     "in_sample_ic": -0.007750689393417923,
     "out_of_sample_ic": 0.004099635324619592,
@@ -20,7 +66,9 @@
     "icir_10d": -0.00987126983441584,
     "decay_halflife_days": 1,
     "universe": "etf_top10",
-    "combo_membership": ["factor_combo_v1"],
+    "combo_membership": [
+      "factor_combo_v1"
+    ],
     "combo_weight": 0.992152,
     "in_sample_ic": -0.007750689393417923,
     "out_of_sample_ic": 0.004099635324619592,
