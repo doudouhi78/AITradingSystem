@@ -304,7 +304,7 @@ def run_crosssectional_backtest(
     cum = (1 + ret_series).cumprod()
     roll_max = cum.cummax()
     drawdown = (cum - roll_max) / roll_max
-    max_drawdown = float(abs(drawdown.min()))
+    max_drawdown = float(drawdown.min())
 
     # Win rate (fraction of positive days)
     win_rate = float((ret_series > 0).mean())
@@ -493,3 +493,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

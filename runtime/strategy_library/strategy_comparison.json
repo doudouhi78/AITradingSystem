@@ -60,7 +60,7 @@
       "strategy_type": "factor",
       "status": "research",
       "sharpe": 0.9046763425841814,
-      "max_drawdown": 0.2797143642711561,
+      "max_drawdown": -0.2797143642711561,
       "annual_return": 0.1985430787591249,
       "win_rate": 0.5240143369175627,
       "trade_count": 69,
