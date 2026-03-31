@@ -1,8 +1,8 @@
-## Sprint 27 结果
-- 问题1修复：将 `src\attribution\strategy_attribution.py` 的 `pyfolio` 改为可选导入；缺失时模块仍可 import，`generate_pyfolio_tearsheet()` 输出降级 HTML，不阻断 pytest collect。
-- 问题2修复：在 attribution 序列化中统一将 NaN 转为 JSON `null`，并增加 `note` 字段说明原因；已用真实实验 `exp-20260329-008-parquet-entry25-exit20` 重新生成合规 `strategy_attribution.json`。
-- pytest 结果：5 passed, 0 failed
-- commit：待提交
-- push：待推送
+## Sprint 29 结果
+- 阻断1修复：已确认目标基线实验 `exp-20260329-008-parquet-entry25-exit20` 的 `portfolio.value()` 与 returns 本身正常，历史失真根因不是该实验退化，而是正式入口脚本缺失、旧/测试工件覆盖真实 attribution JSON；本次补齐 `scripts\attribution\run_strategy_attribution.py` 并隔离 `tests\test_strategy_attribution.py` 的 runtime 输出覆盖。新的指标为：sharpe=0.432405，max_drawdown=-0.162690，alpha=0.030396，beta=0.071152。
+- 阻断2修复：已补齐 `src\attribution\factor_attribution.py`、`src\attribution\report_generator.py` 与对应运行脚本，成功生成 `runtime\attribution\factor_attribution\factor_drift_report.json`；摘要：turnover_20d drift_ratio=1.7406 status=healthy，volume_price_divergence drift_ratio=-2.7561 status=failed。
+- HTML报告：已重新生成 `runtime\attribution\reports\attribution_report_202603.html`。
+- commit：[待填写]
+- push：已推送 / 若失败见补充说明
 
 BUILDER_DONE
