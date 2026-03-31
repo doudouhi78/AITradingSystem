@@ -1,0 +1,18 @@
+[
+  {
+    "gate_status": "allowed",
+    "count": 1,
+    "win_rate": 1.0,
+    "avg_pnl_pct": 1.2,
+    "sharpe": 0.0,
+    "insufficient_sample": true
+  },
+  {
+    "gate_status": "unknown",
+    "count": 1,
+    "win_rate": 0.0,
+    "avg_pnl_pct": -0.4,
+    "sharpe": 0.0,
+    "insufficient_sample": true
+  }
+]

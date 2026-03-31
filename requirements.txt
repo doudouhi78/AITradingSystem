@@ -12,3 +12,6 @@ yfinance
 pyarrow
 alphalens-reloaded
 pandas_ta
+empyrical-reloaded
+pyfolio-reloaded
+plotly

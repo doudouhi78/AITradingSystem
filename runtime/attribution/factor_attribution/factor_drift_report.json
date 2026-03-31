@@ -1,0 +1,26 @@
+{
+  "test_period": {
+    "start": "2024-07-01",
+    "end": "2025-09-30"
+  },
+  "reports": [
+    {
+      "factor_name": "turnover_20d",
+      "live_ic_mean": -0.036012631455992566,
+      "live_icir": -0.1707894295498388,
+      "historical_ic_baseline": -0.020689360230295845,
+      "drift_ratio": 1.7406353340621208,
+      "status": "healthy",
+      "recommendation": "继续保留因子进入组合"
+    },
+    {
+      "factor_name": "volume_price_divergence",
+      "live_ic_mean": 0.011873157107854122,
+      "live_icir": 0.05333723891602978,
+      "historical_ic_baseline": -0.004307909718919416,
+      "drift_ratio": -2.7561295111895596,
+      "status": "failed",
+      "recommendation": "暂停该因子，回到 Phase 2 重筛"
+    }
+  ]
+}

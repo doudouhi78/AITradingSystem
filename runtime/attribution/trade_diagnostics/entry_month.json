@@ -1,0 +1,10 @@
+[
+  {
+    "entry_month": "2026-03",
+    "count": 2,
+    "win_rate": 0.5,
+    "avg_pnl_pct": 0.39999999999999997,
+    "sharpe": 5.612486080160913,
+    "insufficient_sample": true
+  }
+]

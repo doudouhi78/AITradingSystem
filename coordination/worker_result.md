@@ -1,31 +1,45 @@
-1) 执行结果
-- Module A：已完成并保留。classification 数据测试继续通过。
-- Module B：已生成 `runtime/fundamental_data/valuation_daily.parquet`，覆盖 1666 只股票，文件大小 52.83 MB。
-- Module C：已生成 `runtime/fundamental_data/financial_quarterly/`，当前覆盖 300 只沪深300成分股；`get_latest_financial("000001", "2024-04-01")` 返回 2023Q4，满足防前向偏差要求。
-- Module D：已生成 `runtime/alternative_data/northbound_flow.parquet` 与 `runtime/alternative_data/margin_balance.parquet`；起始日期分别为 2014-11-17 和 2010-03-31。
-- Module E：已将股票 universe 收缩为沪深300内日均成交额 > 5000万的前 200 只；已重跑 `scripts/alpha/run_ic_batch.py` 和 `scripts/alpha/run_screening.py`，生成 `runtime/alpha_research/phase2/ic_batch_result.json`、`runtime/alpha_research/factor_registry.json`、`runtime/alpha_research/phase2/top5_factors_report.json`。
+1) 执行概况
+- 已按 Module A→B→C→D 完成 Sprint 24 Phase 5 绩效归因层。
+- 依赖已补齐：empyrical-reloaded / pyfolio-reloaded / plotly。导入验证通过（empyrical、pyfolio、plotly）。
 
-2) 代码改动
-- 新增 `src/data_pipeline/alternative_loader.py`
-- 更新 `src/data_pipeline/fundamental_loader.py`
-- 更新 `src/alpha_research/data_loader.py`
-- 更新 `scripts/alpha/run_ic_batch.py`
-- 更新 `scripts/alpha/run_screening.py`
-- 新增 `tests/test_classification_data.py`
-- 新增 `tests/test_fundamental_loader.py`
-- 新增 `tests/test_alternative_data.py`
+2) 已完成工作
+- Module A
+  - 新增 src/attribution/trade_diagnostics.py
+  - 新增 scripts/attribution/run_trade_diagnostics.py
+  - 生成 runtime/attribution/trade_diagnostics/gate_status.json
+  - 生成 runtime/attribution/trade_diagnostics/holding_bucket.json
+  - 生成 runtime/attribution/trade_diagnostics/vol_bucket.json
+  - 生成 runtime/attribution/trade_diagnostics/entry_month.json
+- Module B
+  - 新增 src/attribution/strategy_attribution.py
+  - 新增 scripts/attribution/run_strategy_attribution.py
+  - 生成 runtime/attribution/strategy_attribution/strategy_attribution.json
+  - 生成 runtime/attribution/strategy_attribution/rolling_alpha.json
+  - 生成 runtime/attribution/reports/pyfolio_tearsheet.html
+- Module C
+  - 新增 src/attribution/factor_attribution.py
+  - 使用 turnover_20d / volume_price_divergence 两个 seed factors 完成 drift 检测
+  - 生成 runtime/attribution/factor_attribution/factor_drift_report.json
+- Module D
+  - 新增 src/attribution/report_generator.py
+  - 新增 scripts/attribution/run_monthly_report.py
+  - 生成 runtime/attribution/reports/attribution_report_202603.html
+- 测试
+  - 新增 tests/test_trade_diagnostics.py
+  - 新增 tests/test_strategy_attribution.py
+  - pytest tests/test_trade_diagnostics.py tests/test_strategy_attribution.py -q 通过（4 passed）
 
-3) 自检结果
-- valuation 覆盖数：1666
-- financial 覆盖文件数：300
-- northbound 起始日期：2014-11-17
-- margin 起始日期：2010-03-31
-- stock universe 长度：200
-- pytest：64 passed
+3) 结果摘要
+- strategy_attribution.json 含 alpha / beta / excess_return 字段，满足任务卡要求。
+- rolling_alpha.json 已按时序写出。
+- factor_drift_report.json 含 status 字段。
+- attribution_report_202603.html 已生成，包含四部分：健康仪表盘 / 交易诊断 / 策略归因 / 因子状态。
 
-4) 风险与说明
-- `valuation_daily` 使用当前 AkShare/Sina 可得估值快照反推历史估值口径，满足当前 Phase 4 数据覆盖目标，但不是严格 PIT 估值源。
-- 运行时生成的 parquet 大文件仍留在 `runtime/` 本地，未纳入 git；git 仅提交代码、测试和轻量 JSON 结果文件。
-- `factor_registry.json` 目前仍为空列表，说明数据层已补齐，但筛选阈值下当前因子尚未通过入库标准；`top5_factors_report.json` 已正常生成供后续复盘。
+4) 注意事项
+- pyfolio-reloaded 在当前环境可 import 为 pyfolio，但会有 zipline 缺失 warning；不阻断任务。
+- 交易级诊断目前主要覆盖 etf_trend_breakout 家族实验；alpha_factor_combo 当前没有独立逐笔 trade 明细，因此未纳入交易诊断聚合。
+
+5) 提交信息
+- feat: Phase 5 performance attribution layer
 
 BUILDER_DONE

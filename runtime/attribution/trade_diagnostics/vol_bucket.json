@@ -1,0 +1,18 @@
+[
+  {
+    "vol_bucket": "high",
+    "count": 1,
+    "win_rate": 0.0,
+    "avg_pnl_pct": -0.4,
+    "sharpe": 0.0,
+    "insufficient_sample": true
+  },
+  {
+    "vol_bucket": "low",
+    "count": 1,
+    "win_rate": 1.0,
+    "avg_pnl_pct": 1.2,
+    "sharpe": 0.0,
+    "insufficient_sample": true
+  }
+]
