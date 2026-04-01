@@ -1,8 +1,26 @@
-## Sprint 29 结果
-- 阻断1修复：已确认目标基线实验 `exp-20260329-008-parquet-entry25-exit20` 的 `portfolio.value()` 与 returns 本身正常，历史失真根因不是该实验退化，而是正式入口脚本缺失、旧/测试工件覆盖真实 attribution JSON；本次补齐 `scripts\attribution\run_strategy_attribution.py` 并隔离 `tests\test_strategy_attribution.py` 的 runtime 输出覆盖。新的指标为：sharpe=0.432405，max_drawdown=-0.162690，alpha=0.030396，beta=0.071152。
-- 阻断2修复：已补齐 `src\attribution\factor_attribution.py`、`src\attribution\report_generator.py` 与对应运行脚本，成功生成 `runtime\attribution\factor_attribution\factor_drift_report.json`；摘要：turnover_20d drift_ratio=1.7406 status=healthy，volume_price_divergence drift_ratio=-2.7561 status=failed。
-- HTML报告：已重新生成 `runtime\attribution\reports\attribution_report_202603.html`。
-- commit：3621382b fix: Phase 5 strategy attribution data fix and factor attribution generation
-- push：已推送
+已完成 Sprint 31b。
+
+结果：
+- 主仓 `D:\AITradingSystem` 已按任务卡先 `stash` 指定已修改文件，再清理指定未跟踪文件后成功 `pull`
+- 当前主仓 HEAD：`e19504f6`
+- `src\strategies\` 已含 4 条策略文件
+- `scripts\attribution\` 已含 `run_trade_diagnostics.py`
+- pytest：`9 passed`
+
+结果文件已更新：
+- [worker_result_b2.md](D:\AITradingSystem\.claude\worktrees\youthful-boyd\coordination\worker_result_b2.md)
+
+BUILDER_DONE
+
+---
+
+Sprint 37 任务卡 Builder-2 已完成。
+
+结果：
+- 新增 `src/alpha_research/knowledge_base/alpha101_library.json`，包含 Alpha101 全量 101 条结构化记录
+- 新增 `src/alpha_research/knowledge_base/README.md`，说明知识库字段、分类与状态口径
+- `alpha101_library.json` 已完成本地 `json.loads` 解析校验，字段完整性检查通过
+- 状态分布：`ready_to_run=52`，`pending_alternative=48`，`pending_valuation=1`
+- commit hash：b7276470
 
 BUILDER_DONE
