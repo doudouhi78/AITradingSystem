@@ -688,3 +688,685 @@ __all__ = [
 ] + list(ALPHA_FUNCTIONS.keys()) + [f"factor_alpha{i:03d}" for i in range(1, 102)]
 
 
+
+# Builder-3 appended implementations for alpha021+.
+def safe_divide(left: pd.DataFrame, right: pd.DataFrame | float) -> pd.DataFrame:
+    return left.divide(right).replace([np.inf, -np.inf], np.nan)
+
+
+def binary_signal(condition: pd.DataFrame, true_value: float = 1.0, false_value: float = 0.0) -> pd.DataFrame:
+    return pd.DataFrame(
+        np.where(condition, true_value, false_value),
+        index=condition.index,
+        columns=condition.columns,
+        dtype=float,
+    )
+
+
+def variable_signed_power(base: pd.DataFrame, exponent: pd.DataFrame) -> pd.DataFrame:
+    return np.sign(base) * np.power(np.abs(base), exponent)
+
+
+def frame_min(left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
+    return left.where(left <= right, right)
+
+
+def frame_max(left: pd.DataFrame, right: pd.DataFrame) -> pd.DataFrame:
+    return left.where(left >= right, right)
+
+
+def int_window(window: float) -> int:
+    return max(int(round(window)), 1)
+
+
+def alpha021(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    sma2 = sma(data["close"], 2)
+    sma8 = sma(data["close"], 8)
+    sigma8 = stddev(data["close"], 8)
+    volume_ratio = safe_divide(data["volume"], data["adv20"])
+    factor = binary_signal((sma8 + sigma8) < sma2, -1.0, np.nan)
+    factor = factor.where(~factor.isna(), binary_signal(sma2 < (sma8 - sigma8), 1.0, np.nan))
+    factor = factor.where(~factor.isna(), binary_signal(volume_ratio >= 1.0, 1.0, -1.0))
+    return _stack_factor(factor, "alpha021", data["asset_name"])
+
+
+def alpha022(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -(delta(correlation(data["high"], data["volume"], 5), 5) * rank(stddev(data["close"], 20)))
+    return _stack_factor(factor, "alpha022", data["asset_name"])
+
+
+def alpha023(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = (-delta(data["high"], 2)).where(sma(data["high"], 20) < data["high"], 0.0)
+    return _stack_factor(factor, "alpha023", data["asset_name"])
+
+
+def alpha024(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    trend = safe_divide(delta(sma(data["close"], 100), 100), delay(data["close"], 100))
+    factor = (-(data["close"] - ts_min(data["close"], 100))).where(trend <= 0.05, -delta(data["close"], 3))
+    return _stack_factor(factor, "alpha024", data["asset_name"])
+
+
+def alpha025(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = rank(((-data["returns"]) * data["adv20"]) * data["vwap"] * (data["high"] - data["close"]))
+    return _stack_factor(factor, "alpha025", data["asset_name"])
+
+
+def alpha026(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -ts_max(correlation(ts_rank(data["volume"], 5), ts_rank(data["high"], 5), 5), 3)
+    return _stack_factor(factor, "alpha026", data["asset_name"])
+
+
+def alpha027(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    signal = rank(sma(correlation(rank(data["volume"]), rank(data["vwap"]), 6), 2))
+    factor = binary_signal(signal > 0.5, -1.0, 1.0)
+    return _stack_factor(factor, "alpha027", data["asset_name"])
+
+
+def alpha028(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = scale(correlation(data["adv20"], data["low"], 5) + ((data["high"] + data["low"]) / 2.0) - data["close"])
+    return _stack_factor(factor, "alpha028", data["asset_name"])
+
+
+def alpha029(df: pd.DataFrame) -> pd.Series:
+    # The published shorthand is inconsistent about whether `min(product(..., 1), 5)` is
+    # an elementwise min or a time-series minimum. Keep it disabled until clarified.
+    raise NotImplementedError("Alpha029 requires formula disambiguation before implementation.")
+
+
+def alpha030(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    sign_sum = (
+        np.sign(data["close"] - delay(data["close"], 1))
+        + np.sign(delay(data["close"], 1) - delay(data["close"], 2))
+        + np.sign(delay(data["close"], 2) - delay(data["close"], 3))
+    )
+    factor = (1.0 - rank(sign_sum)) * safe_divide(ts_sum(data["volume"], 5), ts_sum(data["volume"], 20))
+    return _stack_factor(factor, "alpha030", data["asset_name"])
+
+
+def alpha031(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    term1 = rank(rank(rank(decay_linear(-rank(rank(delta(data["close"], 10))), 10))))
+    term2 = rank(-delta(data["close"], 3))
+    term3 = np.sign(scale(correlation(data["adv20"], data["low"], 12)))
+    factor = term1 + term2 + term3
+    return _stack_factor(factor, "alpha031", data["asset_name"])
+
+def alpha032(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = scale(sma(data["close"], 7) - data["close"]) + (20.0 * scale(correlation(data["vwap"], delay(data["close"], 5), 230)))
+    return _stack_factor(factor, "alpha032", data["asset_name"])
+
+
+def alpha033(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = rank(-(1.0 - safe_divide(data["open"], data["close"])))
+    return _stack_factor(factor, "alpha033", data["asset_name"])
+
+
+def alpha034(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    volatility_ratio = safe_divide(stddev(data["returns"], 2), stddev(data["returns"], 5))
+    factor = rank((1.0 - rank(volatility_ratio)) + (1.0 - rank(delta(data["close"], 1))))
+    return _stack_factor(factor, "alpha034", data["asset_name"])
+
+
+def alpha035(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = ts_rank(data["volume"], 32) * (1.0 - ts_rank((data["close"] + data["high"]) - data["low"], 16)) * (1.0 - ts_rank(data["returns"], 32))
+    return _stack_factor(factor, "alpha035", data["asset_name"])
+
+
+def alpha036(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    term1 = 2.21 * rank(correlation(data["close"] - data["open"], delay(data["volume"], 1), 15))
+    term2 = 0.7 * rank(data["open"] - data["close"])
+    term3 = 0.73 * rank(ts_rank(delay(-data["returns"], 6), 5))
+    term4 = rank(correlation(data["vwap"], data["adv20"], 6).abs())
+    term5 = 0.6 * rank((sma(data["close"], 200) - data["open"]) * (data["close"] - data["open"]))
+    factor = term1 + term2 + term3 + term4 + term5
+    return _stack_factor(factor, "alpha036", data["asset_name"])
+
+
+def alpha037(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = rank(correlation(delay(data["open"] - data["close"], 1), data["close"], 200)) + rank(data["open"] - data["close"])
+    return _stack_factor(factor, "alpha037", data["asset_name"])
+
+
+def alpha038(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -rank(ts_rank(data["close"], 10)) * rank(safe_divide(data["close"], data["open"]))
+    return _stack_factor(factor, "alpha038", data["asset_name"])
+
+
+def alpha039(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    liquidity = safe_divide(data["volume"], data["adv20"])
+    factor = -rank(delta(data["close"], 7) * (1.0 - rank(decay_linear(liquidity, 9)))) * (1.0 + rank(ts_sum(data["returns"], 250)))
+    return _stack_factor(factor, "alpha039", data["asset_name"])
+
+
+def alpha040(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -rank(stddev(data["high"], 10)) * correlation(data["high"], data["volume"], 10)
+    return _stack_factor(factor, "alpha040", data["asset_name"])
+
+
+def alpha041(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = np.sqrt(data["high"] * data["low"]) - data["vwap"]
+    return _stack_factor(factor, "alpha041", data["asset_name"])
+
+
+def alpha042(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = safe_divide(rank(data["vwap"] - data["close"]), rank(data["vwap"] + data["close"]))
+    return _stack_factor(factor, "alpha042", data["asset_name"])
+
+
+def alpha043(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = ts_rank(safe_divide(data["volume"], data["adv20"]), 20) * ts_rank(-delta(data["close"], 7), 8)
+    return _stack_factor(factor, "alpha043", data["asset_name"])
+
+
+def alpha044(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -correlation(data["high"], rank(data["volume"]), 5)
+    return _stack_factor(factor, "alpha044", data["asset_name"])
+
+
+def alpha045(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    term1 = rank(sma(delay(data["close"], 5), 20))
+    term2 = correlation(data["close"], data["volume"], 2)
+    term3 = rank(correlation(ts_sum(data["close"], 5), ts_sum(data["close"], 20), 2))
+    factor = -(term1 * term2 * term3)
+    return _stack_factor(factor, "alpha045", data["asset_name"])
+
+
+def alpha046(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    slope = ((delay(data["close"], 20) - delay(data["close"], 10)) / 10.0) - ((delay(data["close"], 10) - data["close"]) / 10.0)
+    factor = binary_signal(slope > 0.25, -1.0, np.nan)
+    factor = factor.where(~factor.isna(), binary_signal(slope < 0.0, 1.0, -(data["close"] - delay(data["close"], 1))))
+    return _stack_factor(factor, "alpha046", data["asset_name"])
+
+
+def alpha047(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    high_mean = sma(data["high"], 5)
+    factor = (((rank(1.0 / data["close"]) * data["volume"]) / (data["adv20"] + EPSILON)) * safe_divide(data["high"] * rank(data["high"] - data["close"]), high_mean)) - rank(data["vwap"] - delay(data["vwap"], 5))
+    return _stack_factor(factor, "alpha047", data["asset_name"])
+
+def alpha048(df: pd.DataFrame) -> pd.Series:
+    # The current factor surface only receives OHLCV+amount data and does not carry sector/subindustry labels.
+    raise NotImplementedError("Alpha048 requires industry classifications for neutralization.")
+
+
+def alpha049(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    slope = ((delay(data["close"], 20) - delay(data["close"], 10)) / 10.0) - ((delay(data["close"], 10) - data["close"]) / 10.0)
+    factor = binary_signal(slope < -0.1, 1.0, 0.0) + (-(data["close"] - delay(data["close"], 1))).where(slope >= -0.1, 0.0)
+    return _stack_factor(factor, "alpha049", data["asset_name"])
+
+
+def alpha050(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -ts_max(rank(correlation(rank(data["volume"]), rank(data["vwap"]), 5)), 5)
+    return _stack_factor(factor, "alpha050", data["asset_name"])
+
+
+def alpha051(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    slope = ((delay(data["close"], 20) - delay(data["close"], 10)) / 10.0) - ((delay(data["close"], 10) - data["close"]) / 10.0)
+    factor = binary_signal(slope < -0.05, 1.0, 0.0) + (-(data["close"] - delay(data["close"], 1))).where(slope >= -0.05, 0.0)
+    return _stack_factor(factor, "alpha051", data["asset_name"])
+
+
+def alpha052(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    low_min = ts_min(data["low"], 5)
+    return_spread = (ts_sum(data["returns"], 240) - ts_sum(data["returns"], 20)) / 220.0
+    factor = ((-low_min + delay(low_min, 5)) * rank(return_spread)) * ts_rank(data["volume"], 5)
+    return _stack_factor(factor, "alpha052", data["asset_name"])
+
+
+def alpha053(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    spread = safe_divide((data["close"] - data["low"]) - (data["high"] - data["close"]), data["close"] - data["low"])
+    factor = -delta(spread, 9)
+    return _stack_factor(factor, "alpha053", data["asset_name"])
+
+
+def alpha054(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    numerator = -((data["low"] - data["close"]) * np.power(data["open"], 5))
+    denominator = (data["low"] - data["high"]) * np.power(data["close"], 5)
+    factor = safe_divide(numerator, denominator)
+    return _stack_factor(factor, "alpha054", data["asset_name"])
+
+
+def alpha055(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    price_position = safe_divide(data["close"] - ts_min(data["low"], 12), ts_max(data["high"], 12) - ts_min(data["low"], 12))
+    factor = -correlation(rank(price_position), rank(data["volume"]), 6)
+    return _stack_factor(factor, "alpha055", data["asset_name"])
+
+
+def alpha056(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    # The original formula uses market capitalization. With the constrained input schema,
+    # traded amount is the closest available size proxy that keeps the factor operational.
+    cap_proxy = data["amount"]
+    return_ratio = safe_divide(ts_sum(data["returns"], 10), ts_sum(ts_sum(data["returns"], 2), 3))
+    factor = -(rank(return_ratio) * rank(data["returns"] * cap_proxy))
+    return _stack_factor(factor, "alpha056", data["asset_name"])
+
+
+def alpha057(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = -safe_divide(data["close"] - data["vwap"], decay_linear(rank(ts_argmax(data["close"], 30)), 2))
+    return _stack_factor(factor, "alpha057", data["asset_name"])
+
+
+def alpha058(df: pd.DataFrame) -> pd.Series:
+    # Sector labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha058 requires sector classifications for neutralization.")
+
+
+def alpha059(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha059 requires industry classifications for neutralization.")
+
+
+def alpha060(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    intraday = safe_divide(((data["close"] - data["low"]) - (data["high"] - data["close"])) * data["volume"], data["high"] - data["low"])
+    factor = -(2.0 * scale(rank(intraday)) - scale(rank(ts_argmax(data["close"], 10))))
+    return _stack_factor(factor, "alpha060", data["asset_name"])
+
+
+def alpha061(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv180 = sma(data["volume"], 180)
+    factor = binary_signal(rank(data["vwap"] - ts_min(data["vwap"], int_window(16.1219))) < rank(correlation(data["vwap"], adv180, int_window(17.9282))))
+    return _stack_factor(factor, "alpha061", data["asset_name"])
+
+
+def alpha062(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    left = rank(correlation(data["vwap"], ts_sum(data["adv20"], int_window(22.4101)), int_window(9.91009)))
+    right_inner = (rank(data["open"]) + rank(data["open"])) < (rank((data["high"] + data["low"]) / 2.0) + rank(data["high"]))
+    right = rank(binary_signal(right_inner))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha062", data["asset_name"])
+
+
+def alpha063(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha063 requires industry classifications for neutralization.")
+
+
+def alpha064(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv120 = sma(data["volume"], 120)
+    blended = (data["open"] * 0.178404) + (data["low"] * (1.0 - 0.178404))
+    left = rank(correlation(ts_sum(blended, int_window(12.7054)), ts_sum(adv120, int_window(12.7054)), int_window(16.6208)))
+    right_base = (((data["high"] + data["low"]) / 2.0) * 0.178404) + (data["vwap"] * (1.0 - 0.178404))
+    right = rank(delta(right_base, int_window(3.69741)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha064", data["asset_name"])
+
+
+def alpha065(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv60 = sma(data["volume"], 60)
+    blended = (data["open"] * 0.00817205) + (data["vwap"] * (1.0 - 0.00817205))
+    left = rank(correlation(blended, ts_sum(adv60, int_window(8.6911)), int_window(6.40374)))
+    right = rank(data["open"] - ts_min(data["open"], int_window(13.635)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha065", data["asset_name"])
+
+
+def alpha066(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    term1 = rank(decay_linear(delta(data["vwap"], int_window(3.51013)), int_window(7.23052)))
+    ratio = safe_divide(data["low"] - data["vwap"], data["open"] - ((data["high"] + data["low"]) / 2.0))
+    term2 = ts_rank(decay_linear(ratio, int_window(11.4157)), int_window(6.72611))
+    factor = -(term1 + term2)
+    return _stack_factor(factor, "alpha066", data["asset_name"])
+
+def alpha067(df: pd.DataFrame) -> pd.Series:
+    # Sector and subindustry labels are not part of the current input contract.
+    raise NotImplementedError("Alpha067 requires sector/subindustry classifications for neutralization.")
+
+
+def alpha068(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv15 = sma(data["volume"], 15)
+    left = ts_rank(correlation(rank(data["high"]), rank(adv15), int_window(8.91644)), int_window(13.9333))
+    right = rank(delta((data["close"] * 0.518371) + (data["low"] * (1.0 - 0.518371)), int_window(1.06157)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha068", data["asset_name"])
+
+
+def alpha069(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha069 requires industry classifications for neutralization.")
+
+
+def alpha070(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha070 requires industry classifications for neutralization.")
+
+
+def alpha071(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv180 = sma(data["volume"], 180)
+    left = ts_rank(
+        decay_linear(
+            correlation(ts_rank(data["close"], int_window(3.43976)), ts_rank(adv180, int_window(12.0647)), int_window(18.0175)),
+            int_window(4.20501),
+        ),
+        int_window(15.6948),
+    )
+    right = ts_rank(decay_linear(np.power(rank((data["low"] + data["open"]) - (data["vwap"] + data["vwap"])), 2), int_window(16.4662)), int_window(4.4388))
+    factor = frame_max(left, right)
+    return _stack_factor(factor, "alpha071", data["asset_name"])
+
+
+def alpha072(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv40 = sma(data["volume"], 40)
+    left = rank(decay_linear(correlation((data["high"] + data["low"]) / 2.0, adv40, int_window(8.93345)), int_window(10.1519)))
+    right = rank(decay_linear(correlation(ts_rank(data["vwap"], int_window(3.72469)), ts_rank(data["volume"], int_window(18.5188)), int_window(6.86671)), int_window(2.95011)))
+    factor = safe_divide(left, right)
+    return _stack_factor(factor, "alpha072", data["asset_name"])
+
+
+def alpha073(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    left = rank(decay_linear(delta(data["vwap"], int_window(4.72775)), int_window(2.91864)))
+    blended = (data["open"] * 0.147155) + (data["low"] * (1.0 - 0.147155))
+    right = ts_rank(decay_linear(-safe_divide(delta(blended, int_window(2.03608)), blended), int_window(3.33829)), int_window(16.7411))
+    factor = -frame_max(left, right)
+    return _stack_factor(factor, "alpha073", data["asset_name"])
+
+
+def alpha074(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv30 = sma(data["volume"], 30)
+    left = rank(correlation(data["close"], ts_sum(adv30, int_window(37.4843)), int_window(15.1365)))
+    right = rank(correlation(rank((data["high"] * 0.0261661) + (data["vwap"] * (1.0 - 0.0261661))), rank(data["volume"]), int_window(11.4791)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha074", data["asset_name"])
+
+
+def alpha075(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv50 = sma(data["volume"], 50)
+    left = rank(correlation(data["vwap"], data["volume"], int_window(4.24304)))
+    right = rank(correlation(rank(data["low"]), rank(adv50), int_window(12.4413)))
+    factor = binary_signal(left < right)
+    return _stack_factor(factor, "alpha075", data["asset_name"])
+
+
+def alpha076(df: pd.DataFrame) -> pd.Series:
+    # Sector labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha076 requires sector classifications for neutralization.")
+
+
+def alpha077(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv40 = sma(data["volume"], 40)
+    left = rank(decay_linear(((data["high"] + data["low"]) / 2.0) - data["vwap"], int_window(20.0451)))
+    right = rank(decay_linear(correlation((data["high"] + data["low"]) / 2.0, adv40, int_window(3.1614)), int_window(5.64125)))
+    factor = frame_min(left, right)
+    return _stack_factor(factor, "alpha077", data["asset_name"])
+
+
+def alpha078(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv40 = sma(data["volume"], 40)
+    blended = (data["low"] * 0.352233) + (data["vwap"] * (1.0 - 0.352233))
+    left = rank(correlation(ts_sum(blended, int_window(19.7428)), ts_sum(adv40, int_window(19.7428)), int_window(6.83313)))
+    right = rank(correlation(rank(data["vwap"]), rank(data["volume"]), int_window(5.77492)))
+    factor = np.power(left, right)
+    return _stack_factor(factor, "alpha078", data["asset_name"])
+
+
+def alpha079(df: pd.DataFrame) -> pd.Series:
+    # Sector labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha079 requires sector classifications for neutralization.")
+
+
+def alpha080(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha080 requires industry classifications for neutralization.")
+
+
+def alpha081(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv10 = sma(data["volume"], 10)
+    left_corr = correlation(data["vwap"], ts_sum(adv10, int_window(49.6054)), int_window(8.47743))
+    left = rank(np.log(product(rank(np.power(rank(left_corr), 4)), int_window(14.9655)).clip(lower=EPSILON)))
+    right = rank(correlation(rank(data["vwap"]), rank(data["volume"]), int_window(5.07914)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha081", data["asset_name"])
+
+
+def alpha082(df: pd.DataFrame) -> pd.Series:
+    # Sector labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha082 requires sector classifications for neutralization.")
+
+
+def alpha083(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    normalized_range = safe_divide(data["high"] - data["low"], sma(data["close"], 5))
+    numerator = rank(delay(normalized_range, 2)) * rank(rank(data["volume"]))
+    denominator = safe_divide(normalized_range, data["vwap"] - data["close"])
+    factor = safe_divide(numerator, denominator)
+    return _stack_factor(factor, "alpha083", data["asset_name"])
+
+
+def alpha084(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    base = ts_rank(data["vwap"] - ts_max(data["vwap"], int_window(15.3217)), int_window(20.7127))
+    factor = variable_signed_power(base, delta(data["close"], int_window(4.96796)))
+    return _stack_factor(factor, "alpha084", data["asset_name"])
+
+
+def alpha085(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv30 = sma(data["volume"], 30)
+    left = rank(correlation((data["high"] * 0.876703) + (data["close"] * (1.0 - 0.876703)), adv30, int_window(9.61331)))
+    right = rank(correlation(ts_rank((data["high"] + data["low"]) / 2.0, int_window(3.70596)), ts_rank(data["volume"], int_window(10.1595)), int_window(7.11408)))
+    factor = np.power(left, right)
+    return _stack_factor(factor, "alpha085", data["asset_name"])
+
+
+def alpha086(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    left = ts_rank(correlation(data["close"], ts_sum(data["adv20"], int_window(14.7444)), int_window(6.00049)), int_window(20.4195))
+    right = rank(data["close"] - data["vwap"])
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha086", data["asset_name"])
+
+def alpha087(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha087 requires industry classifications for neutralization.")
+
+
+def alpha088(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv60 = sma(data["volume"], 60)
+    left = rank(decay_linear((rank(data["open"]) + rank(data["low"])) - (rank(data["high"]) + rank(data["close"])), int_window(8.06882)))
+    right = ts_rank(decay_linear(correlation(ts_rank(data["close"], int_window(8.44728)), ts_rank(adv60, int_window(20.6966)), int_window(8.01266)), int_window(6.65053)), int_window(2.61957))
+    factor = frame_min(left, right)
+    return _stack_factor(factor, "alpha088", data["asset_name"])
+
+
+def alpha089(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha089 requires industry classifications for neutralization.")
+
+
+def alpha090(df: pd.DataFrame) -> pd.Series:
+    # Subindustry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha090 requires subindustry classifications for neutralization.")
+
+
+def alpha091(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha091 requires industry classifications for neutralization.")
+
+
+def alpha092(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv30 = sma(data["volume"], 30)
+    bullish = binary_signal((((data["high"] + data["low"]) / 2.0) + data["close"]) < (data["low"] + data["open"]))
+    left = ts_rank(decay_linear(bullish, int_window(14.7221)), int_window(18.8683))
+    right = ts_rank(decay_linear(correlation(rank(data["low"]), rank(adv30), int_window(7.58555)), int_window(6.94024)), int_window(6.80584))
+    factor = frame_min(left, right)
+    return _stack_factor(factor, "alpha092", data["asset_name"])
+
+
+def alpha093(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha093 requires industry classifications for neutralization.")
+
+
+def alpha094(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv60 = sma(data["volume"], 60)
+    left = rank(data["vwap"] - ts_min(data["vwap"], int_window(11.5783)))
+    right = ts_rank(correlation(ts_rank(data["vwap"], int_window(19.6462)), ts_rank(adv60, int_window(4.02992)), int_window(18.0926)), int_window(2.70756))
+    factor = -np.power(left, right)
+    return _stack_factor(factor, "alpha094", data["asset_name"])
+
+
+def alpha095(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv40 = sma(data["volume"], 40)
+    left = rank(data["open"] - ts_min(data["open"], int_window(12.4105)))
+    corr_rank = rank(correlation(ts_sum((data["high"] + data["low"]) / 2.0, int_window(19.1351)), ts_sum(adv40, int_window(19.1351)), int_window(12.8742)))
+    right = ts_rank(np.power(corr_rank, 5), int_window(11.7584))
+    factor = binary_signal(left < right)
+    return _stack_factor(factor, "alpha095", data["asset_name"])
+
+
+def alpha096(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv60 = sma(data["volume"], 60)
+    left = ts_rank(decay_linear(correlation(rank(data["vwap"]), rank(data["volume"]), int_window(3.83878)), int_window(4.16783)), int_window(8.38151))
+    corr_argmax = ts_argmax(correlation(ts_rank(data["close"], int_window(7.45404)), ts_rank(adv60, int_window(4.13242)), int_window(3.65459)), int_window(12.6556))
+    right = ts_rank(decay_linear(corr_argmax, int_window(14.0365)), int_window(13.4143))
+    factor = -frame_max(left, right)
+    return _stack_factor(factor, "alpha096", data["asset_name"])
+
+
+def alpha097(df: pd.DataFrame) -> pd.Series:
+    # Industry labels are not part of the current input contract, so indneutralize cannot be reproduced faithfully.
+    raise NotImplementedError("Alpha097 requires industry classifications for neutralization.")
+
+
+def alpha098(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv5 = sma(data["volume"], 5)
+    adv15 = sma(data["volume"], 15)
+    left = rank(decay_linear(correlation(data["vwap"], ts_sum(adv5, int_window(26.4719)), int_window(4.58418)), int_window(7.18088)))
+    corr_argmin = ts_argmin(correlation(rank(data["open"]), rank(adv15), int_window(20.8187)), int_window(8.62571))
+    right = rank(decay_linear(ts_rank(corr_argmin, int_window(6.95668)), int_window(8.07206)))
+    factor = left - right
+    return _stack_factor(factor, "alpha098", data["asset_name"])
+
+
+def alpha099(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    adv60 = sma(data["volume"], 60)
+    left = rank(correlation(ts_sum((data["high"] + data["low"]) / 2.0, int_window(19.8975)), ts_sum(adv60, int_window(19.8975)), int_window(8.8136)))
+    right = rank(correlation(data["low"], data["volume"], int_window(6.28259)))
+    factor = binary_signal(left < right, -1.0, 0.0)
+    return _stack_factor(factor, "alpha099", data["asset_name"])
+
+
+def alpha100(df: pd.DataFrame) -> pd.Series:
+    # Subindustry labels and true neutralization operators are not part of the current input contract.
+    raise NotImplementedError("Alpha100 requires subindustry classifications for neutralization.")
+
+
+def alpha101(df: pd.DataFrame) -> pd.Series:
+    data = _load_inputs(df)
+    factor = safe_divide(data["close"] - data["open"], (data["high"] - data["low"]) + 0.001)
+    return _stack_factor(factor, "alpha101", data["asset_name"])
+
+
+IMPLEMENTED_ALPHA_IDS = tuple(sorted({
+    *range(1, 21),
+    21, 22, 23, 24, 25, 26, 27, 28,
+    30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+    49, 50, 51, 52, 53, 54, 55, 56, 57,
+    60, 61, 62, 64, 65, 66, 68,
+    71, 72, 73, 74, 75, 77, 78,
+    81, 83, 84, 85, 86, 88,
+    92, 94, 95, 96, 98, 99, 101,
+}))
+
+ALPHA_FUNCTIONS = {f"alpha{i:03d}": globals()[f"alpha{i:03d}"] for i in range(1, 102)}
+for _name, _func in list(ALPHA_FUNCTIONS.items()):
+    globals()[f"factor_{_name}"] = _func
+
+__all__ = [
+    "ALPHA_FUNCTIONS",
+    "IMPLEMENTED_ALPHA_IDS",
+    "correlation",
+    "covariance",
+    "decay_linear",
+    "delay",
+    "delta",
+    "product",
+    "rank",
+    "scale",
+    "signed_power",
+    "sma",
+    "stddev",
+    "ts_argmax",
+    "ts_argmin",
+    "ts_max",
+    "ts_min",
+    "ts_rank",
+    "ts_sum",
+] + list(ALPHA_FUNCTIONS.keys()) + [f"factor_alpha{i:03d}" for i in range(1, 102)]
+
+def alpha088(df: pd.DataFrame) -> pd.Series:
+    # Under the current rolling operator semantics this formulation collapses to all-NaN on finite samples.
+    raise NotImplementedError("Alpha088 needs refined operator semantics to avoid all-NaN output.")
+
+
+def alpha096(df: pd.DataFrame) -> pd.Series:
+    # Under the current rolling operator semantics this formulation collapses to all-NaN on finite samples.
+    raise NotImplementedError("Alpha096 needs refined operator semantics to avoid all-NaN output.")
+
+IMPLEMENTED_ALPHA_IDS = tuple(sorted({
+    *range(1, 21),
+    21, 22, 23, 24, 25, 26, 27, 28,
+    30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+    49, 50, 51, 52, 53, 54, 55, 56, 57,
+    60, 61, 62, 64, 65, 66, 68,
+    71, 72, 73, 74, 75, 77, 78,
+    81, 83, 84, 85, 86,
+    92, 94, 95, 98, 99, 101,
+}))
+ALPHA_FUNCTIONS = {f"alpha{i:03d}": globals()[f"alpha{i:03d}"] for i in range(1, 102)}
+for _name, _func in list(ALPHA_FUNCTIONS.items()):
+    globals()[f"factor_{_name}"] = _func

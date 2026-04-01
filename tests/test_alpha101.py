@@ -7,6 +7,12 @@ import pytest
 from alpha_research.factors import alpha101
 
 
+IMPLEMENTED_ROUND_IDS = [
+    21, 22, 25, 28, 30, 31, 32, 36, 41, 47, 56, 61, 68, 71, 72, 73, 81, 92, 98, 101,
+]
+UNIMPLEMENTED_IDS = [29, 48, 58, 63, 76, 88, 90, 96, 100]
+
+
 def _sample_factor_input() -> pd.DataFrame:
     dates = pd.date_range("2022-01-01", periods=320, freq="D")
     symbols = ["AAA", "BBB", "CCC", "DDD", "EEE", "FFF"]
@@ -45,19 +51,12 @@ def _sample_factor_input() -> pd.DataFrame:
                 }
             )
 
-    frame = pd.DataFrame(rows).set_index(["date", "symbol"]).sort_index()
-    return frame
+    return pd.DataFrame(rows).set_index(["date", "symbol"]).sort_index()
 
 
 def test_helper_operators_produce_expected_values() -> None:
     dates = pd.date_range("2024-01-01", periods=4, freq="D")
-    frame = pd.DataFrame(
-        {
-            "AAA": [1.0, 2.0, 3.0, 4.0],
-            "BBB": [4.0, 3.0, 2.0, 1.0],
-        },
-        index=dates,
-    )
+    frame = pd.DataFrame({"AAA": [1.0, 2.0, 3.0, 4.0], "BBB": [4.0, 3.0, 2.0, 1.0]}, index=dates)
 
     ranked = alpha101.rank(frame)
     shifted = alpha101.delay(frame, 1)
@@ -78,30 +77,48 @@ def test_module_exposes_all_101_alpha_functions_and_aliases() -> None:
     assert len(alpha101.ALPHA_FUNCTIONS) == 101
     assert alpha101.factor_alpha001 is alpha101.alpha001
     assert alpha101.factor_alpha101 is alpha101.alpha101
-    assert alpha101.IMPLEMENTED_ALPHA_IDS == tuple(range(1, 21))
+    assert 101 in alpha101.IMPLEMENTED_ALPHA_IDS
+    assert 29 not in alpha101.IMPLEMENTED_ALPHA_IDS
+    assert len(alpha101.IMPLEMENTED_ALPHA_IDS) > 50
 
 
-def test_first_twenty_alphas_return_non_empty_multiindex_series() -> None:
+@pytest.mark.parametrize("alpha_id", [1, 5, 10, 15, 20])
+def test_first_twenty_alphas_still_return_non_empty_multiindex_series(alpha_id: int) -> None:
     factor_input = _sample_factor_input()
-
-    for alpha_id in range(1, 21):
-        name = f"alpha{alpha_id:03d}"
-        result = alpha101.ALPHA_FUNCTIONS[name](factor_input)
-        assert isinstance(result, pd.Series), name
-        assert result.name == name
-        assert isinstance(result.index, pd.MultiIndex)
-        assert list(result.index.names) == ["date", "symbol"]
-        assert not result.empty, name
-        assert result.notna().any(), name
+    name = f"alpha{alpha_id:03d}"
+    result = alpha101.ALPHA_FUNCTIONS[name](factor_input)
+    assert isinstance(result, pd.Series)
+    assert result.name == name
+    assert isinstance(result.index, pd.MultiIndex)
+    assert list(result.index.names) == ["date", "symbol"]
+    assert not result.empty
+    assert result.notna().any()
 
 
-def test_placeholder_alphas_raise_not_implemented() -> None:
+@pytest.mark.parametrize("alpha_id", IMPLEMENTED_ROUND_IDS)
+def test_round_two_implemented_alphas_return_non_empty_multiindex_series(alpha_id: int) -> None:
     factor_input = _sample_factor_input()
+    name = f"alpha{alpha_id:03d}"
+    result = alpha101.ALPHA_FUNCTIONS[name](factor_input)
+    assert isinstance(result, pd.Series)
+    assert result.name == name
+    assert isinstance(result.index, pd.MultiIndex)
+    assert list(result.index.names) == ["date", "symbol"]
+    assert not result.empty
+    assert result.notna().any()
 
+
+@pytest.mark.parametrize("alpha_id", UNIMPLEMENTED_IDS)
+def test_unimplemented_alphas_raise_not_implemented(alpha_id: int) -> None:
+    factor_input = _sample_factor_input()
     with pytest.raises(NotImplementedError):
-        alpha101.alpha021(factor_input)
-    with pytest.raises(NotImplementedError):
-        alpha101.alpha050(factor_input)
-    with pytest.raises(NotImplementedError):
-        alpha101.alpha101(factor_input)
+        alpha101.ALPHA_FUNCTIONS[f"alpha{alpha_id:03d}"](factor_input)
+
+
+def test_alpha101_matches_manual_formula() -> None:
+    factor_input = _sample_factor_input()
+    result = alpha101.alpha101(factor_input).unstack()
+    expected = ((factor_input["close"] - factor_input["open"]) / ((factor_input["high"] - factor_input["low"]) + 0.001)).unstack()
+    expected = expected.loc[result.index, result.columns]
+    pd.testing.assert_frame_equal(result, expected)
 
