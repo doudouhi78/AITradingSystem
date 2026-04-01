@@ -7,6 +7,7 @@
 - SHAP Top5：[alpha065 shap=0.0016, alpha006 shap=0.0014, alpha047 shap=0.0012, alpha054 shap=0.0011, momentum_12_1 shap=0.0009]
 - 模型文件：runtime/models/lgbm_factor_synthesis_v1.pkl ✅
 - pytest：76 passed, 0 failed
-- commit：[待提交]
+- commit：[0ce9f330] feat: add LightGBM factor synthesis pipeline
 
 BUILDER_DONE
+
