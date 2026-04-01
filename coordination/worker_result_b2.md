@@ -58,3 +58,19 @@ Sprint 39b-2 Builder-2 已完成。
 - push：已完成，分支 `claude/youthful-boyd` 已推送到 `origin`
 
 BUILDER_DONE
+
+---
+
+Sprint 40+41 Builder-2 已执行。
+
+结果：
+- 新增 `src/alpha_research/feature_factory.py`，实现因子筛选、Alpha101 因子批量计算、异常股票/停牌过滤、3σ 去极值、行业+市值中性化、截面标准化与按月分片落盘
+- 新增 `src/alpha_research/lgbm_trainer.py`，实现未来20日收益率百分位目标、按年滚动训练、LightGBM GPU/CPU 自动回退、模型/重要性/评估报告输出与 `predict()` 接口
+- 更新 `src/alpha_research/__init__.py` 导出 `FeatureFactory` 与 `LGBMTrainer`
+- 新增 `tests/test_alpha_research_pipeline.py`，覆盖 Feature Factory 小样本产出、失败因子跳过、LightGBM CPU fallback 与预测接口
+- 定向验证通过：`pytest tests/test_alpha_research_pipeline.py -q` -> `2 passed`
+- 未执行全量 `pytest`；当前仓库历史上仍存在其他模块依赖问题，任务卡要求的新增模块测试已通过
+- 说明：当前默认优先尝试 PyTorch tensor 做截面裁剪；本机当前会自动 fallback 到 pandas/numpy。LightGBM 训练会先尝试 GPU，失败后自动切回 CPU
+- commit hash：`d3918c61`
+
+BUILDER_DONE
