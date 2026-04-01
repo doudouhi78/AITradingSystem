@@ -114,8 +114,8 @@ def scale(frame: pd.DataFrame, factor: float = 1.0) -> pd.DataFrame:
 
 def ts_rank(frame: pd.DataFrame, window: int) -> pd.DataFrame:
     return frame.rolling(window, min_periods=window).apply(
-        lambda values: pd.Series(values).rank(pct=True).iloc[-1],
-        raw=False,
+        lambda v: (v.argsort().argsort()[-1] + 1.0) / len(v),
+        raw=True,
     )
 
 
