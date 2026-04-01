@@ -7,6 +7,7 @@
 - ICIR 最高前3：[momentum_12_1 icir_n=0.06, momentum_1m icir_n=0.02, earnings_yield icir_n=0.01]
 - 财务数据缺失跳过：[roe, gross_margin, asset_turnover, accruals]
 - pytest：76 passed, 0 failed
-- commit：[待提交]
+- commit：[a7de6816] feat: add classic academic factors evaluation
 
 BUILDER_DONE
+
