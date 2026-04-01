@@ -19,3 +19,16 @@
 代码提交：`225cf0fd` `feat: add alpha101 factor library`
 
 BUILDER_DONE
+---
+2026-04-01 Sprint 38A-2 / Builder-3
+
+完成情况：在 [alpha101.py](D:\AITradingSystem\.claude\worktrees\youthful-boyd\src\alpha_research\factors\alpha101.py) 中补齐 `alpha021`~`alpha101` 的主要实现，最终新增可运行实现 60 个（本轮区间内），保留 21 个 `NotImplementedError`。未实现项集中在三类：
+1. 原始公式依赖行业/板块中性化，但当前输入契约只有 OHLCV+amount，缺少行业标签。
+2. `alpha029` 的公开公式写法对 `min/product/log` 的嵌套语义存在歧义，暂未强行落地。
+3. `alpha088`、`alpha096` 在当前滚动算子语义下会退化为全空序列，因此显式保留未实现说明。
+
+测试：更新 [test_alpha101.py](D:\AITradingSystem\.claude\worktrees\youthful-boyd\tests\test_alpha101.py)，抽测了 20 个本轮实现因子，并保留对未实现复杂因子的异常断言。`pytest tests/test_alpha101.py -q` 结果为 `37 passed`。
+
+代码提交：`49acfe91` `feat: implement alpha101 factor set`
+
+BUILDER_DONE
