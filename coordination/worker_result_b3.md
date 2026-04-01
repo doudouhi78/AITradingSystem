@@ -4,8 +4,8 @@
 - market_classifier：行业分类完成，市值分组完成
 - 数据缺失处理：对缺失的 `csi1000` 成分文件、`limit_list.parquet`、真实市值列都实现了 warning + fallback；不会抛异常中断。市值列缺失时回落到 `close*volume` 近似分组。
 - pytest：88 passed, 0 failed, 0 skipped
-- commit：[待补] [feat: Prepare-B - universe builder and market classifier]
-- push：待补
+- commit：`f6691c21` `feat: Prepare-B - universe builder and market classifier`
+- push：已推送
 - 遗留问题：当前主仓仍缺 `csi1000` 历史/最新成分文件，`get_universe(..., 'csi1000')` 只能暂时回落到 all_a；`valuation_daily.parquet` 当前也缺 `circ_mv/total_mv` 列，因此市值分组使用近似代理而非真实流通市值。
 
 BUILDER_DONE
