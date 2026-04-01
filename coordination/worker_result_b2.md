@@ -41,3 +41,20 @@ Sprint 39b Builder-2 已执行。
 - `git commit` / `push` 待执行；由于 PyTorch 未安装成功，本任务未达到“PyTorch + LightGBM 两项通过”的完整验收标准
 
 BUILDER_DONE
+
+---
+
+Sprint 39b-2 Builder-2 已完成。
+
+结果：
+- `scripts/verify_gpu_env.py` 已更新为优先使用 `D:\AITradingSystem\.venv\Scripts\python.exe`，`python scripts/verify_gpu_env.py` 现输出：
+  - `[✓] PyTorch CUDA: NVIDIA GeForce RTX 4070 Ti SUPER, CUDA 12.8, torch 2.11.0+cu128`
+  - `[✓] LightGBM GPU: OK`
+  - `[!] cuDF: 不可用（Windows限制），已切换PyTorch tensor方案`
+- `requirements.txt` 已更新为实际安装版本：`torch==2.11.0+cu128`、`torchvision==0.26.0+cu128`、`torchaudio==2.11.0+cu128`
+- `docs/gpu_setup.md` 已补充 `cu128` 手动安装步骤、安装源和验证命令
+- 本地验证已通过：`python scripts/verify_gpu_env.py`
+- commit hash：a5ddb863
+- push：待补充
+
+BUILDER_DONE
