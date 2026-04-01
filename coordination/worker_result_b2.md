@@ -55,6 +55,6 @@ Sprint 39b-2 Builder-2 已完成。
 - `docs/gpu_setup.md` 已补充 `cu128` 手动安装步骤、安装源和验证命令
 - 本地验证已通过：`python scripts/verify_gpu_env.py`
 - commit hash：a5ddb863
-- push：待补充
+- push：已完成，分支 `claude/youthful-boyd` 已推送到 `origin`
 
 BUILDER_DONE
