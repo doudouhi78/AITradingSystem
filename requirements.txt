@@ -1,5 +1,6 @@
 akshare
 baostock
+tushare
 vectorbt
 mlflow
 pyqlib
