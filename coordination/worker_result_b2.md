@@ -74,3 +74,21 @@ Sprint 40+41 Builder-2 已执行。
 - commit hash：`d3918c61`
 
 BUILDER_DONE
+
+---
+
+Sprint 40b Builder-2 已执行。
+
+结果：
+- 新增 `src/alpha_research/gpu_ic_calculator.py`，实现 `GPUIcCalculator.batch_compute_ic()` 与 `compute_icir()`，支持 `spearman` / `pearson`、`torch.cuda` 自动启用、GPU 不可用时静默回退到 numpy
+- `spearman` 路径使用 `torch.argsort` / numpy `argsort` 做批量截面排名，并在排名前按因子-收益共同有效掩码处理 `NaN`
+- 更新 `scripts/run_alpha101_batch_eval.py`，在 batch 评估时先批量计算整批因子的原始 IC 序列，再复用现有流程生成报告；上层接口与报告结构保持不变
+- 更新 `src/alpha_research/__init__.py` 导出 `GPUIcCalculator`
+- 新增 `tests/test_gpu_ic_calculator.py`，覆盖正确性、80因子×2500天×1000股速度对比、全 NaN / 单日截面 / 极小样本边界测试
+- 定向验证通过：`pytest tests/test_gpu_ic_calculator.py -q -s` -> `3 passed in 32.75s`
+- 回归验证通过：`pytest tests/test_alpha_research_pipeline.py -q` -> `2 passed in 4.07s`
+- 实测速度对比（本机 RTX 4070 Ti SUPER，torch 2.11.0+cu128）：CPU `24.749s`，GPU `1.731s`，加速比 `14.295x`，CPU/GPU 最大误差 `3e-08`
+- 说明：当前批量 GPU 加速已用于原始 IC 序列计算；行业市值中性化 IC 与分层收益仍沿用原 CPU 逻辑，未修改 neutralization 核心流程
+- `git commit` / `push` 尚未执行
+
+BUILDER_DONE
