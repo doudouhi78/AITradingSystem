@@ -1,0 +1,50 @@
+{
+  "selected": [
+    "alpha004",
+    "alpha042",
+    "alpha027",
+    "alpha071",
+    "alpha061",
+    "alpha065",
+    "alpha075",
+    "alpha037",
+    "alpha074",
+    "alpha036",
+    "alpha033",
+    "alpha040",
+    "alpha007",
+    "alpha014",
+    "alpha054",
+    "alpha062",
+    "alpha028",
+    "alpha030",
+    "alpha060",
+    "alpha056",
+    "alpha047",
+    "alpha025",
+    "alpha043",
+    "alpha032",
+    "alpha018",
+    "alpha023",
+    "momentum_12_1"
+  ],
+  "removed": [
+    {
+      "factor": "alpha006",
+      "reason": "corr=0.81 with alpha014, lower ICIR (0.1013 < 0.1112)"
+    },
+    {
+      "factor": "alpha020",
+      "reason": "corr=0.83 with alpha025, lower ICIR (0.0627 < 0.0713)"
+    },
+    {
+      "factor": "alpha009",
+      "reason": "corr=0.82 with alpha025, lower ICIR (0.0528 < 0.0713)"
+    }
+  ],
+  "total_selected": 27,
+  "total_removed": 3,
+  "missing_report_files": [
+    "momentum_12_1"
+  ]
+}
