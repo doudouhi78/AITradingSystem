@@ -346,5 +346,17 @@
     "source": "alphalens",
     "forward_period_days": 5,
     "updated_at": "2026-04-01T15:53:48Z"
+  },
+  {
+    "factor_id": "classic_momentum_12_1",
+    "factor_name": "momentum_12_1",
+    "category": "momentum",
+    "ic_mean": 0.015119672946398178,
+    "ic_std": 0.2735785292510205,
+    "icir": 0.05526629954401576,
+    "status": "pass",
+    "source": "classic_factors_alphalens",
+    "forward_period_days": 5,
+    "updated_at": "2026-04-01T16:12:23Z"
   }
 ]
