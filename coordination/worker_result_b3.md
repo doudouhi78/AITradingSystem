@@ -7,6 +7,7 @@
 - factor_registry 更新：29 个 ICIR>0.05 因子
 - 遇到的问题：主仓缺少 Alpha101 模块，已从同机工作树同步；知识库原始为 101 条，任务卡要求 80 条，因此评估范围收敛到 alpha001-alpha080；当前仓库 pytest 基线为 74 passed, 7 skipped，不是任务卡里提到的 81 passed
 - pytest 结果：74 passed, 0 failed
-- commit：[待提交]
+- commit：[5a4ff9c4] feat: Sprint 39c alphalens alpha101 evaluation
 
 BUILDER_DONE
+
