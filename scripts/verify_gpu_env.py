@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import shutil
 import subprocess
 import sys
@@ -8,7 +9,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 try:
-    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
     pass
 
@@ -24,9 +25,21 @@ class CheckResult:
         return f"{prefix} {self.label}: {self.detail}"
 
 
+def resolve_python_executable() -> str:
+    candidates = [
+        Path.cwd() / ".venv" / "Scripts" / "python.exe",
+        Path(__file__).resolve().parents[1] / ".venv" / "Scripts" / "python.exe",
+        Path(r"D:\AITradingSystem\.venv\Scripts\python.exe"),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    return sys.executable
+
+
 def run_python(code: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, "-c", code],
+        [resolve_python_executable(), "-c", code],
         capture_output=True,
         text=True,
         check=False,
@@ -68,11 +81,9 @@ else:
     if not torch.cuda.is_available():
         print(json.dumps({"ok": False, "error": "torch installed but CUDA unavailable"}))
     else:
-        props = torch.cuda.get_device_properties(0)
         print(json.dumps({
             "ok": True,
             "name": torch.cuda.get_device_name(0),
-            "memory_gb": round(props.total_memory / 1024**3, 1),
             "torch_version": torch.__version__,
             "cuda_runtime": torch.version.cuda,
         }))
@@ -85,8 +96,8 @@ else:
 
     if payload.get("ok"):
         detail = (
-            f"{payload['name']}, {payload['memory_gb']}GB "
-            f"(torch {payload['torch_version']}, CUDA {payload['cuda_runtime']})"
+            f"{payload['name']}, CUDA {payload['cuda_runtime']}, "
+            f"torch {payload['torch_version']}"
         )
         return CheckResult(True, "PyTorch CUDA", detail)
 
@@ -128,12 +139,8 @@ params = {
 }
 
 try:
-    booster = lgb.train(params, train_set, num_boost_round=5)
-    print(json.dumps({
-        "ok": True,
-        "iteration": booster.current_iteration(),
-        "version": lgb.__version__,
-    }))
+    lgb.train(params, train_set, num_boost_round=5)
+    print(json.dumps({"ok": True, "version": lgb.__version__}))
 except Exception as exc:
     print(json.dumps({"ok": False, "error": str(exc), "version": lgb.__version__}))
 """
@@ -144,11 +151,7 @@ except Exception as exc:
         payload = {"ok": False, "error": proc.stderr.strip() or "unknown error"}
 
     if payload.get("ok"):
-        return CheckResult(
-            True,
-            "LightGBM GPU",
-            f"OK (lightgbm {payload['version']}, rounds={payload['iteration']})",
-        )
+        return CheckResult(True, "LightGBM GPU", "OK")
     return CheckResult(
         False,
         "LightGBM GPU",
@@ -179,12 +182,7 @@ else:
             "cuDF",
             f"OK (cudf {payload['version']}, rows={payload['rows']})",
         )
-    return CheckResult(
-        False,
-        "cuDF",
-        "不可用，已切换PyTorch tensor方案"
-        f" ({payload.get('error', 'not installed')})",
-    )
+    return CheckResult(False, "cuDF", "不可用（Windows限制），已切换PyTorch tensor方案")
 
 
 def main() -> int:
@@ -192,8 +190,8 @@ def main() -> int:
     for result in results:
         print(result.render())
 
-    mandatory_passed = sum(result.ok for result in results[:2])
-    return 0 if mandatory_passed >= 1 else 1
+    mandatory_passed = all(result.ok for result in results[:2])
+    return 0 if mandatory_passed else 1
 
 
 if __name__ == "__main__":

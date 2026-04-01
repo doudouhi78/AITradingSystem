@@ -11,9 +11,10 @@ pytest
 yfinance
 pyarrow
 # GPU acceleration
-# Installed from PyPI
 lightgbm==4.6.0
-# PyTorch CUDA 12.1 target install source:
-# --index-url https://download.pytorch.org/whl/cu121
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+torchaudio==2.11.0+cu128
+# 安装源：https://download.pytorch.org/whl/cu128
 # cuDF target install source:
 # --extra-index-url https://pypi.nvidia.com
