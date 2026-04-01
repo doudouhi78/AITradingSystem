@@ -20,6 +20,6 @@ BUILDER_DONE
 - Top3 高相关对：[alpha025 vs alpha020 corr=0.83] [alpha020 vs alpha009 corr=0.82] [alpha025 vs alpha009 corr=0.82]
 - 输出文件：factor_correlation_matrix.csv ✅ / selected_factors.json ✅
 - pytest：117 passed, 0 failed
-- commit：待提交
+- commit：41b8a8a1 feat: add factor correlation pruning for part2
 
 BUILDER_DONE
