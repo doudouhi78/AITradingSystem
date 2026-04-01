@@ -7,6 +7,6 @@
 - pytest：74 passed, 0 failed, 7 skipped
 - commit：cca9a2fb feat: Prepare-C - factor evaluation protocol upgrade
 - push：已推送
-- 遗留问题：stock/valuation 相关模块原先对 baostock 和 pandera 是硬依赖；本次已改为可选导入/懒加载，保证 Prepare-C 的全量 pytest 不因环境缺包在 collect 阶段失败。行业/市值中性化目前仅对截面因子有效，market-level 因子返回 null 属预期。
+- 遗留问题：stock/valuation 模块原先对 baostock 和 pandera 是硬依赖；本次已改为可选导入/懒加载，避免在当前环境缺包时阻断 pytest collect。行业/市值中性化目前仅对截面因子有效，market-level 因子返回 null 属预期。
 
 BUILDER_DONE
