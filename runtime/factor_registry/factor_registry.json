@@ -9,7 +9,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 42,
@@ -21,7 +21,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 27,
@@ -33,7 +33,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 71,
@@ -45,7 +45,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 61,
@@ -57,7 +57,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 65,
@@ -69,7 +69,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 75,
@@ -81,7 +81,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 37,
@@ -93,7 +93,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 74,
@@ -105,7 +105,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 36,
@@ -117,7 +117,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 33,
@@ -129,7 +129,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 40,
@@ -141,7 +141,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 7,
@@ -153,7 +153,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 14,
@@ -165,7 +165,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 54,
@@ -177,7 +177,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 62,
@@ -189,7 +189,7 @@
     "status": "pass",
     "source": "existing_summary",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 6,
@@ -201,7 +201,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 28,
@@ -213,7 +213,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 30,
@@ -225,7 +225,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 60,
@@ -237,7 +237,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 56,
@@ -249,7 +249,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 47,
@@ -261,7 +261,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 25,
@@ -273,7 +273,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 43,
@@ -285,7 +285,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 32,
@@ -297,7 +297,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 20,
@@ -309,7 +309,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 18,
@@ -321,7 +321,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 9,
@@ -333,7 +333,7 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   },
   {
     "factor_id": 23,
@@ -345,6 +345,6 @@
     "status": "pass",
     "source": "alphalens",
     "forward_period_days": 5,
-    "updated_at": "2026-04-01T15:52:35Z"
+    "updated_at": "2026-04-01T15:53:48Z"
   }
 ]
