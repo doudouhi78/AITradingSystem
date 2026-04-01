@@ -1,0 +1,38 @@
+{
+  "factor_name": "factor_turnover_20d",
+  "evaluation_date": "2026-04-01",
+  "universe": "etf_top10",
+  "sample_period": "2020-01-01 ~ 2024-06-30",
+  "basic_metrics": {
+    "rank_ic_mean": 0.0,
+    "icir": 0.0,
+    "ic_positive_pct": 0.0
+  },
+  "layered_returns": {
+    "q1_annual_excess": 0.0,
+    "q2_annual_excess": 0.0,
+    "q3_annual_excess": 0.0,
+    "q4_annual_excess": 0.0,
+    "q5_annual_excess": 0.0,
+    "long_short_annual_return": 0.0,
+    "long_short_sharpe": 0.0,
+    "long_short_max_drawdown": 0.0,
+    "is_monotonic": true
+  },
+  "yearly_ic": {},
+  "neutralization_compare": {
+    "raw_icir": 0.0,
+    "industry_neutral_icir": 0.0,
+    "size_neutral_icir": 0.0
+  },
+  "correlation_with_existing": {
+    "factor_margin_balance_change_5d": null,
+    "factor_northbound_flow_5d": null,
+    "factor_pb_ratio": null,
+    "factor_pe_ttm": null,
+    "factor_turnover_20d": 1.0,
+    "factor_volume_price_divergence": 0.005259180246382385
+  },
+  "status": "seed",
+  "notes": "Phase 3 WFO 选出的种子因子，换手率20日因子，ICIR低但被WFO优化器选入combo，权重极小(0.78%)"
+}

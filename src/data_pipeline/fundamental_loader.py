@@ -7,11 +7,13 @@ import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-import baostock as bs
+try:
+    import baostock as bs
+except ModuleNotFoundError:
+    bs = None
 import pandas as pd
 import pandera as pa
 from pandera import Check, Column, DataFrameSchema
-
 from akshare.stock_fundamental.stock_finance_sina import stock_financial_analysis_indicator
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -64,6 +66,8 @@ def _to_baostock_code(instrument_code: str) -> str:
 
 
 def _query_baostock_valuation(bs_code: str, start_date: str, end_date: str) -> pd.DataFrame:
+    if bs is None:
+        raise ModuleNotFoundError("baostock is required for valuation data")
     rs = bs.query_history_k_data_plus(
         bs_code,
         "date,code,peTTM,pbMRQ,psTTM",
@@ -91,6 +95,8 @@ def _query_baostock_valuation(bs_code: str, start_date: str, end_date: str) -> p
 def _build_valuation_chunk(codes: list[str], start_date: str, end_date: str) -> tuple[pd.DataFrame, list[dict[str, str]]]:
     frames: list[pd.DataFrame] = []
     failed: list[dict[str, str]] = []
+    if bs is None:
+        raise ModuleNotFoundError("baostock is required for valuation data")
     login_result = bs.login()
     if login_result.error_code != "0":
         raise RuntimeError(f"baostock login failed: {login_result.error_code} {login_result.error_msg}")
@@ -262,4 +268,3 @@ def get_latest_financial(instrument: str, signal_date: str) -> dict:
         if pd.notna(row.get(key)):
             row[key] = pd.Timestamp(row[key]).strftime("%Y-%m-%d")
     return row
-

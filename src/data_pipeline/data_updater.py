@@ -7,13 +7,14 @@ from pathlib import Path
 from typing import Any, Callable
 
 import akshare as ak
-import baostock as bs
+try:
+    import baostock as bs
+except ModuleNotFoundError:
+    bs = None
 import pandas as pd
-
 from ai_dev_os.etf_breakout_runtime import to_fund_symbol
 from ai_dev_os.market_data_v1 import BAR_COLUMNS, standardize_market_bars
 from data_pipeline.alternative_loader import build_margin_balance, build_northbound_flow
-from data_pipeline.fundamental_loader import VALUATION_PATH, build_valuation_daily
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME_DIR = ROOT / "runtime"
@@ -105,6 +106,8 @@ def _to_baostock_code(symbol: str) -> str:
 
 
 def _fetch_stock_increment(symbol: str, start_date: str, end_date: str) -> pd.DataFrame:
+    if bs is None:
+        raise ModuleNotFoundError("baostock is required for stock incremental update")
     login = bs.login()
     if login.error_code != "0":
         raise RuntimeError(f"baostock login failed: {login.error_code} {login.error_msg}")
@@ -226,6 +229,8 @@ def update_alternative_data() -> dict[str, Any]:
 
 
 def update_valuation_if_stale(today: pd.Timestamp | None = None) -> dict[str, Any]:
+    from data_pipeline.fundamental_loader import VALUATION_PATH, build_valuation_daily
+
     today = today or _today()
     latest = _latest_trade_date(VALUATION_PATH, column="date")
     lag = _business_day_lag(latest, today)
@@ -291,4 +296,3 @@ def run_daily_update(*, etf: bool = True, stocks: bool = True, alternative: bool
     log_path = write_update_log(summary, run_date=today)
     summary["update_log"] = str(log_path)
     return summary
-

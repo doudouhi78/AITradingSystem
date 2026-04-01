@@ -1,0 +1,44 @@
+{
+  "factor_name": "factor_margin_balance_change_5d",
+  "evaluation_date": "2026-04-01",
+  "universe": "stock_csi300_latest",
+  "sample_period": "2020-01-01 ~ 2024-06-30",
+  "basic_metrics": {
+    "rank_ic_mean": 0.08311329675638951,
+    "icir": 0.3227416462277308,
+    "ic_positive_pct": 0.6408518877057116
+  },
+  "layered_returns": {
+    "q1_annual_excess": 0.0,
+    "q2_annual_excess": 0.0,
+    "q3_annual_excess": 0.0,
+    "q4_annual_excess": 0.0,
+    "q5_annual_excess": 0.0,
+    "long_short_annual_return": 0.0,
+    "long_short_sharpe": 0.0,
+    "long_short_max_drawdown": 0.0,
+    "is_monotonic": false
+  },
+  "yearly_ic": {
+    "2020": 0.00827718407651212,
+    "2021": 0.033678506582137765,
+    "2022": -0.017626528135380688,
+    "2023": 0.22418951240398194,
+    "2024": 0.24333417407162133
+  },
+  "neutralization_compare": {
+    "raw_icir": 0.3227416462277308,
+    "industry_neutral_icir": null,
+    "size_neutral_icir": null
+  },
+  "correlation_with_existing": {
+    "factor_margin_balance_change_5d": 1.0,
+    "factor_northbound_flow_5d": -0.18993618707523618,
+    "factor_pb_ratio": null,
+    "factor_pe_ttm": null,
+    "factor_turnover_20d": null,
+    "factor_volume_price_divergence": null
+  },
+  "status": "weak",
+  "notes": "Phase 8B newly registered factor"
+}
