@@ -10,3 +10,10 @@ optuna
 pytest
 yfinance
 pyarrow
+# GPU acceleration
+# Installed from PyPI
+lightgbm==4.6.0
+# PyTorch CUDA 12.1 target install source:
+# --index-url https://download.pytorch.org/whl/cu121
+# cuDF target install source:
+# --extra-index-url https://pypi.nvidia.com

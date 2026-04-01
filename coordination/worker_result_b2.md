@@ -24,3 +24,20 @@ Sprint 37 任务卡 Builder-2 已完成。
 - commit hash：b7276470
 
 BUILDER_DONE
+
+---
+
+Sprint 39b Builder-2 已执行。
+
+结果：
+- 新增验证脚本 `scripts/verify_gpu_env.py`，可一键检查 PyTorch CUDA、LightGBM GPU、cuDF 状态
+- 新增环境说明 `docs/gpu_setup.md`，记录安装步骤、验证命令、Windows 下 cuDF 兼容性问题与 PyTorch tensor 备用方案
+- `requirements.txt` 已补充 GPU 组件记录；当前成功安装组件为 `lightgbm==4.6.0`
+- `lightgbm==4.6.0` 已安装并完成 `lgb.train(params={'device': 'gpu'})` 小样本验证，通过
+- `cudf-cu12` 安装失败，原因为 Windows 11 + Python 3.12 环境下 NVIDIA 源未提供匹配 wheel，报错核心为 `Didn't find wheel for cudf-cu12 24.10.1`
+- `torch` CUDA 12.1 安装未完成；官方 wheel 约 2.4GB，当前网络条件下多次下载被远端中断，尚未落地到可导入状态
+- 当前机器 GPU 已确认：`NVIDIA GeForce RTX 4070 Ti Super`，显存约 `16GB`，驱动 `591.59`
+- `pytest -q` 已执行，但当前环境因缺少 `pandera`、`mlflow`、`optuna` 在测试收集阶段失败；该失败为既有环境缺依赖，非本次 GPU 改动引入
+- `git commit` / `push` 待执行；由于 PyTorch 未安装成功，本任务未达到“PyTorch + LightGBM 两项通过”的完整验收标准
+
+BUILDER_DONE
