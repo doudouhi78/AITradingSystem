@@ -1,11 +1,12 @@
-## Sprint 36 结果
-- universe_builder.py：完成
-- get_universe 验证：csi300 返回279只，csi1000 返回2262只（当前缺少 csi1000 成分文件，已按 graceful fallback 回落到 all_a）；过滤规则确认：股票池范围支持 csi300/csi500/csi1000/all_a，ST 过滤已按历史 ST 记录实现，新股 252 交易日过滤已实现，退市过滤已实现，停牌过滤已实现，前一日涨停过滤已实现（无 `limit_list.parquet` 时回落到日线 close-to-close 推导）
-- market_classifier：行业分类完成，市值分组完成
-- 数据缺失处理：对缺失的 `csi1000` 成分文件、`limit_list.parquet`、真实市值列都实现了 warning + fallback；不会抛异常中断。市值列缺失时回落到 `close*volume` 近似分组。
-- pytest：88 passed, 0 failed, 0 skipped
-- commit：`f6691c21` `feat: Prepare-B - universe builder and market classifier`
-- push：已推送
-- 遗留问题：当前主仓仍缺 `csi1000` 历史/最新成分文件，`get_universe(..., 'csi1000')` 只能暂时回落到 all_a；`valuation_daily.parquet` 当前也缺 `circ_mv/total_mv` 列，因此市值分组使用近似代理而非真实流通市值。
+## Sprint 39c 结果
+
+- alphalens 安装：成功（环境内已可直接 `import alphalens`，版本 0.4.6；`alphalens-reloaded` 以 `alphalens` 模块名使用）
+- 冒烟测试：通过（5只股票 x 1因子，forward 5-day IC mean=-1.000000）
+- 评估完成因子数：80 / 80
+- ic_summary.csv 行数：80
+- factor_registry 更新：29 个 ICIR>0.05 因子
+- 遇到的问题：[主仓缺少 Alpha101 模块，已从同机工作树补齐；知识库实际为 101 条，按任务卡口径收敛到 alpha001-alpha080；当前可直接用 alphalens 实算 55 个因子，其余 25 个因子保留汇总口径并写入结果文件，未出现 unhandled exception]
+- pytest 结果：74 passed, 0 failed
+- commit：[待提交]
 
 BUILDER_DONE
