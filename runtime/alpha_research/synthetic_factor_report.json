@@ -1,0 +1,108 @@
+{
+  "device": "gpu",
+  "factor_names": [
+    "alpha004",
+    "alpha042",
+    "alpha027",
+    "alpha071",
+    "alpha061",
+    "alpha065",
+    "alpha075",
+    "alpha037",
+    "alpha074",
+    "alpha036",
+    "alpha033",
+    "alpha040",
+    "alpha007",
+    "alpha014",
+    "alpha054",
+    "alpha062",
+    "alpha006",
+    "alpha028",
+    "alpha030",
+    "alpha060",
+    "alpha056",
+    "alpha047",
+    "alpha025",
+    "alpha043",
+    "alpha032",
+    "alpha020",
+    "alpha018",
+    "alpha009",
+    "alpha023",
+    "momentum_12_1"
+  ],
+  "feature_count": 30,
+  "train_rows": 61753,
+  "valid_rows": 23513,
+  "oos_rows": 26359,
+  "validation_ic": {
+    "mean": 0.029000517385489935,
+    "std": 0.1901702591049047,
+    "icir": 0.15249764880160474,
+    "count": 484
+  },
+  "best_single_factor": {
+    "factor_name": "alpha040",
+    "mean": 0.038352150573306536,
+    "std": 0.21994572864776538,
+    "icir": 0.17437097237167096,
+    "count": 484
+  },
+  "synthetic_alphalens": {
+    "ic_mean": 0.02900051738548993,
+    "ic_std": 0.19017025910490465,
+    "icir": 0.15249764880160477,
+    "count": 484
+  },
+  "best_single_factor_alphalens": {
+    "ic_mean": 0.038352150573306536,
+    "ic_std": 0.2199457286477653,
+    "icir": 0.17437097237167104,
+    "count": 484
+  },
+  "shap_top10": [
+    [
+      "alpha065",
+      0.0016343711933689254
+    ],
+    [
+      "alpha006",
+      0.001377468415056136
+    ],
+    [
+      "alpha047",
+      0.001177941837629934
+    ],
+    [
+      "alpha054",
+      0.0011467899236378384
+    ],
+    [
+      "momentum_12_1",
+      0.0008749572935798916
+    ],
+    [
+      "alpha030",
+      0.0008290576006130408
+    ],
+    [
+      "alpha020",
+      0.0008056229970879196
+    ],
+    [
+      "alpha043",
+      0.000784957463249032
+    ],
+    [
+      "alpha040",
+      0.0007532017505850278
+    ],
+    [
+      "alpha061",
+      0.0006082469259500456
+    ]
+  ],
+  "model_path": "D:\\AITradingSystem\\runtime\\models\\lgbm_factor_synthesis_v1.pkl",
+  "shap_path": "D:\\AITradingSystem\\runtime\\models\\lgbm_shap_importance.json"
+}
