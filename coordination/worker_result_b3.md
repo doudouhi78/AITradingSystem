@@ -1,24 +1,20 @@
-已执行 Sprint 45，结果写入 [coordination/worker_result_b3.md](D:\AITradingSystem\coordination\worker_result_b3.md)，末尾已包含 `BUILDER_DONE`。
+已执行 Sprint 46，结果写入 [coordination/worker_result_b3.md](D:\AITradingSystem\coordination\worker_result_b3.md)，末尾已包含 `BUILDER_DONE`。
 
-本次新增了 [run_alpha004_full_backtest.py](D:\AITradingSystem\scripts\run_alpha004_full_backtest.py)，并生成了 [alpha004_full_backtest.json](D:\AITradingSystem\runtime\alpha_research\alpha004_full_backtest.json)。按任务卡要求实现了 `VectorBT`、月度调仓、`Top20%/Q5` 等权、单票 5% 上限，以及 `ST/停牌/上市<60天` 过滤和含成本/不含成本对比。
+这次新增了 [alpha_gate_adapter.py](D:\AITradingSystem\src\strategy_engine\alpha_gate_adapter.py)，并在 [signal_daily.py](D:\AITradingSystem\scripts\signal_daily.py) 接入了 alpha 因子到 Gate 的适配流程。当前接口梳理结论是：`GateScheduler.evaluate(date, equity_series, etf_df)` 只负责给出 `allowed/blocked_by/reason/gate_details`，策略额度分配由 `aggregate_daily_signals(...)` 给出 `approved_capital_pct/notional_capital`，新适配层再把 `factor_scores` 转成策略内部个股权重。
 
-实际回测结果是：
-- 样本内 `2016-2021`：年化 `16.0%`，Sharpe `0.88`，最大回撤 `-30.7%`
-- 样本外 `2022-2023`：年化 `5.9%`，Sharpe `0.43`，最大回撤 `-21.1%`
-- 成本拖累：Sharpe 损失 `0.19`
+集成验证已跑通。最新交易日 `2026-03-30` 的真实 Gate 结果是阻断，所以脚本会额外打印最近一次放行日的历史演示权重；当前示例输出是 `600028.SH: 0.59%, 600023.SH: 0.59%, 600039.SH: 0.59%`，对应演示日 `2026-03-18`。测试结果为 `136 passed, 0 failed, 8 skipped`。
 
-验证已完成：`pytest -q` 为 `119 passed, 0 failed, 8 skipped`。已提交并推送：
-- `6ec79674` `feat: add alpha004 full backtest`
-- `131f116e` `docs: update Sprint 45 result card`
+已提交并推送：
+- `76f288a1` `feat: add alpha factor gate adapter`
+- `fcaabb8f` `docs: update Sprint 46 result card`
+## Sprint 48 结果 — Qlib 数据适配层
 
-需要如实说明：按这次实现和现有数据口径，样本外 Sharpe 没达到任务卡里的 `> 0.8`。
-## Sprint 46 结果 — Alpha 因子接入 Gate 系统
-
-- alpha_gate_adapter.py：✅ 实现完成
-- Gate 接口梳理：`GateScheduler.evaluate(date, equity_series, etf_df)` 输出 `allowed/blocked_by/reason/gate_details`；`aggregate_daily_signals(strategy_signals, strategy_configs, gate_allowed, current_equity)` 输出 `action/requested_capital_pct/approved_capital_pct/notional_capital`
-- 集成验证：✅ signal_daily.py 跑通
-- 示例输出：600028.SH: 0.59%, 600023.SH: 0.59%, 600039.SH: 0.59%
-- pytest：136 passed, 0 failed
-- commit：[76f288a1] [feat: add alpha factor gate adapter]
+- qlib_data_adapter.py：✅ 实现完成
+- 列名映射：open→$open, close→$close, volume→$volume, high→$high, low→$low, amount→$amount
+- 代码格式：600519.SH → SH600519 ✅
+- 标签计算：T+1 开盘买入，防前向偏差 ✅
+- test_qlib_data_adapter.py：4 passed
+- pytest：143 passed, 0 failed
+- commit：[19a48f13] [feat: add qlib data adapter]
 
 BUILDER_DONE
