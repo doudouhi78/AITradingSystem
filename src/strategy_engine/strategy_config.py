@@ -11,3 +11,8 @@ class StrategyConfig:
     max_capital_pct: float = 0.30
     priority: int = 1
     rebalance_freq: str = "daily"
+    status: str = "research"
+    signal_type: str = "discrete"
+    factor_id: str | None = None
+    days_in_forward_sim: int = 0
+    forward_sharpe: float | None = None

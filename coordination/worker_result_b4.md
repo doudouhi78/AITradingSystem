@@ -1,13 +1,9 @@
-## Sprint 44b 结果 — WFO 验证框架
+## Sprint 45b 结果 — alpha004 策略接入
 
-- 完成 fold 数：10 / 5
-- 各 fold ICIR：[0.18, 0.12, 0.09, 0.15, 0.20, 0.13, 0.35, 0.11, 0.06, 0.05]
-- 平均 ICIR：0.15
-- ICIR 标准差：0.08
-- 稳定性评级：moderate
-- wfo_report.json：✅
+- strategy_configs.json：strat_alpha004_v1 已注册 ✅
+- strategy_registry.json：已更新 ✅
+- signal_daily.py 兼容性：需要修改（已新增 alpha004 的 factor_rank 分支；当日横截面前20%/后20%候选已计算，observation 模式下仅记录元数据，不直接产生实盘信号）
 - pytest：119 passed, 0 failed
-- commit：[0dee1b28] feat: add WFO validation framework
+- commit：[待提交]
 
 BUILDER_DONE
-

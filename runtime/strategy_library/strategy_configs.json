@@ -3,7 +3,7 @@
     "strategy_id": "strat_breakout_v1",
     "strategy_name": "价格突破策略（entry25/exit20）",
     "is_active": true,
-    "max_capital_pct": 0.30,
+    "max_capital_pct": 0.3,
     "priority": 1,
     "rebalance_freq": "daily"
   },
@@ -19,7 +19,7 @@
     "strategy_id": "strat_rsi_reversion_v1",
     "strategy_name": "RSI 均值回归",
     "is_active": false,
-    "max_capital_pct": 0.20,
+    "max_capital_pct": 0.2,
     "priority": 3,
     "rebalance_freq": "daily"
   },
@@ -35,8 +35,21 @@
     "strategy_id": "strat_factor_momentum_v1",
     "strategy_name": "截面动量因子选股",
     "is_active": false,
-    "max_capital_pct": 0.30,
+    "max_capital_pct": 0.3,
     "priority": 5,
     "rebalance_freq": "daily"
+  },
+  {
+    "strategy_id": "strat_alpha004_v1",
+    "strategy_name": "Alpha004 Factor Strategy",
+    "is_active": false,
+    "status": "observation",
+    "factor_id": "alpha004",
+    "signal_type": "factor_rank",
+    "max_capital_pct": 0.25,
+    "priority": 6,
+    "rebalance_freq": "monthly",
+    "days_in_forward_sim": 0,
+    "forward_sharpe": null
   }
 ]

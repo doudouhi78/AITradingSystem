@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / 'src'
@@ -20,8 +21,11 @@ from attribution.report_generator import generate_monthly_report
 from strategies import MACrossStrategy, RSIReversionStrategy, VolBreakoutStrategy
 from strategy_engine.signal_aggregator import aggregate_daily_signals
 from strategy_engine.strategy_config import StrategyConfig
+from alpha_research.factors import alpha101
 
 DATA_PATH = ROOT / 'runtime' / 'market_data' / 'cn_etf' / '510300.parquet'
+CSI300_PATH = ROOT / 'runtime' / 'classification_data' / 'index_components' / 'csi300_latest.parquet'
+STOCK_DATA_DIR = ROOT / 'runtime' / 'market_data' / 'cn_stock'
 SIGNAL_DIR = ROOT / 'runtime' / 'paper_trading' / 'signals'
 FORWARD_SIM_PATH = ROOT / 'runtime' / 'paper_trading' / 'forward_sim_equity.csv'
 STRATEGY_LIBRARY_DIR = ROOT / 'runtime' / 'strategy_library'
@@ -173,6 +177,73 @@ def load_market_data(data_path: Path = DATA_PATH) -> pd.DataFrame:
 
 
 
+
+def load_alpha004_snapshot(lookback_rows: int = 40) -> tuple[pd.Series, pd.Timestamp | None]:
+    if not CSI300_PATH.exists():
+        return pd.Series(dtype=float), None
+    csi300 = pd.read_parquet(CSI300_PATH)
+    codes = csi300['instrument_code'].astype(str).str.zfill(6).tolist()
+    frames: list[pd.DataFrame] = []
+    for code in codes:
+        path = STOCK_DATA_DIR / f'{code}.parquet'
+        if not path.exists():
+            continue
+        frame = pd.read_parquet(path, columns=['trade_date', 'open', 'high', 'low', 'close', 'volume', 'amount']).copy()
+        frame['trade_date'] = pd.to_datetime(frame['trade_date'])
+        frame = frame.sort_values('trade_date').tail(lookback_rows)
+        if frame.empty:
+            continue
+        frame['asset'] = code
+        frames.append(frame.rename(columns={'trade_date': 'date'}))
+    if not frames:
+        return pd.Series(dtype=float), None
+    factor_input = pd.concat(frames, ignore_index=True).set_index(['date', 'asset']).sort_index()
+    factor_series = alpha101.alpha004(factor_input)
+    if factor_series.empty:
+        return pd.Series(dtype=float), None
+    latest_date = pd.Timestamp(factor_series.index.get_level_values('date').max())
+    snapshot = factor_series.xs(latest_date, level='date').sort_values(ascending=False)
+    snapshot.index = snapshot.index.astype(str).str.zfill(6)
+    return snapshot, latest_date
+
+
+def generate_factor_rank_signal(config: StrategyConfig) -> dict[str, Any]:
+    factor_id = str(config.factor_id or '')
+    if factor_id != 'alpha004':
+        return {
+            'signal': 0,
+            'rationale': f'未实现的 factor_rank 因子：{factor_id}',
+            'strategy_name': config.strategy_name,
+            'strategy_type': 'factor',
+            'signal_type': 'factor_rank',
+            'factor_id': factor_id,
+        }
+    snapshot, snapshot_date = load_alpha004_snapshot()
+    if snapshot.empty or snapshot_date is None:
+        return {
+            'signal': 0,
+            'rationale': 'alpha004 截面因子快照为空，跳过当日 factor_rank 生成。',
+            'strategy_name': config.strategy_name,
+            'strategy_type': 'factor',
+            'signal_type': 'factor_rank',
+            'factor_id': factor_id,
+        }
+    bucket = max(1, int(np.ceil(len(snapshot) * 0.2)))
+    top_candidates = snapshot.head(bucket).index.tolist()
+    bottom_candidates = snapshot.tail(bucket).index.tolist()
+    return {
+        'signal': 0,
+        'rationale': f'alpha004 截面排名已计算：前20%={bucket}只，后20%={bucket}只；observation 模式下不直接产生实盘信号。',
+        'strategy_name': config.strategy_name,
+        'strategy_type': 'factor',
+        'signal_type': 'factor_rank',
+        'factor_id': factor_id,
+        'snapshot_date': str(snapshot_date.date()),
+        'universe_size': int(len(snapshot)),
+        'top_candidates': top_candidates[:10],
+        'bottom_candidates': bottom_candidates[:10],
+    }
+
 def generate_breakout_signal(data: pd.DataFrame) -> tuple[int, dict[str, Any]]:
     close = data['close'].astype(float)
     latest = data.iloc[-1]
@@ -240,6 +311,10 @@ def build_strategy_signal_details(data: pd.DataFrame, configs: list[StrategyConf
         'strategy_name': '截面动量因子选股',
         'strategy_type': 'factor',
     }
+
+    for config in configs:
+        if config.signal_type == 'factor_rank' and config.strategy_id not in details:
+            details[config.strategy_id] = generate_factor_rank_signal(config)
 
     for strategy_id, payload in details.items():
         config = config_map.get(strategy_id)
@@ -327,4 +402,5 @@ if __name__ == '__main__':
         print('报告已更新：runtime/reports/strategy_report.html')
     except Exception as e:
         print(f'报告生成失败（不影响信号）：{e}')
+
 
