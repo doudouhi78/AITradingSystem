@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,7 @@ if str(ROOT) not in sys.path:
 from ai_dev_os.gate import GateScheduler
 from attribution.report_generator import generate_monthly_report
 from strategies import MACrossStrategy, RSIReversionStrategy, VolBreakoutStrategy
+from strategy_engine.alpha_gate_adapter import adapt_factor_signal
 from strategy_engine.signal_aggregator import aggregate_daily_signals
 from strategy_engine.strategy_config import StrategyConfig
 from alpha_research.factors import alpha101
@@ -178,7 +180,7 @@ def load_market_data(data_path: Path = DATA_PATH) -> pd.DataFrame:
 
 
 
-def load_alpha004_snapshot(lookback_rows: int = 40) -> tuple[pd.Series, pd.Timestamp | None]:
+def load_alpha004_snapshot(lookback_rows: int = 40, as_of_date: pd.Timestamp | None = None) -> tuple[pd.Series, pd.Timestamp | None]:
     if not CSI300_PATH.exists():
         return pd.Series(dtype=float), None
     csi300 = pd.read_parquet(CSI300_PATH)
@@ -190,6 +192,8 @@ def load_alpha004_snapshot(lookback_rows: int = 40) -> tuple[pd.Series, pd.Times
             continue
         frame = pd.read_parquet(path, columns=['trade_date', 'open', 'high', 'low', 'close', 'volume', 'amount']).copy()
         frame['trade_date'] = pd.to_datetime(frame['trade_date'])
+        if as_of_date is not None:
+            frame = frame.loc[frame['trade_date'] <= pd.Timestamp(as_of_date)]
         frame = frame.sort_values('trade_date').tail(lookback_rows)
         if frame.empty:
             continue
@@ -338,6 +342,84 @@ def enrich_aggregated_trades(aggregated_trades: list[dict[str, Any]], configs: l
 
 
 
+def build_factor_gate_outputs(
+    configs: list[StrategyConfig],
+    gate_allowed: bool,
+    current_equity: float,
+    as_of_date: pd.Timestamp | None = None,
+) -> dict[str, dict[str, Any]]:
+    outputs: dict[str, dict[str, Any]] = {}
+    for config in configs:
+        if config.signal_type != 'factor_rank':
+            continue
+        factor_id = str(config.factor_id or '')
+        if factor_id != 'alpha004':
+            continue
+        snapshot, snapshot_date = load_alpha004_snapshot(as_of_date=as_of_date)
+        if snapshot.empty or snapshot_date is None:
+            outputs[config.strategy_id] = {
+                'snapshot_date': None,
+                'selection_count': 0,
+                'position_weights': [],
+                'reason': 'empty_factor_snapshot',
+            }
+            continue
+        simulated_config = replace(config, is_active=True)
+        gate_trades = aggregate_daily_signals(
+            strategy_signals={config.strategy_id: 1},
+            strategy_configs=[simulated_config],
+            gate_allowed=gate_allowed,
+            current_equity=current_equity,
+        )
+        gate_trade = gate_trades[0] if gate_trades else {
+            'strategy_id': config.strategy_id,
+            'strategy_name': config.strategy_name,
+            'action': 'blocked_entry',
+            'requested_capital_pct': float(config.max_capital_pct),
+            'approved_capital_pct': 0.0,
+            'notional_capital': 0.0,
+            'reason': 'no_gate_trade_generated',
+        }
+        adapter_output = adapt_factor_signal(
+            snapshot,
+            {
+                **gate_trade,
+                'top_pct': 0.2,
+                'max_single_weight': 0.10,
+            },
+        )
+        outputs[config.strategy_id] = {
+            **adapter_output,
+            'snapshot_date': str(snapshot_date.date()),
+            'status': config.status,
+            'is_active': config.is_active,
+        }
+    return outputs
+
+
+
+def find_recent_gate_allowed_date(
+    scheduler: GateScheduler,
+    etf_df: pd.DataFrame,
+    equity_series: list[float],
+    lookback_days: int = 90,
+) -> pd.Timestamp | None:
+    unique_dates = pd.DatetimeIndex(pd.to_datetime(etf_df['trade_date'])).sort_values().unique()
+    for trade_date in reversed(unique_dates[-lookback_days:]):
+        subset = etf_df.loc[etf_df['trade_date'] <= trade_date].copy()
+        if subset.empty:
+            continue
+        gate_result = scheduler.evaluate(
+            date=str(pd.Timestamp(trade_date).date()),
+            equity_series=equity_series,
+            etf_df=subset,
+        )
+        if bool(gate_result['allowed']):
+            return pd.Timestamp(trade_date).normalize()
+    return None
+
+
+
 def main() -> None:
     SIGNAL_DIR.mkdir(parents=True, exist_ok=True)
     strategy_configs = load_strategy_configs()
@@ -349,9 +431,10 @@ def main() -> None:
     run_date = datetime.now().astimezone().isoformat()
 
     scheduler = GateScheduler()
+    equity_series = load_equity_series()
     gate_result = scheduler.evaluate(
         date=str(trade_date.date()),
-        equity_series=load_equity_series(),
+        equity_series=equity_series,
         etf_df=df,
     )
 
@@ -364,6 +447,27 @@ def main() -> None:
         current_equity=ACCOUNT_EQUITY,
     )
     aggregated_trades = enrich_aggregated_trades(aggregated_trades, strategy_configs)
+    factor_gate_outputs = build_factor_gate_outputs(
+        configs=strategy_configs,
+        gate_allowed=bool(gate_result['allowed']),
+        current_equity=ACCOUNT_EQUITY,
+        as_of_date=trade_date,
+    )
+    factor_gate_demo_outputs: dict[str, dict[str, Any]] = {}
+    if not any(payload.get('position_weights') for payload in factor_gate_outputs.values()):
+        demo_date = find_recent_gate_allowed_date(scheduler, df, equity_series)
+        if demo_date is not None:
+            factor_gate_demo_outputs = build_factor_gate_outputs(
+                configs=strategy_configs,
+                gate_allowed=True,
+                current_equity=ACCOUNT_EQUITY,
+                as_of_date=demo_date,
+            )
+            for payload in factor_gate_demo_outputs.values():
+                payload['demo_date'] = str(demo_date.date())
+    for strategy_id, gate_payload in factor_gate_outputs.items():
+        if strategy_id in strategy_signal_details:
+            strategy_signal_details[strategy_id]['gate_adapter'] = gate_payload
 
     payload = {
         'date': str(trade_date.date()),
@@ -373,6 +477,8 @@ def main() -> None:
         'gate_result': gate_result,
         'strategy_signals': strategy_signal_details,
         'aggregated_trades': aggregated_trades,
+        'factor_gate_outputs': factor_gate_outputs,
+        'factor_gate_demo_outputs': factor_gate_demo_outputs,
     }
     out_path = SIGNAL_DIR / f'{trade_date:%Y%m%d}.json'
     out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -384,6 +490,20 @@ def main() -> None:
             f"{strategy_id}: signal={detail['signal']} active={detail['is_active']} "
             f"max_capital_pct={detail['max_capital_pct']:.2f} rationale={detail['rationale']}"
         )
+        gate_adapter = detail.get('gate_adapter')
+        if gate_adapter and gate_adapter.get('position_weights'):
+            sample = ', '.join(
+                f"{item['symbol']}: {item['account_weight'] * 100:.2f}%"
+                for item in gate_adapter['position_weights'][:3]
+            )
+            print(f"{strategy_id} gate_weights: {sample}")
+        elif strategy_id in factor_gate_demo_outputs and factor_gate_demo_outputs[strategy_id].get('position_weights'):
+            demo_payload = factor_gate_demo_outputs[strategy_id]
+            sample = ', '.join(
+                f"{item['symbol']}: {item['account_weight'] * 100:.2f}%"
+                for item in demo_payload['position_weights'][:3]
+            )
+            print(f"{strategy_id} gate_weights_demo[{demo_payload['demo_date']}]: {sample}")
     print(f'aggregated_trades={len(aggregated_trades)}')
     print(f'信号文件: {out_path}')
     maybe_generate_monthly_attribution_report(trade_date)
