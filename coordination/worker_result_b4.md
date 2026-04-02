@@ -1,17 +1,17 @@
-Sprint 45b 已完成，结果写入 [worker_result_b4.md](D:\AITradingSystem\coordination\worker_result_b4.md)。
+已执行完成，结果写入 [worker_result_b4.md](D:\AITradingSystem\coordination\worker_result_b4.md)，末尾已包含 `BUILDER_DONE`。
 
-这次新增了 `strat_alpha004_v1` 到 [strategy_configs.json](D:\AITradingSystem\runtime\strategy_library\strategy_configs.json)，并同步更新了 [strategy_registry.json](D:\AITradingSystem\runtime\strategy_library\strategy_registry.json)。同时我扩展了 [strategy_config.py](D:\AITradingSystem\src\strategy_engine\strategy_config.py) 的配置字段，并在 [signal_daily.py](D:\AITradingSystem\scripts\signal_daily.py) 里补了 `factor_rank` 兼容逻辑：现在会真实计算当日 `alpha004` 截面前 20% / 后 20% 候选，但由于该策略按任务卡要求仍是 `is_active=false`、`observation` 状态，所以只写入元数据，不会进入实盘执行列表。
+本次新增了 [moneyflow_factors.py](D:\AITradingSystem\src\alpha_research\factors\moneyflow_factors.py)、[test_moneyflow_factors.py](D:\AITradingSystem\tests\test_moneyflow_factors.py) 和轻量入口 [run_moneyflow_ic_eval.py](D:\AITradingSystem\scripts\run_moneyflow_ic_eval.py)，并把 5 个 moneyflow 因子写入 [knowledge_base.json](D:\AITradingSystem\runtime\factor_registry\knowledge_base.json)。实现按任务卡要求在缺少 `moneyflow.parquet` 时抛出明确 `FileNotFoundError`，mock 单测覆盖了空数据、单日数据和 NaN 处理。
 
-验证已完成：`python scripts/signal_daily.py` 运行正常，输出里已经包含 `strat_alpha004_v1`；全量 `pytest` 仍是 `119 passed, 0 failed, 8 skipped`。提交并推送完成：
-- `0b52bfce` `feat: add alpha004 strategy to execution layer`
-- `aca13162` `docs: update Sprint 45b result card`
-## Sprint 45d 结果 — Moneyflow 因子预研
+验证结果是 `pytest -q` 为 `124 passed, 0 failed, 8 skipped`。已提交并推送：
+- `00565b01` `feat: add moneyflow factor research scaffolding`
+- `8c9e2c1e` `docs: update Sprint 45d result card`
+## Sprint 46c 结果 — 研究管理自动化管道
 
-- knowledge_base 新增：5个 moneyflow 因子描述
-- moneyflow_factors.py：5个函数实现完成
-- 单元测试：5 passed（mock数据）
-- 数据就绪后可直接运行：`python scripts/run_moneyflow_ic_eval.py`
-- pytest：124 passed, 0 failed
-- commit：00565b01 feat: add moneyflow factor research scaffolding
+- refresh_factor_registry.py：✅ 实现（含 --dry-run / --factor 参数）
+- research_dashboard.py：✅ 实现
+- dashboard 示例输出：研究状态仪表盘 / - 总数: 32 / - 类型分布: fundamental_proxy=1, momentum=1, price_volume=19, quality=1, reversal=7, symbolic_regression=1, volatility=2 / - mean_icir: 0.1464
+- test_refresh_pipeline.py：3 passed
+- pytest：135 passed, 1 failed（现存失败：tests/test_signal_daily.py::test_build_factor_gate_outputs_runs_observation_mode）
+- commit：db334ac5 feat: add research automation pipeline
 
 BUILDER_DONE
