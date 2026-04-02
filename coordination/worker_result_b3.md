@@ -4,5 +4,5 @@
 - 过滤剔除比例：ST 4.08% / 次新股 4.63% / 低流动性 35.50% / 停牌 0.00%
 - 结论：过滤后信号更弱
 - pytest：163p/0f/0s
-- commit：PENDING
+- commit：f3d6b412
 BUILDER_DONE
