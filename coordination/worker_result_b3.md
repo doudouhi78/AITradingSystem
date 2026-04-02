@@ -1,18 +1,18 @@
-## Sprint 43 结果 — PySR 符号回归
+## Sprint 44c 结果 — 因子选股回测
 
-- PySR 搜索完成：✅
-- 发现表达式数：5 个
-- Top3 表达式：
-  1. [0.005347974] r2=-0.00 complexity=1
-  2. [abs(alpha065 * 0.00519571)] r2=0.00 complexity=4
-  3. [(momentum_12_1 + 4.241988) * 0.0012860908] r2=0.00 complexity=5
-- 样本外 ICIR（2022-2023）：
-  1. [0.005347974] icir=null status=fail
-  2. [abs(alpha065 * 0.00519571)] icir=null status=fail
-  3. [(momentum_12_1 + 4.241988) * 0.0012860908] icir=0.09 status=pass
-- 新增 factor_registry 条目：1 个
-- pytest：118 passed, 0 failed
-- commit：[bc04281f] feat: add PySR factor discovery pipeline
+| 因子 | 样本内Sharpe | 样本外Sharpe | 样本外年化 | 样本外最大回撤 |
+|------|------------|------------|----------|--------------|
+| alpha004 | -0.18 | 1.66 | 10.0% | -6.2% |
+| alpha042 | 0.46 | 0.39 | 1.5% | -5.2% |
+| alpha027 | -0.60 | 0.34 | 1.4% | -5.4% |
+| alpha071 | -0.77 | 0.43 | 2.2% | -5.7% |
+| alpha061 | -1.13 | 0.99 | 6.7% | -9.3% |
+| lgbm_synthetic | 0.99 | 0.62 | 3.1% | -5.5% |
+| pysr_formula_3 | 0.92 | 0.20 | 1.4% | -18.1% |
+
+- 最优因子：[alpha004] 样本外Sharpe=1.66
+- factor_backtest_report.json：✅
+- pytest：119 passed, 0 failed
+- commit：[待提交]
 
 BUILDER_DONE
-

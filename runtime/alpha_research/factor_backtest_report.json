@@ -1,0 +1,95 @@
+{
+  "factors": [
+    {
+      "factor_id": "alpha004",
+      "in_sample": {
+        "annual_return": -0.01254164205711028,
+        "sharpe": -0.17562952920520783,
+        "max_drawdown": -0.16789189688575923
+      },
+      "out_of_sample": {
+        "annual_return": 0.09950768284038358,
+        "sharpe": 1.6567909374058774,
+        "max_drawdown": -0.06242447497465442
+      }
+    },
+    {
+      "factor_id": "alpha042",
+      "in_sample": {
+        "annual_return": 0.017279389430405523,
+        "sharpe": 0.4578546714165558,
+        "max_drawdown": -0.05672675749354106
+      },
+      "out_of_sample": {
+        "annual_return": 0.015141034855657987,
+        "sharpe": 0.38975127295451123,
+        "max_drawdown": -0.05216078028260851
+      }
+    },
+    {
+      "factor_id": "alpha027",
+      "in_sample": {
+        "annual_return": -0.036196687874484934,
+        "sharpe": -0.6030590734414261,
+        "max_drawdown": -0.24513240358775867
+      },
+      "out_of_sample": {
+        "annual_return": 0.014074561845480282,
+        "sharpe": 0.3383835277275287,
+        "max_drawdown": -0.05412845930866694
+      }
+    },
+    {
+      "factor_id": "alpha071",
+      "in_sample": {
+        "annual_return": -0.04707519337016319,
+        "sharpe": -0.7667833009062226,
+        "max_drawdown": -0.31485645659862227
+      },
+      "out_of_sample": {
+        "annual_return": 0.021906460154375917,
+        "sharpe": 0.42848849530035277,
+        "max_drawdown": -0.05691646195751687
+      }
+    },
+    {
+      "factor_id": "alpha061",
+      "in_sample": {
+        "annual_return": -0.07639313336387266,
+        "sharpe": -1.12907091669259,
+        "max_drawdown": -0.39671526613169417
+      },
+      "out_of_sample": {
+        "annual_return": 0.06729836590552973,
+        "sharpe": 0.9923191219406354,
+        "max_drawdown": -0.09339669648950044
+      }
+    },
+    {
+      "factor_id": "lgbm_synthetic",
+      "in_sample": {
+        "annual_return": 0.05421217334123929,
+        "sharpe": 0.991811010440118,
+        "max_drawdown": -0.07457344323131343
+      },
+      "out_of_sample": {
+        "annual_return": 0.030788903236977916,
+        "sharpe": 0.6218466264904632,
+        "max_drawdown": -0.055010931999439405
+      }
+    },
+    {
+      "factor_id": "pysr_formula_3",
+      "in_sample": {
+        "annual_return": 0.08199847553702488,
+        "sharpe": 0.9233899377183149,
+        "max_drawdown": -0.16495566174439347
+      },
+      "out_of_sample": {
+        "annual_return": 0.01350043840468218,
+        "sharpe": 0.1989580733141721,
+        "max_drawdown": -0.18071043171929613
+      }
+    }
+  ]
+}
