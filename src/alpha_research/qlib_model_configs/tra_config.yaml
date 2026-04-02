@@ -1,0 +1,23 @@
+model:
+  class: TRA
+  kwargs:
+    d_feat: 158
+    hidden_size: 64
+    num_layers: 2
+    num_states: 8
+    dropout: 0.0
+    n_epochs: 200
+    lr: 1e-3
+    batch_size: 800
+    device: cuda
+
+dataset:
+  train: ["2016-01-01", "2021-12-31"]
+  valid: ["2022-01-01", "2022-12-31"]
+  test: ["2023-01-01", "2023-12-31"]
+  forward_days: 20
+
+output:
+  model_path: runtime/models/qlib_tra_v1.pkl
+  factor_path: runtime/alpha_research/qlib_tra_factor.parquet
+  report_path: runtime/alpha_research/qlib_tra_ic_report.json
