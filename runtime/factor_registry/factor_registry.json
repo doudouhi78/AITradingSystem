@@ -369,5 +369,17 @@
     "icir": 0.09160895177293146,
     "status": "pass",
     "source": "pysr"
+  },
+  {
+    "factor_id": "classic_asset_turnover",
+    "factor_name": "asset_turnover",
+    "category": "quality",
+    "ic_mean": 0.0062600846719423,
+    "ic_std": 0.09863883741227887,
+    "icir": 0.06346470453394684,
+    "status": "pass",
+    "source": "classic_factors_alphalens_backfill",
+    "forward_period_days": 5,
+    "updated_at": "2026-04-02T01:05:17Z"
   }
 ]
