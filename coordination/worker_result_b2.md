@@ -31,6 +31,6 @@ lgbm_synthetic：
 
 - 成本拖累对比：alpha061 损失 0.11 | lgbm 损失 0.18
 - pytest：119 passed, 0 failed
-- commit：待提交
+- commit：a9cf6688 feat: add full backtests for alpha061 and lgbm synthetic
 
 BUILDER_DONE
