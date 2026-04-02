@@ -41,6 +41,6 @@ BUILDER_DONE## Sprint 50 结果 — TRA 训练 + 双模型对比
 - 推荐模型：TRA
 - 是否入库：✅
 - pytest：145 passed, 0 failed
-- commit：待提交
+- commit：3a40146d feat: add qlib TRA training and comparison pipeline
 
 BUILDER_DONE
