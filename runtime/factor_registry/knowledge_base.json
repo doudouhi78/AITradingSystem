@@ -42,6 +42,36 @@
     "description": "特质波动率 = 过去60日日收益率标准差"
   },
   {
+    "factor_name": "mf_inflow_acceleration",
+    "category": "moneyflow",
+    "formula": "sum(net_mf_amount, 5) - sum(net_mf_amount, 20)",
+    "description": "资金流入加速度 = 5日主力净流入 - 20日主力净流入"
+  },
+  {
+    "factor_name": "mf_large_order_ratio",
+    "category": "moneyflow",
+    "formula": "sum(buy_elg_amount, 5) / (sum(buy_elg_amount, 5) + sum(sell_elg_amount, 5))",
+    "description": "超大单净买入占比 = 过去5日超大单净买入 / (超大单净买入 + 超大单净卖出)"
+  },
+  {
+    "factor_name": "mf_net_inflow_20d",
+    "category": "moneyflow",
+    "formula": "sum(net_mf_amount, 20) / total_market_cap",
+    "description": "20日主力净流入强度 = 过去20日主力净流入额 / 总市值"
+  },
+  {
+    "factor_name": "mf_net_inflow_5d",
+    "category": "moneyflow",
+    "formula": "sum(net_mf_amount, 5) / total_market_cap",
+    "description": "5日主力净流入强度 = 过去5日主力净流入额 / 总市值"
+  },
+  {
+    "factor_name": "mf_smart_money",
+    "category": "moneyflow",
+    "formula": "sum(buy_elg_amount - sell_elg_amount, 5) / sum(amount, 5)",
+    "description": "聪明钱比率 = 过去5日超大单净流入 / 过去5日总成交额"
+  },
+  {
     "factor_name": "momentum_12_1",
     "category": "momentum",
     "formula": "return_252d_ex_last_21d",
