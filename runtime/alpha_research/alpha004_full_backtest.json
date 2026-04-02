@@ -1,0 +1,605 @@
+{
+  "factor_id": "alpha004",
+  "universe": "csi300_latest_with_filters",
+  "config": {
+    "start": "2016-01-01",
+    "end": "2023-12-31",
+    "train_end": "2021-12-31",
+    "oos_start": "2022-01-01",
+    "quantile": "Q5 / Top20%",
+    "weighting": "equal_weight",
+    "max_stock_weight": 0.05,
+    "rebalance": "monthly",
+    "costs": {
+      "commission": 0.0003,
+      "stamp_duty_sell": 0.001,
+      "slippage_per_side": 0.001
+    },
+    "constraints": [
+      "exclude_st",
+      "exclude_suspended",
+      "exclude_listing_lt_60d"
+    ],
+    "instrument_count": 300
+  },
+  "in_sample": {
+    "annual_return": 0.16047610182716654,
+    "sharpe": 0.877829769004923,
+    "max_drawdown": -0.30746384802409166,
+    "turnover_annualized": 9.558934588173997
+  },
+  "out_of_sample": {
+    "annual_return": 0.058656301204527805,
+    "sharpe": 0.43041376702044326,
+    "max_drawdown": -0.2108372197731725,
+    "turnover_annualized": 10.28551727058835,
+    "sharpe_cost_drag": 0.18606120151764888,
+    "gross_sharpe": 0.6164749685380921
+  },
+  "rebalances": [
+    {
+      "signal_date": "2016-01-29",
+      "entry_date": "2016-02-01",
+      "holding_count": 42,
+      "turnover": 0.5000000000000001
+    },
+    {
+      "signal_date": "2016-02-29",
+      "entry_date": "2016-03-01",
+      "holding_count": 41,
+      "turnover": 0.6572436760464557
+    },
+    {
+      "signal_date": "2016-03-31",
+      "entry_date": "2016-04-01",
+      "holding_count": 40,
+      "turnover": 0.8821943695428671
+    },
+    {
+      "signal_date": "2016-05-31",
+      "entry_date": "2016-06-01",
+      "holding_count": 41,
+      "turnover": 0.8124356975905185
+    },
+    {
+      "signal_date": "2016-06-30",
+      "entry_date": "2016-07-01",
+      "holding_count": 41,
+      "turnover": 0.8089396706581606
+    },
+    {
+      "signal_date": "2016-07-29",
+      "entry_date": "2016-08-01",
+      "holding_count": 41,
+      "turnover": 0.8453719025922157
+    },
+    {
+      "signal_date": "2016-08-31",
+      "entry_date": "2016-09-01",
+      "holding_count": 42,
+      "turnover": 0.7163805530777965
+    },
+    {
+      "signal_date": "2016-09-30",
+      "entry_date": "2016-10-10",
+      "holding_count": 42,
+      "turnover": 0.779020369828924
+    },
+    {
+      "signal_date": "2016-10-31",
+      "entry_date": "2016-11-01",
+      "holding_count": 42,
+      "turnover": 0.8166081226647357
+    },
+    {
+      "signal_date": "2016-11-30",
+      "entry_date": "2016-12-01",
+      "holding_count": 42,
+      "turnover": 0.7986171938218383
+    },
+    {
+      "signal_date": "2016-12-30",
+      "entry_date": "2017-01-03",
+      "holding_count": 43,
+      "turnover": 0.814883994698288
+    },
+    {
+      "signal_date": "2017-01-26",
+      "entry_date": "2017-02-03",
+      "holding_count": 43,
+      "turnover": 0.8385565166549176
+    },
+    {
+      "signal_date": "2017-02-28",
+      "entry_date": "2017-03-01",
+      "holding_count": 42,
+      "turnover": 0.8196387175510647
+    },
+    {
+      "signal_date": "2017-03-31",
+      "entry_date": "2017-04-05",
+      "holding_count": 43,
+      "turnover": 0.8642570999573569
+    },
+    {
+      "signal_date": "2017-04-28",
+      "entry_date": "2017-05-02",
+      "holding_count": 42,
+      "turnover": 0.8173536361346342
+    },
+    {
+      "signal_date": "2017-05-31",
+      "entry_date": "2017-06-01",
+      "holding_count": 42,
+      "turnover": 0.9085678814353273
+    },
+    {
+      "signal_date": "2017-06-30",
+      "entry_date": "2017-07-03",
+      "holding_count": 43,
+      "turnover": 0.8389561149700753
+    },
+    {
+      "signal_date": "2017-07-31",
+      "entry_date": "2017-08-01",
+      "holding_count": 42,
+      "turnover": 0.7575767075624796
+    },
+    {
+      "signal_date": "2017-08-31",
+      "entry_date": "2017-09-01",
+      "holding_count": 44,
+      "turnover": 0.6423044640763047
+    },
+    {
+      "signal_date": "2017-09-29",
+      "entry_date": "2017-10-09",
+      "holding_count": 44,
+      "turnover": 0.6933866130109532
+    },
+    {
+      "signal_date": "2017-10-31",
+      "entry_date": "2017-11-01",
+      "holding_count": 44,
+      "turnover": 0.8500049247326998
+    },
+    {
+      "signal_date": "2017-11-30",
+      "entry_date": "2017-12-01",
+      "holding_count": 44,
+      "turnover": 0.8217470606223699
+    },
+    {
+      "signal_date": "2017-12-29",
+      "entry_date": "2018-01-02",
+      "holding_count": 45,
+      "turnover": 0.7666995612641168
+    },
+    {
+      "signal_date": "2018-01-31",
+      "entry_date": "2018-02-01",
+      "holding_count": 45,
+      "turnover": 0.7961936819112094
+    },
+    {
+      "signal_date": "2018-02-28",
+      "entry_date": "2018-03-01",
+      "holding_count": 45,
+      "turnover": 0.8785989599797608
+    },
+    {
+      "signal_date": "2018-03-30",
+      "entry_date": "2018-04-02",
+      "holding_count": 46,
+      "turnover": 0.7429377353093194
+    },
+    {
+      "signal_date": "2018-04-27",
+      "entry_date": "2018-05-02",
+      "holding_count": 46,
+      "turnover": 0.7989514201383809
+    },
+    {
+      "signal_date": "2018-05-31",
+      "entry_date": "2018-06-01",
+      "holding_count": 46,
+      "turnover": 0.7491123720099091
+    },
+    {
+      "signal_date": "2018-06-29",
+      "entry_date": "2018-07-02",
+      "holding_count": 46,
+      "turnover": 0.9793860554594458
+    },
+    {
+      "signal_date": "2018-07-31",
+      "entry_date": "2018-08-01",
+      "holding_count": 46,
+      "turnover": 0.8394519285596374
+    },
+    {
+      "signal_date": "2018-08-31",
+      "entry_date": "2018-09-03",
+      "holding_count": 47,
+      "turnover": 0.7577118447234331
+    },
+    {
+      "signal_date": "2018-09-28",
+      "entry_date": "2018-10-08",
+      "holding_count": 47,
+      "turnover": 0.8352523889531167
+    },
+    {
+      "signal_date": "2018-10-31",
+      "entry_date": "2018-11-01",
+      "holding_count": 46,
+      "turnover": 0.9153369561626852
+    },
+    {
+      "signal_date": "2018-11-30",
+      "entry_date": "2018-12-03",
+      "holding_count": 47,
+      "turnover": 0.8961364011855559
+    },
+    {
+      "signal_date": "2018-12-28",
+      "entry_date": "2019-01-02",
+      "holding_count": 48,
+      "turnover": 0.7350988246774841
+    },
+    {
+      "signal_date": "2019-01-31",
+      "entry_date": "2019-02-01",
+      "holding_count": 48,
+      "turnover": 0.7250875438407184
+    },
+    {
+      "signal_date": "2019-02-28",
+      "entry_date": "2019-03-01",
+      "holding_count": 48,
+      "turnover": 0.8843277943367708
+    },
+    {
+      "signal_date": "2019-03-29",
+      "entry_date": "2019-04-01",
+      "holding_count": 49,
+      "turnover": 0.8383465868928598
+    },
+    {
+      "signal_date": "2019-04-30",
+      "entry_date": "2019-05-06",
+      "holding_count": 49,
+      "turnover": 0.7553569827973764
+    },
+    {
+      "signal_date": "2019-05-31",
+      "entry_date": "2019-06-03",
+      "holding_count": 48,
+      "turnover": 0.8421460355940745
+    },
+    {
+      "signal_date": "2019-06-28",
+      "entry_date": "2019-07-01",
+      "holding_count": 49,
+      "turnover": 0.7796722340184212
+    },
+    {
+      "signal_date": "2019-07-31",
+      "entry_date": "2019-08-01",
+      "holding_count": 49,
+      "turnover": 0.8415005977161393
+    },
+    {
+      "signal_date": "2019-08-30",
+      "entry_date": "2019-09-02",
+      "holding_count": 49,
+      "turnover": 0.8469376717533776
+    },
+    {
+      "signal_date": "2019-09-30",
+      "entry_date": "2019-10-08",
+      "holding_count": 50,
+      "turnover": 0.8621071655471375
+    },
+    {
+      "signal_date": "2019-10-31",
+      "entry_date": "2019-11-01",
+      "holding_count": 50,
+      "turnover": 0.6510379004190596
+    },
+    {
+      "signal_date": "2019-11-29",
+      "entry_date": "2019-12-02",
+      "holding_count": 50,
+      "turnover": 0.7827581583890039
+    },
+    {
+      "signal_date": "2019-12-31",
+      "entry_date": "2020-01-02",
+      "holding_count": 50,
+      "turnover": 0.7901112079481002
+    },
+    {
+      "signal_date": "2020-01-23",
+      "entry_date": "2020-02-03",
+      "holding_count": 51,
+      "turnover": 0.872458000253475
+    },
+    {
+      "signal_date": "2020-02-28",
+      "entry_date": "2020-03-02",
+      "holding_count": 52,
+      "turnover": 0.7771482061273565
+    },
+    {
+      "signal_date": "2020-03-31",
+      "entry_date": "2020-04-01",
+      "holding_count": 52,
+      "turnover": 0.6928047548300227
+    },
+    {
+      "signal_date": "2020-04-30",
+      "entry_date": "2020-05-06",
+      "holding_count": 52,
+      "turnover": 0.7861381845540742
+    },
+    {
+      "signal_date": "2020-05-29",
+      "entry_date": "2020-06-01",
+      "holding_count": 52,
+      "turnover": 0.8020436936073926
+    },
+    {
+      "signal_date": "2020-06-30",
+      "entry_date": "2020-07-01",
+      "holding_count": 53,
+      "turnover": 0.7488619496775917
+    },
+    {
+      "signal_date": "2020-07-31",
+      "entry_date": "2020-08-03",
+      "holding_count": 53,
+      "turnover": 0.7171962151875872
+    },
+    {
+      "signal_date": "2020-08-31",
+      "entry_date": "2020-09-01",
+      "holding_count": 53,
+      "turnover": 0.767664757443207
+    },
+    {
+      "signal_date": "2020-09-30",
+      "entry_date": "2020-10-09",
+      "holding_count": 53,
+      "turnover": 0.7820532810182359
+    },
+    {
+      "signal_date": "2020-10-30",
+      "entry_date": "2020-11-02",
+      "holding_count": 54,
+      "turnover": 0.7137588643697379
+    },
+    {
+      "signal_date": "2020-11-30",
+      "entry_date": "2020-12-01",
+      "holding_count": 54,
+      "turnover": 0.9155583574912677
+    },
+    {
+      "signal_date": "2020-12-31",
+      "entry_date": "2021-01-04",
+      "holding_count": 55,
+      "turnover": 0.8092807284565995
+    },
+    {
+      "signal_date": "2021-01-29",
+      "entry_date": "2021-02-01",
+      "holding_count": 55,
+      "turnover": 0.7362311891116655
+    },
+    {
+      "signal_date": "2021-02-26",
+      "entry_date": "2021-03-01",
+      "holding_count": 54,
+      "turnover": 0.8807281478431297
+    },
+    {
+      "signal_date": "2021-03-31",
+      "entry_date": "2021-04-01",
+      "holding_count": 54,
+      "turnover": 0.8913959871702086
+    },
+    {
+      "signal_date": "2021-04-30",
+      "entry_date": "2021-05-06",
+      "holding_count": 54,
+      "turnover": 0.7639311468236636
+    },
+    {
+      "signal_date": "2021-05-31",
+      "entry_date": "2021-06-01",
+      "holding_count": 55,
+      "turnover": 0.7728168061896339
+    },
+    {
+      "signal_date": "2021-06-30",
+      "entry_date": "2021-07-01",
+      "holding_count": 55,
+      "turnover": 0.7603478372668939
+    },
+    {
+      "signal_date": "2021-07-30",
+      "entry_date": "2021-08-02",
+      "holding_count": 55,
+      "turnover": 0.7593663969019826
+    },
+    {
+      "signal_date": "2021-08-31",
+      "entry_date": "2021-09-01",
+      "holding_count": 55,
+      "turnover": 0.9029419924584903
+    },
+    {
+      "signal_date": "2021-09-30",
+      "entry_date": "2021-10-08",
+      "holding_count": 55,
+      "turnover": 0.8487288577046712
+    },
+    {
+      "signal_date": "2021-10-29",
+      "entry_date": "2021-11-01",
+      "holding_count": 56,
+      "turnover": 0.6726529884788687
+    },
+    {
+      "signal_date": "2021-11-30",
+      "entry_date": "2021-12-01",
+      "holding_count": 56,
+      "turnover": 0.7956832891989982
+    },
+    {
+      "signal_date": "2021-12-31",
+      "entry_date": "2022-01-04",
+      "holding_count": 56,
+      "turnover": 0.7283033427116039
+    },
+    {
+      "signal_date": "2022-01-28",
+      "entry_date": "2022-02-07",
+      "holding_count": 56,
+      "turnover": 0.7845100730277852
+    },
+    {
+      "signal_date": "2022-02-28",
+      "entry_date": "2022-03-01",
+      "holding_count": 57,
+      "turnover": 0.8477239145413108
+    },
+    {
+      "signal_date": "2022-03-31",
+      "entry_date": "2022-04-01",
+      "holding_count": 57,
+      "turnover": 0.8189354260452978
+    },
+    {
+      "signal_date": "2022-04-29",
+      "entry_date": "2022-05-05",
+      "holding_count": 57,
+      "turnover": 0.7831489491578275
+    },
+    {
+      "signal_date": "2022-05-31",
+      "entry_date": "2022-06-01",
+      "holding_count": 57,
+      "turnover": 0.8505925017034297
+    },
+    {
+      "signal_date": "2022-06-30",
+      "entry_date": "2022-07-01",
+      "holding_count": 57,
+      "turnover": 0.8326387409431125
+    },
+    {
+      "signal_date": "2022-07-29",
+      "entry_date": "2022-08-01",
+      "holding_count": 57,
+      "turnover": 0.8498675309975098
+    },
+    {
+      "signal_date": "2022-08-31",
+      "entry_date": "2022-09-01",
+      "holding_count": 57,
+      "turnover": 0.9172937930847855
+    },
+    {
+      "signal_date": "2022-09-30",
+      "entry_date": "2022-10-10",
+      "holding_count": 58,
+      "turnover": 0.7524512885688412
+    },
+    {
+      "signal_date": "2022-10-31",
+      "entry_date": "2022-11-01",
+      "holding_count": 58,
+      "turnover": 0.8754442828843665
+    },
+    {
+      "signal_date": "2022-11-30",
+      "entry_date": "2022-12-01",
+      "holding_count": 58,
+      "turnover": 0.8736318142678886
+    },
+    {
+      "signal_date": "2022-12-30",
+      "entry_date": "2023-01-03",
+      "holding_count": 58,
+      "turnover": 0.8680745380429946
+    },
+    {
+      "signal_date": "2023-01-31",
+      "entry_date": "2023-02-01",
+      "holding_count": 58,
+      "turnover": 0.8834296775089718
+    },
+    {
+      "signal_date": "2023-02-28",
+      "entry_date": "2023-03-01",
+      "holding_count": 58,
+      "turnover": 0.7500502274544281
+    },
+    {
+      "signal_date": "2023-03-31",
+      "entry_date": "2023-04-03",
+      "holding_count": 59,
+      "turnover": 0.7785078558268885
+    },
+    {
+      "signal_date": "2023-04-28",
+      "entry_date": "2023-05-04",
+      "holding_count": 59,
+      "turnover": 0.7628554490105308
+    },
+    {
+      "signal_date": "2023-05-31",
+      "entry_date": "2023-06-01",
+      "holding_count": 59,
+      "turnover": 0.8738826991553743
+    },
+    {
+      "signal_date": "2023-06-30",
+      "entry_date": "2023-07-03",
+      "holding_count": 58,
+      "turnover": 0.837179194893624
+    },
+    {
+      "signal_date": "2023-07-31",
+      "entry_date": "2023-08-01",
+      "holding_count": 59,
+      "turnover": 0.788724200379203
+    },
+    {
+      "signal_date": "2023-08-31",
+      "entry_date": "2023-09-01",
+      "holding_count": 59,
+      "turnover": 0.8536835017384627
+    },
+    {
+      "signal_date": "2023-09-28",
+      "entry_date": "2023-10-09",
+      "holding_count": 59,
+      "turnover": 0.7385109765756404
+    },
+    {
+      "signal_date": "2023-10-31",
+      "entry_date": "2023-11-01",
+      "holding_count": 59,
+      "turnover": 0.7936603041769563
+    },
+    {
+      "signal_date": "2023-11-30",
+      "entry_date": "2023-12-01",
+      "holding_count": 59,
+      "turnover": 0.7564069598205976
+    }
+  ]
+}
