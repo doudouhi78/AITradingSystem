@@ -18,7 +18,9 @@
 推送：
 - 已推送到 `origin/main`
 
-BUILDER_DONE## Sprint 47 结果 — Qlib 环境验证
+BUILDER_DONE
+
+## Sprint 47 结果 — Qlib 环境验证
 
 - Qlib 版本：0.9.7
 - 安装状态：✅ 成功（.venv 中已安装，`pip install pyqlib` 显示 requirement already satisfied，无依赖冲突）
