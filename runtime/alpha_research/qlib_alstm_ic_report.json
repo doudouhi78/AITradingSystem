@@ -1,0 +1,14 @@
+{
+  "factor_name": "qlib_alstm_v1",
+  "factor_path": "D:\\AITradingSystem\\runtime\\alpha_research\\qlib_alstm_factor.parquet",
+  "prices_path": "D:\\AITradingSystem\\runtime\\alpha_research\\qlib_alstm_test_prices.parquet",
+  "forward_days": 20,
+  "basic_metrics": {
+    "rank_ic_mean": 0.05590447246612349,
+    "icir": 0.3637122641440996,
+    "ic_positive_pct": 0.64375,
+    "sample_count": 160
+  },
+  "status": "pass",
+  "generated_at": "2026-04-02T03:44:14Z"
+}
