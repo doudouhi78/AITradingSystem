@@ -12,6 +12,7 @@
   3. [(momentum_12_1 + 4.241988) * 0.0012860908] icir=0.09 status=pass
 - 新增 factor_registry 条目：1 个
 - pytest：118 passed, 0 failed
-- commit：[待提交]
+- commit：[bc04281f] feat: add PySR factor discovery pipeline
 
 BUILDER_DONE
+
