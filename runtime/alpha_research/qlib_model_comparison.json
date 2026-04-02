@@ -1,0 +1,18 @@
+{
+  "alstm": {
+    "icir": 0.3637122641440996,
+    "ic_mean": 0.05590447246612349
+  },
+  "tra": {
+    "icir": 0.655024144508903,
+    "ic_mean": 0.12750979087979014
+  },
+  "baseline_lgbm": {
+    "icir": 0.1525
+  },
+  "baseline_alpha004": {
+    "icir": 0.1744
+  },
+  "recommendation": "tra",
+  "note": "Qlib example cn_data ends at 2020-09-25; TRA used fallback test window 2020-01-01~2020-08-31."
+}

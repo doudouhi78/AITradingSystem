@@ -1,0 +1,14 @@
+{
+  "factor_name": "qlib_tra_v1",
+  "factor_path": "runtime/alpha_research/qlib_tra_factor.parquet",
+  "prices_path": "runtime/alpha_research/qlib_tra_prices.parquet",
+  "forward_days": 20,
+  "basic_metrics": {
+    "rank_ic_mean": 0.12750979087979014,
+    "icir": 0.655024144508903,
+    "ic_positive_pct": 0.7304964539007093,
+    "sample_count": 141
+  },
+  "status": "pass",
+  "generated_at": "2026-04-02T03:51:00Z"
+}

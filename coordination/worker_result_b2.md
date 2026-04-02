@@ -1,32 +1,46 @@
 已读取并执行。
 
 结果：
-- `factor_combination.py`：已实现 `equal_weight` / `ic_weight` / `rank_weight`
-- 演示输出已跑通，使用 `selected_factors.json` 中已裁剪因子生成组合截面得分
-- `tests\\test_factor_combination.py`：`6 passed`
-- 全量 `pytest`：`130 passed, 0 failed, 8 skipped`
+- `Qlib` 版本：`0.9.7`
+- 安装状态：✅ 成功
+  - 在 `D:\\AITradingSystem\\.venv` 中已存在
+  - `pip install pyqlib` 为 `requirement already satisfied`
+  - 未发现依赖冲突
+- 基础验证：✅
+  - `qlib.init()` 正常
+  - `DataHandlerLP` 正常加载（`Alpha158`）
+  - `ALSTM` 可导入
+- GPU 训练：✅
+  - `ALSTM` 已在 GPU 上实际跑完 `5 epoch`
+  - 显存占用：`0.022 GB`
+  - 说明：`qlib 0.9.7` 自带 `fit()` 在该最小样例上触发 `best_param` 上游 bug，所以验证脚本自动退回 `manual_fallback` 完成 5 epoch
+- `verify_qlib_env.py` 输出：
+  - `Qlib 0.9.7 | CUDA: True | GPU: NVIDIA GeForce RTX 4070 Ti SUPER 16GB | ALSTM: OK | Train: manual_fallback | PeakMemGB: 0.022`
+- `pytest`：`143 passed, 0 failed, 8 skipped`
 
 交付：
-- `src\\alpha_research\\factor_combination.py`
-- `tests\\test_factor_combination.py`
+- `scripts\\verify_qlib_env.py`
 - `coordination\\worker_result_b2.md`
 
 提交：
-- `f3ef0c3e` `feat: add multi-factor combination module`
-- `b0bf7a3b` `docs: finalize Sprint 46b worker result`
+- `5992c545` `feat: add qlib environment verification script`
+- `ee23fc86` `docs: finalize Sprint 47 worker result`
+- `5d098919` `docs: fix Sprint 47 result formatting`
 
 推送：
 - 已推送到 `origin/main`
 
-BUILDER_DONE
+BUILDER_DONE## Sprint 50 结果 — TRA 训练 + 双模型对比
 
-## Sprint 47 结果 — Qlib 环境验证
-
-- Qlib 版本：0.9.7
-- 安装状态：✅ 成功（.venv 中已安装，`pip install pyqlib` 显示 requirement already satisfied，无依赖冲突）
-- GPU 训练：✅ ALSTM 5 epoch 跑通（manual_fallback） | 显存占用：0.022 GB
-- verify_qlib_env.py 输出：Qlib 0.9.7 | CUDA: True | GPU: NVIDIA GeForce RTX 4070 Ti SUPER 16GB | ALSTM: OK | Train: manual_fallback | PeakMemGB: 0.022
-- pytest：143 passed, 0 failed
-- commit：5992c545 feat: add qlib environment verification script
+- 显存检查：剩余 15.99 GB，可继续
+- 训练状态：✅ 完成（manual_fallback） | epoch数：5 | 耗时：0.50 分钟
+- TRA IC评估：IC均值=0.128 | ICIR=0.655
+- 双模型对比：
+  ALSTM ICIR=0.364 | TRA ICIR=0.655
+  基准 lgbm=0.1525 | alpha004=0.1744
+- 推荐模型：TRA
+- 是否入库：✅
+- pytest：145 passed, 0 failed
+- commit：待提交
 
 BUILDER_DONE

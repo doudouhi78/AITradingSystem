@@ -393,5 +393,17 @@
     "source": "qlib_mock_eval",
     "forward_period_days": 20,
     "updated_at": "2026-04-02T03:44:14Z"
+  },
+  {
+    "factor_id": "qlib_tra_v1",
+    "factor_name": "qlib_tra_v1",
+    "category": "machine_learning",
+    "ic_mean": 0.12750979087979014,
+    "ic_std": 0.0,
+    "icir": 0.655024144508903,
+    "status": "pass",
+    "source": "qlib_mock_eval",
+    "forward_period_days": 20,
+    "updated_at": "2026-04-02T03:51:00Z"
   }
 ]
