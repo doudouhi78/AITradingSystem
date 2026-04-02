@@ -1,17 +1,18 @@
 已执行完成，结果写入 [worker_result_b4.md](D:\AITradingSystem\coordination\worker_result_b4.md)，末尾已包含 `BUILDER_DONE`。
 
-本次新增了 [moneyflow_factors.py](D:\AITradingSystem\src\alpha_research\factors\moneyflow_factors.py)、[test_moneyflow_factors.py](D:\AITradingSystem\tests\test_moneyflow_factors.py) 和轻量入口 [run_moneyflow_ic_eval.py](D:\AITradingSystem\scripts\run_moneyflow_ic_eval.py)，并把 5 个 moneyflow 因子写入 [knowledge_base.json](D:\AITradingSystem\runtime\factor_registry\knowledge_base.json)。实现按任务卡要求在缺少 `moneyflow.parquet` 时抛出明确 `FileNotFoundError`，mock 单测覆盖了空数据、单日数据和 NaN 处理。
+这次新增了 [refresh_factor_registry.py](D:\AITradingSystem\scripts\refresh_factor_registry.py)、[research_dashboard.py](D:\AITradingSystem\scripts\research_dashboard.py) 和 [test_refresh_pipeline.py](D:\AITradingSystem\tests\test_refresh_pipeline.py)。`refresh_factor_registry.py` 支持 `--dry-run` 和 `--factor`，会按数据文件可用性选择研究家族、幂等合并 `factor_registry.json`；`research_dashboard.py` 会输出 registry 概况、数据层状态、待评估队列和最近一次 WFO 摘要。
 
-验证结果是 `pytest -q` 为 `124 passed, 0 failed, 8 skipped`。已提交并推送：
-- `00565b01` `feat: add moneyflow factor research scaffolding`
-- `8c9e2c1e` `docs: update Sprint 45d result card`
-## Sprint 46c 结果 — 研究管理自动化管道
+验证方面，定向测试 `tests/test_refresh_pipeline.py` 是 `3 passed`，`python scripts/refresh_factor_registry.py --dry-run` 和 `python scripts/research_dashboard.py` 都可运行。全量 `pytest -q` 实际为 `135 passed, 1 failed, 8 skipped`；唯一失败是现存的 `tests/test_signal_daily.py::test_build_factor_gate_outputs_runs_observation_mode`，与这次新增脚本无关，我已经在结果卡里如实记录。提交并推送完成：
+- `db334ac5` `feat: add research automation pipeline`
+- `8276e7fb` `docs: update Sprint 46c result card`
+## Sprint 47b 结果 — Qlib 模型训练配置框架
 
-- refresh_factor_registry.py：✅ 实现（含 --dry-run / --factor 参数）
-- research_dashboard.py：✅ 实现
-- dashboard 示例输出：研究状态仪表盘 / - 总数: 32 / - 类型分布: fundamental_proxy=1, momentum=1, price_volume=19, quality=1, reversal=7, symbolic_regression=1, volatility=2 / - mean_icir: 0.1464
-- test_refresh_pipeline.py：3 passed
-- pytest：135 passed, 1 failed（现存失败：tests/test_signal_daily.py::test_build_factor_gate_outputs_runs_observation_mode）
-- commit：db334ac5 feat: add research automation pipeline
+- alstm_config.yaml：✅
+- tra_config.yaml：✅
+- qlib_factor_extractor.py：✅ extract_factor_scores 接口实现
+- run_qlib_factor_ic_eval.py：✅ 可运行（mock 数据）
+- test_qlib_factor_extractor.py：3 passed
+- pytest：143 passed, 0 failed
+- commit：46380ec5 feat: add qlib model config scaffold
 
 BUILDER_DONE
