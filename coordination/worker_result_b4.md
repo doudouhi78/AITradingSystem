@@ -7,6 +7,7 @@
 - 稳定性评级：moderate
 - wfo_report.json：✅
 - pytest：119 passed, 0 failed
-- commit：[待提交]
+- commit：[0dee1b28] feat: add WFO validation framework
 
 BUILDER_DONE
+
