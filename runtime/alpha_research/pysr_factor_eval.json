@@ -1,0 +1,53 @@
+{
+  "top_factors": [
+    "alpha065",
+    "alpha006",
+    "alpha047",
+    "alpha054",
+    "momentum_12_1"
+  ],
+  "train_rows": 186165,
+  "formula_count": 5,
+  "top3_eval": [
+    {
+      "rank": 1,
+      "formula": "0.005347974",
+      "r2": -2.9608012708237652e-08,
+      "complexity": 1,
+      "metrics": {
+        "ic_mean": null,
+        "ic_std": null,
+        "icir": null,
+        "count": 0
+      },
+      "status": "fail"
+    },
+    {
+      "rank": 2,
+      "formula": "abs(alpha065 * 0.00519571)",
+      "r2": 0.00010104798286059147,
+      "complexity": 4,
+      "metrics": {
+        "ic_mean": null,
+        "ic_std": null,
+        "icir": null,
+        "count": 0
+      },
+      "status": "fail"
+    },
+    {
+      "rank": 3,
+      "formula": "(momentum_12_1 + 4.241988) * 0.0012860908",
+      "r2": 0.0005678278255734082,
+      "complexity": 5,
+      "metrics": {
+        "ic_mean": 0.018420047381256233,
+        "ic_std": 0.20107257014482044,
+        "icir": 0.09160895177293146,
+        "count": 479
+      },
+      "status": "pass"
+    }
+  ],
+  "registry_added": 1
+}

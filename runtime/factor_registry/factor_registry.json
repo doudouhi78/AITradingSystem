@@ -358,5 +358,16 @@
     "source": "classic_factors_alphalens",
     "forward_period_days": 5,
     "updated_at": "2026-04-01T16:12:23Z"
+  },
+  {
+    "factor_id": "pysr_formula_3",
+    "factor_name": "pysr_formula_3",
+    "category": "symbolic_regression",
+    "formula": "(momentum_12_1 + 4.241988) * 0.0012860908",
+    "ic_mean": 0.018420047381256233,
+    "ic_std": 0.20107257014482044,
+    "icir": 0.09160895177293146,
+    "status": "pass",
+    "source": "pysr"
   }
 ]

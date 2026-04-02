@@ -1,13 +1,17 @@
-## Sprint 41b 结果 — LightGBM 因子合成
+## Sprint 43 结果 — PySR 符号回归
 
-- 训练因子数：30 个
-- 训练样本：61753 行（股票×日期）
-- 验证集 ICIR：0.15（合成因子 vs forward 5日收益）
-- vs 最优单因子 ICIR：0.17（alpha040）
-- SHAP Top5：[alpha065 shap=0.0016, alpha006 shap=0.0014, alpha047 shap=0.0012, alpha054 shap=0.0011, momentum_12_1 shap=0.0009]
-- 模型文件：runtime/models/lgbm_factor_synthesis_v1.pkl ✅
-- pytest：76 passed, 0 failed
-- commit：[0ce9f330] feat: add LightGBM factor synthesis pipeline
+- PySR 搜索完成：✅
+- 发现表达式数：5 个
+- Top3 表达式：
+  1. [0.005347974] r2=-0.00 complexity=1
+  2. [abs(alpha065 * 0.00519571)] r2=0.00 complexity=4
+  3. [(momentum_12_1 + 4.241988) * 0.0012860908] r2=0.00 complexity=5
+- 样本外 ICIR（2022-2023）：
+  1. [0.005347974] icir=null status=fail
+  2. [abs(alpha065 * 0.00519571)] icir=null status=fail
+  3. [(momentum_12_1 + 4.241988) * 0.0012860908] icir=0.09 status=pass
+- 新增 factor_registry 条目：1 个
+- pytest：118 passed, 0 failed
+- commit：[待提交]
 
 BUILDER_DONE
-

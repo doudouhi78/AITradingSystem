@@ -1,0 +1,37 @@
+[
+  {
+    "rank": 1,
+    "formula": "0.005347974",
+    "r2": -2.9608012708237652e-08,
+    "complexity": 1,
+    "equation_index": 0
+  },
+  {
+    "rank": 2,
+    "formula": "abs(alpha065 * 0.00519571)",
+    "r2": 0.00010104798286059147,
+    "complexity": 4,
+    "equation_index": 1
+  },
+  {
+    "rank": 3,
+    "formula": "(momentum_12_1 + 4.241988) * 0.0012860908",
+    "r2": 0.0005678278255734082,
+    "complexity": 5,
+    "equation_index": 2
+  },
+  {
+    "rank": 4,
+    "formula": "abs((momentum_12_1 + 4.142783) * 0.0012860908)",
+    "r2": 0.0005701398929623958,
+    "complexity": 6,
+    "equation_index": 3
+  },
+  {
+    "rank": 5,
+    "formula": "(momentum_12_1 + (alpha047 - -3.5531259)) * 0.001568446",
+    "r2": 0.0011275584698420271,
+    "complexity": 7,
+    "equation_index": 4
+  }
+]
