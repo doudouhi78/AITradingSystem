@@ -35,6 +35,6 @@ BUILDER_DONE## Sprint 44a 结果 — 财务因子补跑
 - accruals：icir=-0.07 status=fail
 - 新增 factor_registry 条目：1 个
 - pytest：119 passed, 0 failed
-- commit：待提交
+- commit：26e8d616 feat: backfill classic financial factor IC evaluation
 
 BUILDER_DONE
