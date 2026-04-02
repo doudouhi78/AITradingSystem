@@ -30,7 +30,9 @@
 推送：
 - 已推送到 `origin/main`
 
-BUILDER_DONE## Sprint 50 结果 — TRA 训练 + 双模型对比
+BUILDER_DONE
+
+## Sprint 50 结果 — TRA 训练 + 双模型对比
 
 - 显存检查：剩余 15.99 GB，可继续
 - 训练状态：✅ 完成（manual_fallback） | epoch数：5 | 耗时：0.50 分钟
