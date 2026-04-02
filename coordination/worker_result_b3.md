@@ -1,26 +1,24 @@
-已执行 Sprint 44c，结果写入 [coordination/worker_result_b3.md](D:\AITradingSystem\coordination\worker_result_b3.md)，末尾已包含 `BUILDER_DONE`。
+已执行 Sprint 45，结果写入 [coordination/worker_result_b3.md](D:\AITradingSystem\coordination\worker_result_b3.md)，末尾已包含 `BUILDER_DONE`。
 
-本次新增了 [run_factor_backtest.py](D:\AITradingSystem\scripts\run_factor_backtest.py)，并生成了 [factor_backtest_report.json](D:\AITradingSystem\runtime\alpha_research\factor_backtest_report.json)。按任务卡要求，回测了 `Top5` 原始因子外加 `lgbm_synthetic` 和 `pysr_formula_3` 共 7 个因子；样本外表现最好的因子是 `alpha004`，Sharpe `1.6568`，其次 `alpha061` `0.9923`，`lgbm_synthetic` `0.6218`，已经满足“至少 1 个因子样本外 Sharpe > 0.5”。
+本次新增了 [run_alpha004_full_backtest.py](D:\AITradingSystem\scripts\run_alpha004_full_backtest.py)，并生成了 [alpha004_full_backtest.json](D:\AITradingSystem\runtime\alpha_research\alpha004_full_backtest.json)。按任务卡要求实现了 `VectorBT`、月度调仓、`Top20%/Q5` 等权、单票 5% 上限，以及 `ST/停牌/上市<60天` 过滤和含成本/不含成本对比。
 
-验证已完成：全量 `pytest` 为 `119 passed, 0 failed, 8 skipped`。提交并推送完成：
-- `e43295c6` `feat: add factor long-short backtest report`
-- `0d053739` `docs: update Sprint 44c result card`
-## Sprint 45 结果 — alpha004 完整回测
+实际回测结果是：
+- 样本内 `2016-2021`：年化 `16.0%`，Sharpe `0.88`，最大回撤 `-30.7%`
+- 样本外 `2022-2023`：年化 `5.9%`，Sharpe `0.43`，最大回撤 `-21.1%`
+- 成本拖累：Sharpe 损失 `0.19`
 
-样本内（2016-2021）：
-- 年化收益：16.0%
-- Sharpe（含成本）：0.88
-- 最大回撤：-30.7%
-- 换手率：955.9%/年
+验证已完成：`pytest -q` 为 `119 passed, 0 failed, 8 skipped`。已提交并推送：
+- `6ec79674` `feat: add alpha004 full backtest`
+- `131f116e` `docs: update Sprint 45 result card`
 
-样本外（2022-2023）：
-- 年化收益：5.9%
-- Sharpe（含成本）：0.43
-- 最大回撤：-21.1%
-- 成本拖累：Sharpe 损失 0.19
+需要如实说明：按这次实现和现有数据口径，样本外 Sharpe 没达到任务卡里的 `> 0.8`。
+## Sprint 46 结果 — Alpha 因子接入 Gate 系统
 
-- alpha004_full_backtest.json：✅
-- pytest：119 passed, 0 failed
-- commit：[6ec79674] [feat: add alpha004 full backtest]
+- alpha_gate_adapter.py：✅ 实现完成
+- Gate 接口梳理：`GateScheduler.evaluate(date, equity_series, etf_df)` 输出 `allowed/blocked_by/reason/gate_details`；`aggregate_daily_signals(strategy_signals, strategy_configs, gate_allowed, current_equity)` 输出 `action/requested_capital_pct/approved_capital_pct/notional_capital`
+- 集成验证：✅ signal_daily.py 跑通
+- 示例输出：600028.SH: 0.59%, 600023.SH: 0.59%, 600039.SH: 0.59%
+- pytest：136 passed, 0 failed
+- commit：[76f288a1] [feat: add alpha factor gate adapter]
 
 BUILDER_DONE
