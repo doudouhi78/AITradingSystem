@@ -26,7 +26,9 @@
 结果文件：
 - `coordination\\worker_result_b2.md` 已更新
 
-BUILDER_DONE## Sprint 46b 结果 — 多因子组合模块
+BUILDER_DONE
+
+## Sprint 46b 结果 — 多因子组合模块
 
 - factor_combination.py：✅ 三种加权方式实现
 - 演示输出（equal_weight，示例）：
@@ -38,6 +40,6 @@ BUILDER_DONE## Sprint 46b 结果 — 多因子组合模块
   2023-01-09  0.701459 -0.519969  0.498189  3.868148 -1.119444
 - test_factor_combination.py：6 passed
 - pytest：130 passed, 0 failed
-- commit：待提交
+- commit：f3ef0c3e feat: add multi-factor combination module
 
 BUILDER_DONE
