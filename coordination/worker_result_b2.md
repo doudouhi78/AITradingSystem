@@ -19,7 +19,9 @@
 结果文件：
 - `coordination\\worker_result_b2.md` 已按任务卡格式更新
 
-BUILDER_DONE## Sprint 45c 结果 — alpha061 + lgbm_synthetic 完整回测
+BUILDER_DONE
+
+## Sprint 45c 结果 — alpha061 + lgbm_synthetic 完整回测
 
 alpha061：
 - 样本内 Sharpe（含成本）：0.90 | 年化：14.3% | 最大回撤：-28.7%
