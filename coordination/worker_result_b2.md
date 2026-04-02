@@ -27,7 +27,9 @@
 结果文件：
 - `coordination\worker_result_b2.md` 已更新
 
-BUILDER_DONE## Sprint 44a 结果 — 财务因子补跑
+BUILDER_DONE
+
+## Sprint 44a 结果 — 财务因子补跑
 
 - roe：icir=0.00 status=weak
 - gross_margin：icir=0.02 status=weak
