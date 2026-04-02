@@ -13,6 +13,7 @@
 - 最优因子：[alpha004] 样本外Sharpe=1.66
 - factor_backtest_report.json：✅
 - pytest：119 passed, 0 failed
-- commit：[待提交]
+- commit：[e43295c6] feat: add factor long-short backtest report
 
 BUILDER_DONE
+
