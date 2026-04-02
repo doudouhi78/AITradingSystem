@@ -25,6 +25,6 @@ BUILDER_DONE## Sprint 47 结果 — Qlib 环境验证
 - GPU 训练：✅ ALSTM 5 epoch 跑通（manual_fallback） | 显存占用：0.022 GB
 - verify_qlib_env.py 输出：Qlib 0.9.7 | CUDA: True | GPU: NVIDIA GeForce RTX 4070 Ti SUPER 16GB | ALSTM: OK | Train: manual_fallback | PeakMemGB: 0.022
 - pytest：143 passed, 0 failed
-- commit：待提交
+- commit：5992c545 feat: add qlib environment verification script
 
 BUILDER_DONE
