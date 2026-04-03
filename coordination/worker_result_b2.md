@@ -46,3 +46,24 @@ BUILDER_DONE
 - commit：3a40146d feat: add qlib TRA training and comparison pipeline
 
 BUILDER_DONE
+## Sprint 56c 结果
+
+### 交付文件
+- src/strategy2/factors/sentiment_factors.py ✅
+- tests/test_strategy2_sentiment.py ✅
+
+### 龙虎榜因子验证
+- 实际字段列表：trade_date, ts_code, name, close, pct_change, turnover_rate, amount, l_sell, l_buy, l_amount, net_amount, net_rate, amount_rate, float_values, reason
+- 情绪热度因子IC/ICIR：IC=-0.0753, ICIR=-1.1949
+- 信号方向是否符合预期：是
+
+### 板块分歧度因子
+- 低分歧+高RPS组合 vs 高分歧+高RPS组合，未来收益差异：0.0418%
+
+### 情绪-价格背离
+- 衰竭信号后5日负收益概率：49.98%
+
+### pytest结果
+164 passed / 0 failed
+
+BUILDER_DONE
