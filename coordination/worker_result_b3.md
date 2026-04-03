@@ -24,6 +24,6 @@
 - 实际验证结果与任务卡验收阈值不一致：RPS与辅助因子在 2018-2024 全市场口径下 IC/ICIR 为负，已按真实结果写入报告，未人为翻转符号。
 - sector_rps_approx 与 stock_rps composite 的平均截面相关性为 0.3638，低于 0.4 阈值；近似行业聚合逻辑已落地，后续可在 DE-01 行业指数数据到位后升级。
 - runtime/strategy2/factor_validation_report.md 已生成，但 runtime 目录受 .gitignore 约束，不随 commit 提交。
-- commit：PENDING
+- commit：1b23992a
 
 BUILDER_DONE
