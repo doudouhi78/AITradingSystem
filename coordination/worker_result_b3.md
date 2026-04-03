@@ -1,21 +1,30 @@
-## Sprint 54A-v2 结果
+## Sprint 57 结果
 
-### 精确版行业RPS多窗口IC验证
-| 因子 | 5日ICIR | 20日ICIR | 60日ICIR | 最佳窗口 | 方向 |
-|------|--------|---------|---------|---------|------|
-| sector_rps_20 | 0.0406 | 0.0056 | -0.0227 | 5日 | 正向 |
-| sector_rps_60 | -0.0197 | -0.0252 | -0.0477 | 60日 | 反向 |
-| sector_rps_120 | 0.0282 | -0.0002 | -0.0017 | 5日 | 正向 |
+### 特征矩阵概况
+- 文件路径：runtime/strategy2/theme_features.parquet
+- 行数：4304318
+- 列数（特征数）：8
+- 有效股票数：5033
+- 有效交易日数：1924
+- 特征列表（前10个）：['theme_avg_ret_5', 'theme_avg_ret_10', 'theme_avg_ret_20', 'theme_rank_pct_5', 'theme_rank_pct_20', 'theme_heat_5', 'theme_heat_20', 'theme_member_count']
 
-### 与近似版对比
-- 近似版sector_rps截面相关性：0.364
-- 精确版最佳ICIR：-0.0477
+### 基础IC扫描（Top特征）
+| 特征名 | 3日IC | 5日IC | 10日IC | 最佳ICIR |
+|--------|------|------|-------|---------|
+| theme_rank_pct_20 | -0.0269 | -0.0331 | -0.0398 | -0.3236 |
+| theme_heat_20 | -0.0071 | -0.0102 | -0.0158 | -0.1015 |
+| theme_avg_ret_10 | 0.0078 | 0.0076 | 0.0084 | 0.0520 |
+| theme_avg_ret_20 | 0.0082 | 0.0079 | 0.0059 | 0.0489 |
+| theme_avg_ret_5 | 0.0046 | 0.0058 | 0.0070 | 0.0435 |
 
-### 结论
-- 行业RPS信号方向：反向
-- 建议策略二使用的行业信号周期：60日
+### 交付文件
+- src/strategy2/features/theme_features.py ✅
+- tests/test_strategy2_theme_features.py ✅
 
 ### pytest结果
-179 passed / 0 failed
+173 passed, 0 failed
+
+### commit
+3f71f895 feat: Sprint 57 - build theme feature matrix
 
 BUILDER_DONE
