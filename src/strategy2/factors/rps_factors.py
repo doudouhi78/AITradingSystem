@@ -25,6 +25,15 @@ def _normalize_price_frame(df: pd.DataFrame) -> pd.DataFrame:
     return frame.dropna(subset=['trade_date', 'ts_code'])
 
 
+def _normalize_member_history(member_history: pd.DataFrame) -> pd.DataFrame:
+    frame = member_history.copy()
+    frame['ts_code'] = frame['ts_code'].astype(str).str.upper()
+    frame['index_code'] = frame['index_code'].astype(str).str.upper()
+    frame['in_date'] = pd.to_datetime(frame['in_date'], errors='coerce')
+    frame['out_date'] = pd.to_datetime(frame['out_date'], errors='coerce')
+    return frame.dropna(subset=['ts_code', 'index_code', 'in_date'])
+
+
 def _pivot_metric(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
     if value_col not in df.columns:
         raise KeyError(f'missing {value_col} column')
@@ -39,6 +48,31 @@ def _stack_frame(frame: pd.DataFrame, value_name: str, entity_name: str) -> pd.D
     return stacked
 
 
+def map_stock_to_sector_history(
+    member_history: pd.DataFrame,
+    trade_dates: pd.DatetimeIndex | list[pd.Timestamp],
+    ts_codes: list[str] | None = None,
+) -> pd.DataFrame:
+    history = _normalize_member_history(member_history)
+    if ts_codes is not None:
+        codes = pd.Index([str(code).upper() for code in ts_codes])
+        history = history.loc[history['ts_code'].isin(codes)]
+    dates = pd.DatetimeIndex(pd.to_datetime(pd.Index(trade_dates), errors='coerce')).dropna().sort_values().unique()
+    rows: list[pd.DataFrame] = []
+    for date in dates:
+        active = history.loc[(history['in_date'] <= date) & (history['out_date'].isna() | (history['out_date'] >= date))]
+        if active.empty:
+            continue
+        active = active.sort_values(['ts_code', 'in_date', 'index_code']).drop_duplicates('ts_code', keep='last')
+        payload = active[['ts_code', 'index_code']].copy()
+        payload['trade_date'] = pd.Timestamp(date)
+        rows.append(payload)
+    if not rows:
+        return pd.DataFrame(columns=['trade_date', 'ts_code', 'index_code'])
+    result = pd.concat(rows, ignore_index=True)
+    return result[['trade_date', 'ts_code', 'index_code']].sort_values(['trade_date', 'ts_code']).reset_index(drop=True)
+
+
 def calc_stock_rps(df: pd.DataFrame) -> pd.DataFrame:
     close = _pivot_metric(df, 'close')
     outputs: list[pd.DataFrame] = []
@@ -50,6 +84,32 @@ def calc_stock_rps(df: pd.DataFrame) -> pd.DataFrame:
     for item in outputs[1:]:
         result = result.merge(item, on=['trade_date', 'ts_code'], how='outer')
     return result.sort_values(['trade_date', 'ts_code']).reset_index(drop=True)
+
+
+def calc_sector_rps(index_daily: pd.DataFrame) -> pd.DataFrame:
+    frame = index_daily.copy()
+    frame['ts_code'] = frame['ts_code'].astype(str).str.upper()
+    frame['trade_date'] = pd.to_datetime(frame['trade_date'], errors='coerce')
+    if 'close' in frame.columns:
+        close = frame.pivot_table(index='trade_date', columns='ts_code', values='close', aggfunc='last').sort_index()
+        returns_by_window = {window: close.pct_change(periods=window, fill_method=None) for window in (20, 60, 120)}
+    elif 'pct_chg' in frame.columns:
+        daily_ret = frame.pivot_table(index='trade_date', columns='ts_code', values='pct_chg', aggfunc='last').sort_index() / 100.0
+        returns_by_window = {
+            window: (1.0 + daily_ret).rolling(window, min_periods=window).apply(np.prod, raw=True) - 1.0
+            for window in (20, 60, 120)
+        }
+    else:
+        raise KeyError('sector index data must contain close or pct_chg')
+
+    outputs: list[pd.DataFrame] = []
+    for window, ret in returns_by_window.items():
+        sector_rps = ret.rank(axis=1, pct=True) * 100.0
+        outputs.append(_stack_frame(sector_rps, f'sector_rps_{window}', 'index_code'))
+    result = outputs[0]
+    for item in outputs[1:]:
+        result = result.merge(item, on=['trade_date', 'index_code'], how='outer')
+    return result.sort_values(['trade_date', 'index_code']).reset_index(drop=True)
 
 
 def calc_sector_rps_approx(df: pd.DataFrame, stock_basic: pd.DataFrame) -> pd.DataFrame:

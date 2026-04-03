@@ -6,7 +6,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,28 +13,20 @@ SRC_ROOT = ROOT / 'src'
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from strategy2.factors import (
-    calc_bias,
-    calc_ema_slope,
-    calc_sector_concentration,
-    calc_sector_rps_approx,
-    calc_stock_rps,
-    calc_turnover_deviation,
-    calc_volume_zscore,
-)
+from strategy2.factors import calc_sector_rps, calc_stock_rps, map_stock_to_sector_history
 
 START = '2018-01-01'
 END = '2024-12-31'
-BASE_PERIOD = 20
-RPS_WINDOWS = [5, 10, 20, 40, 60]
+WINDOWS = [5, 20, 60]
 MARKET_DIR = ROOT / 'runtime' / 'market_data' / 'cn_stock'
-FUNDAMENTAL_DIR = ROOT / 'runtime' / 'fundamental_data'
+INDEX_DIR = ROOT / 'runtime' / 'index_data'
 REPORT_PATH = ROOT / 'runtime' / 'strategy2' / 'factor_validation_report.md'
+APPROX_CORR = 0.364
 
 
 def _load_eval_module():
     module_path = ROOT / 'scripts' / 'alpha' / 'run_factor_evaluation.py'
-    spec = importlib.util.spec_from_file_location('strategy2_factor_eval', module_path)
+    spec = importlib.util.spec_from_file_location('strategy2_factor_eval_v2', module_path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     sys.modules[spec.name] = module
@@ -58,52 +49,19 @@ def load_market_data(start: str, end: str) -> pd.DataFrame:
     rows: list[pd.DataFrame] = []
     files = sorted(MARKET_DIR.glob('*.parquet'))
     for idx, path in enumerate(files, start=1):
-        frame = pd.read_parquet(path, columns=['trade_date', 'symbol', 'close', 'volume']).copy()
+        frame = pd.read_parquet(path, columns=['trade_date', 'symbol', 'close']).copy()
         frame['trade_date'] = pd.to_datetime(frame['trade_date'], errors='coerce')
         frame = frame.loc[(frame['trade_date'] >= start_ts) & (frame['trade_date'] <= end_ts)]
         if frame.empty:
             continue
         frame['ts_code'] = frame['symbol'].astype(str).str.zfill(6).map(_symbol_to_ts)
-        rows.append(frame[['ts_code', 'trade_date', 'close', 'volume']])
+        rows.append(frame[['ts_code', 'trade_date', 'close']])
         if idx % 500 == 0:
             print(f'market_progress={idx}/{len(files)}', flush=True)
-    if not rows:
-        raise FileNotFoundError('no market rows loaded')
-    market = pd.concat(rows, ignore_index=True)
-    return market.sort_values(['trade_date', 'ts_code']).reset_index(drop=True)
+    return pd.concat(rows, ignore_index=True).sort_values(['trade_date', 'ts_code']).reset_index(drop=True)
 
 
-def _factor_to_wide(frame: pd.DataFrame, value_col: str) -> pd.DataFrame:
-    wide = frame.pivot_table(index='trade_date', columns='ts_code', values=value_col, aggfunc='last')
-    return wide.sort_index().sort_index(axis=1)
-
-
-def _mean_cross_section_corr(left: pd.DataFrame, right: pd.DataFrame) -> float:
-    aligned_left, aligned_right = left.align(right, join='inner', axis=1)
-    values: list[float] = []
-    for date in aligned_left.index.intersection(aligned_right.index):
-        cross = pd.concat([
-            aligned_left.loc[date].rename('left'),
-            aligned_right.loc[date].rename('right'),
-        ], axis=1).dropna()
-        if len(cross) < 20:
-            continue
-        corr = cross['left'].corr(cross['right'], method='spearman')
-        if pd.notna(corr):
-            values.append(float(corr))
-    return float(np.mean(values)) if values else 0.0
-
-
-def _metric_row(name: str, metrics: dict[str, float], pass_rule: bool) -> dict[str, Any]:
-    return {
-        'factor': name,
-        'ic_mean': float(metrics['rank_ic_mean']),
-        'icir': float(metrics['icir']),
-        'passed': bool(pass_rule),
-    }
-
-
-def _compute_metrics(eval_module, factor_frame: pd.DataFrame, prices: pd.DataFrame, period: int) -> dict[str, Any]:
+def _compute_metrics(eval_module, factor_frame: pd.DataFrame, prices: pd.DataFrame, period: int) -> dict[str, float]:
     aligned_factor, aligned_prices = factor_frame.align(prices, join='inner', axis=1)
     aligned_factor, aligned_prices = aligned_factor.align(aligned_prices, join='inner', axis=0)
     ic_series = eval_module.compute_daily_ic_series(aligned_factor, aligned_prices, period=period)
@@ -115,143 +73,118 @@ def _compute_metrics(eval_module, factor_frame: pd.DataFrame, prices: pd.DataFra
     }
 
 
+def _factor_to_wide(frame: pd.DataFrame, entity_col: str, value_col: str) -> pd.DataFrame:
+    wide = frame.pivot_table(index='trade_date', columns=entity_col, values=value_col, aggfunc='last')
+    return wide.sort_index().sort_index(axis=1)
+
+
 def main() -> int:
     eval_module = _load_eval_module()
-    stock_basic = pd.read_parquet(FUNDAMENTAL_DIR / 'stock_basic.parquet')[['ts_code', 'industry']].copy()
-    stock_basic['ts_code'] = stock_basic['ts_code'].astype(str).str.upper()
-    valuation = pd.read_parquet(FUNDAMENTAL_DIR / 'valuation_daily.parquet').copy()
-    valuation['date'] = pd.to_datetime(valuation['date'], errors='coerce')
-    valuation = valuation.loc[(valuation['date'] >= pd.Timestamp(START)) & (valuation['date'] <= pd.Timestamp(END))].copy()
+    index_daily = pd.read_parquet(INDEX_DIR / 'sw_industry_index_daily.parquet').copy()
+    index_daily['trade_date'] = pd.to_datetime(index_daily['trade_date'].astype(str), format='%Y%m%d', errors='coerce')
+    index_daily = index_daily.loc[(index_daily['trade_date'] >= pd.Timestamp(START)) & (index_daily['trade_date'] <= pd.Timestamp(END))].copy()
+    member_history = pd.read_parquet(INDEX_DIR / 'sw_industry_member_history.parquet').copy()
 
-    market = load_market_data(START, END)
-    prices = market.pivot_table(index='trade_date', columns='ts_code', values='close', aggfunc='last').sort_index().sort_index(axis=1)
+    sector_rps = calc_sector_rps(index_daily)
+    sector_prices = _factor_to_wide(index_daily.rename(columns={'ts_code': 'index_code'}), 'index_code', 'close')
 
-    stock_rps = calc_stock_rps(market)
-    sector_rps = calc_sector_rps_approx(market, stock_basic)
-    sector_concentration = calc_sector_concentration(market, stock_basic)
-    volume_zscore = calc_volume_zscore(market)
-    turnover_deviation = calc_turnover_deviation(valuation)
-    ema_slope = calc_ema_slope(market)
-    bias = calc_bias(market)
-
-    sector_factor = sector_rps.copy()
-    sector_factor['sector_rps_approx'] = sector_factor[['sector_rps_20', 'sector_rps_60', 'sector_rps_120']].mean(axis=1)
-    sector_stock = stock_basic[['ts_code', 'industry']].drop_duplicates('ts_code').merge(
-        sector_factor[['trade_date', 'industry', 'sector_rps_approx']],
-        on='industry',
-        how='left',
-    )
-
-    factor_frames = {
-        'rps_20': _factor_to_wide(stock_rps, 'rps_20'),
-        'rps_60': _factor_to_wide(stock_rps, 'rps_60'),
-        'rps_120': _factor_to_wide(stock_rps, 'rps_120'),
-        'sector_rps_approx': _factor_to_wide(sector_stock, 'sector_rps_approx'),
-        'volume_zscore': _factor_to_wide(volume_zscore, 'volume_zscore'),
-        'turnover_deviation': _factor_to_wide(turnover_deviation, 'turnover_deviation'),
-        'ema_slope': _factor_to_wide(ema_slope, 'ema_slope'),
-        'bias': _factor_to_wide(bias, 'bias'),
-    }
-
-    results: list[dict[str, Any]] = []
-    for name in ('rps_20', 'rps_60', 'rps_120', 'sector_rps_approx', 'volume_zscore', 'turnover_deviation'):
-        metrics = _compute_metrics(eval_module, factor_frames[name], prices, BASE_PERIOD)
-        if name.startswith('rps_'):
-            passed = metrics['icir'] > 0.3
-        elif name == 'sector_rps_approx':
-            stock_composite = factor_frames['rps_20'].add(factor_frames['rps_60'], fill_value=0).add(factor_frames['rps_120'], fill_value=0) / 3.0
-            sector_corr = _mean_cross_section_corr(factor_frames[name], stock_composite)
-            passed = sector_corr > 0.4
-            metrics['sector_cross_corr'] = sector_corr
-        elif name == 'volume_zscore':
-            passed = metrics['ic_mean'] > 0.02
-        else:
-            passed = metrics['icir'] > 0.0
-        row = _metric_row(name, {'rank_ic_mean': metrics['ic_mean'], 'icir': metrics['icir']}, passed)
-        if 'sector_cross_corr' in metrics:
-            row['sector_cross_corr'] = metrics['sector_cross_corr']
-        results.append(row)
-
-    rps_multi: dict[str, dict[int, dict[str, float]]] = {}
+    sector_results: dict[str, dict[int, dict[str, float]]] = {}
     best_choice: dict[str, Any] | None = None
-    for name in ('rps_20', 'rps_60', 'rps_120'):
-        rps_multi[name] = {}
-        for window in RPS_WINDOWS:
-            metrics = _compute_metrics(eval_module, factor_frames[name], prices, window)
-            rps_multi[name][window] = metrics
+    for factor_name in ('sector_rps_20', 'sector_rps_60', 'sector_rps_120'):
+        frame = _factor_to_wide(sector_rps, 'index_code', factor_name)
+        sector_results[factor_name] = {}
+        for window in WINDOWS:
+            metrics = _compute_metrics(eval_module, frame, sector_prices, window)
+            sector_results[factor_name][window] = metrics
             score = abs(metrics['icir'])
             if best_choice is None or score > best_choice['score']:
                 best_choice = {
-                    'factor': name,
+                    'factor': factor_name,
                     'window': window,
                     'ic_mean': metrics['ic_mean'],
                     'icir': metrics['icir'],
                     'score': score,
                 }
 
-    sector_corr_value = next((row.get('sector_cross_corr') for row in results if row['factor'] == 'sector_rps_approx'), None)
-    report_lines = [
-        '# Sprint 54A Factor Validation',
+    market = load_market_data(START, END)
+    stock_prices = _factor_to_wide(market, 'ts_code', 'close')
+    stock_rps = calc_stock_rps(market)
+    stock_rps_60 = _factor_to_wide(stock_rps, 'ts_code', 'rps_60')
+
+    membership = map_stock_to_sector_history(member_history, stock_rps_60.index, list(stock_rps_60.columns))
+    strong_sector_map = sector_rps[['trade_date', 'index_code', 'sector_rps_60']].copy()
+    membership = membership.merge(strong_sector_map, on=['trade_date', 'index_code'], how='left')
+    membership['is_strong_sector'] = membership['sector_rps_60'] >= 75.0
+    strong_membership = membership.loc[membership['is_strong_sector']].copy()
+    if strong_membership.empty:
+        strong_stock_factor = stock_rps_60 * pd.NA
+    else:
+        strong_mask = strong_membership.assign(flag=True).pivot_table(index='trade_date', columns='ts_code', values='flag', aggfunc='last')
+        strong_mask = strong_mask.reindex(index=stock_rps_60.index, columns=stock_rps_60.columns)
+        strong_mask = strong_mask.where(strong_mask.notna(), False).astype(bool)
+        strong_stock_factor = stock_rps_60.where(strong_mask)
+
+    compare_window = int(best_choice['window']) if best_choice is not None else 20
+    full_stock_metrics = _compute_metrics(eval_module, stock_rps_60, stock_prices, compare_window)
+    strong_stock_metrics = _compute_metrics(eval_module, strong_stock_factor, stock_prices, compare_window)
+
+    best_icir = float(best_choice['icir']) if best_choice is not None else 0.0
+    best_window = int(best_choice['window']) if best_choice is not None else 20
+    direction = '正向' if best_icir >= 0 else '反向'
+
+    lines = [
+        '# Sprint 54A-v2 Factor Validation',
         '',
         f'- Sample: {START} ~ {END}',
-        f'- Universe rows: {len(market):,}',
-        f'- Stock count: {market["ts_code"].nunique():,}',
-        f'- Sector concentration rows: {len(sector_concentration):,}',
+        f'- Industry index rows: {len(index_daily):,}',
+        f'- Member history rows: {len(member_history):,}',
         '',
-        '## Base 20D Validation',
+        '## 精确版行业RPS多窗口IC验证',
         '',
-        '| 因子 | IC均值 | ICIR | 达标 |',
-        '|------|-------|------|------|',
+        '| 因子 | 5日ICIR | 20日ICIR | 60日ICIR | 最佳窗口 | 方向 |',
+        '|------|--------|---------|---------|---------|------|',
     ]
-    for row in results:
-        report_lines.append(f"| {row['factor']} | {row['ic_mean']:.4f} | {row['icir']:.4f} | {'✅' if row['passed'] else '❌'} |")
+    for factor_name in ('sector_rps_20', 'sector_rps_60', 'sector_rps_120'):
+        m5 = sector_results[factor_name][5]['icir']
+        m20 = sector_results[factor_name][20]['icir']
+        m60 = sector_results[factor_name][60]['icir']
+        best_local = max(sector_results[factor_name].items(), key=lambda item: abs(item[1]['icir']))
+        local_direction = '正向' if best_local[1]['icir'] >= 0 else '反向'
+        lines.append(f'| {factor_name} | {m5:.4f} | {m20:.4f} | {m60:.4f} | {best_local[0]}日 | {local_direction} |')
 
-    report_lines += [
+    lines.extend([
         '',
-        '## RPS Multi-Window Analysis',
+        '## 与近似版对比',
+        f'- 近似版sector_rps截面相关性：{APPROX_CORR:.3f}',
+        f'- 精确版最佳ICIR：{best_icir:.4f}',
         '',
-        '| 因子 | 5日 | 10日 | 20日 | 40日 | 60日 | 最佳窗口 |',
-        '|------|-----|------|------|------|------|---------|',
-    ]
-    for name in ('rps_20', 'rps_60', 'rps_120'):
-        cells = []
-        best_window = max(rps_multi[name].items(), key=lambda item: abs(item[1]['icir']))
-        for window in RPS_WINDOWS:
-            metrics = rps_multi[name][window]
-            cells.append(f"IC={metrics['ic_mean']:.4f}, ICIR={metrics['icir']:.4f}")
-        best_label = f"{best_window[0]}日 ({'正向' if best_window[1]['icir'] >= 0 else '反向'})"
-        report_lines.append(f"| {name} | " + ' | '.join(cells) + f" | {best_label} |")
-
-    if best_choice is None:
-        best_summary = {'window': 'N/A', 'direction': 'N/A'}
-    else:
-        best_summary = {
-            'window': f"{best_choice['window']}日",
-            'direction': '正向' if best_choice['icir'] >= 0 else '反向',
-            'factor': best_choice['factor'],
-            'ic_mean': best_choice['ic_mean'],
-            'icir': best_choice['icir'],
-        }
-
-    report_lines += [
+        '## 个股层面增强验证',
+        f'- 全市场 rps_60 @ {compare_window}日 ICIR：{full_stock_metrics["icir"]:.4f}',
+        f'- 强行业内 rps_60 @ {compare_window}日 ICIR：{strong_stock_metrics["icir"]:.4f}',
         '',
         '## 结论',
-        f"- RPS因子有效信号周期: {best_summary['window']}",
-        f"- 信号方向: {best_summary['direction']}",
-        f"- 最佳组合: {best_summary.get('factor', 'N/A')} / IC={best_summary.get('ic_mean', 0.0):.4f} / ICIR={best_summary.get('icir', 0.0):.4f}" if best_choice is not None else '- 最佳组合: N/A',
-        f"- 策略二建议持仓周期: {best_summary['window']}",
-        '',
-        '## 补充验证',
-        f'- sector_rps_approx 与 stock_rps composite 截面相关性: {sector_corr_value:.4f}' if sector_corr_value is not None else '- sector correlation: N/A',
-        f"- extra factors computed: ema_slope rows={len(ema_slope):,}, bias rows={len(bias):,}",
+        f'- 行业RPS信号方向：{direction}',
+        f'- 建议策略二使用的行业信号周期：{best_window}日',
         '',
         '## JSON Summary',
         '```json',
-        json.dumps({'results': results, 'rps_multi_window': rps_multi, 'best_summary': best_summary}, ensure_ascii=False, indent=2),
+        json.dumps({
+            'sector_results': sector_results,
+            'best_choice': best_choice,
+            'approx_corr': APPROX_CORR,
+            'full_stock_metrics': full_stock_metrics,
+            'strong_stock_metrics': strong_stock_metrics,
+        }, ensure_ascii=False, indent=2),
         '```',
-    ]
-    REPORT_PATH.write_text('\n'.join(report_lines) + '\n', encoding='utf-8')
-    print(json.dumps({'report_path': str(REPORT_PATH), 'rps_multi_window': rps_multi, 'best_summary': best_summary}, ensure_ascii=False, indent=2))
+    ])
+    REPORT_PATH.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+    print(json.dumps({
+        'report_path': str(REPORT_PATH),
+        'sector_results': sector_results,
+        'best_choice': best_choice,
+        'full_stock_metrics': full_stock_metrics,
+        'strong_stock_metrics': strong_stock_metrics,
+    }, ensure_ascii=False, indent=2))
     return 0
 
 
