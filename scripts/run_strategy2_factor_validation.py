@@ -26,7 +26,8 @@ from strategy2.factors import (
 
 START = '2018-01-01'
 END = '2024-12-31'
-PERIOD = 20
+BASE_PERIOD = 20
+RPS_WINDOWS = [5, 10, 20, 40, 60]
 MARKET_DIR = ROOT / 'runtime' / 'market_data' / 'cn_stock'
 FUNDAMENTAL_DIR = ROOT / 'runtime' / 'fundamental_data'
 REPORT_PATH = ROOT / 'runtime' / 'strategy2' / 'factor_validation_report.md'
@@ -102,6 +103,18 @@ def _metric_row(name: str, metrics: dict[str, float], pass_rule: bool) -> dict[s
     }
 
 
+def _compute_metrics(eval_module, factor_frame: pd.DataFrame, prices: pd.DataFrame, period: int) -> dict[str, Any]:
+    aligned_factor, aligned_prices = factor_frame.align(prices, join='inner', axis=1)
+    aligned_factor, aligned_prices = aligned_factor.align(aligned_prices, join='inner', axis=0)
+    ic_series = eval_module.compute_daily_ic_series(aligned_factor, aligned_prices, period=period)
+    metrics = eval_module.compute_basic_metrics(ic_series)
+    return {
+        'ic_mean': float(metrics['rank_ic_mean']),
+        'icir': float(metrics['icir']),
+        'sample_count': int(len(ic_series)),
+    }
+
+
 def main() -> int:
     eval_module = _load_eval_module()
     stock_basic = pd.read_parquet(FUNDAMENTAL_DIR / 'stock_basic.parquet')[['ts_code', 'industry']].copy()
@@ -142,23 +155,39 @@ def main() -> int:
 
     results: list[dict[str, Any]] = []
     for name in ('rps_20', 'rps_60', 'rps_120', 'sector_rps_approx', 'volume_zscore', 'turnover_deviation'):
-        factor_frame = factor_frames[name]
-        aligned_factor, aligned_prices = factor_frame.align(prices, join='inner', axis=1)
-        aligned_factor, aligned_prices = aligned_factor.align(aligned_prices, join='inner', axis=0)
-        ic_series = eval_module.compute_daily_ic_series(aligned_factor, aligned_prices, period=PERIOD)
-        metrics = eval_module.compute_basic_metrics(ic_series)
+        metrics = _compute_metrics(eval_module, factor_frames[name], prices, BASE_PERIOD)
         if name.startswith('rps_'):
             passed = metrics['icir'] > 0.3
         elif name == 'sector_rps_approx':
             stock_composite = factor_frames['rps_20'].add(factor_frames['rps_60'], fill_value=0).add(factor_frames['rps_120'], fill_value=0) / 3.0
-            sector_corr = _mean_cross_section_corr(aligned_factor, stock_composite)
+            sector_corr = _mean_cross_section_corr(factor_frames[name], stock_composite)
             passed = sector_corr > 0.4
             metrics['sector_cross_corr'] = sector_corr
         elif name == 'volume_zscore':
-            passed = metrics['rank_ic_mean'] > 0.02
+            passed = metrics['ic_mean'] > 0.02
         else:
             passed = metrics['icir'] > 0.0
-        results.append(_metric_row(name, metrics, passed) | ({'sector_cross_corr': metrics.get('sector_cross_corr')} if 'sector_cross_corr' in metrics else {}))
+        row = _metric_row(name, {'rank_ic_mean': metrics['ic_mean'], 'icir': metrics['icir']}, passed)
+        if 'sector_cross_corr' in metrics:
+            row['sector_cross_corr'] = metrics['sector_cross_corr']
+        results.append(row)
+
+    rps_multi: dict[str, dict[int, dict[str, float]]] = {}
+    best_choice: dict[str, Any] | None = None
+    for name in ('rps_20', 'rps_60', 'rps_120'):
+        rps_multi[name] = {}
+        for window in RPS_WINDOWS:
+            metrics = _compute_metrics(eval_module, factor_frames[name], prices, window)
+            rps_multi[name][window] = metrics
+            score = abs(metrics['icir'])
+            if best_choice is None or score > best_choice['score']:
+                best_choice = {
+                    'factor': name,
+                    'window': window,
+                    'ic_mean': metrics['ic_mean'],
+                    'icir': metrics['icir'],
+                    'score': score,
+                }
 
     sector_corr_value = next((row.get('sector_cross_corr') for row in results if row['factor'] == 'sector_rps_approx'), None)
     report_lines = [
@@ -169,14 +198,48 @@ def main() -> int:
         f'- Stock count: {market["ts_code"].nunique():,}',
         f'- Sector concentration rows: {len(sector_concentration):,}',
         '',
+        '## Base 20D Validation',
+        '',
         '| 因子 | IC均值 | ICIR | 达标 |',
         '|------|-------|------|------|',
     ]
     for row in results:
-        report_lines.append(
-            f"| {row['factor']} | {row['ic_mean']:.4f} | {row['icir']:.4f} | {'✅' if row['passed'] else '❌'} |"
-        )
+        report_lines.append(f"| {row['factor']} | {row['ic_mean']:.4f} | {row['icir']:.4f} | {'✅' if row['passed'] else '❌'} |")
+
     report_lines += [
+        '',
+        '## RPS Multi-Window Analysis',
+        '',
+        '| 因子 | 5日 | 10日 | 20日 | 40日 | 60日 | 最佳窗口 |',
+        '|------|-----|------|------|------|------|---------|',
+    ]
+    for name in ('rps_20', 'rps_60', 'rps_120'):
+        cells = []
+        best_window = max(rps_multi[name].items(), key=lambda item: abs(item[1]['icir']))
+        for window in RPS_WINDOWS:
+            metrics = rps_multi[name][window]
+            cells.append(f"IC={metrics['ic_mean']:.4f}, ICIR={metrics['icir']:.4f}")
+        best_label = f"{best_window[0]}日 ({'正向' if best_window[1]['icir'] >= 0 else '反向'})"
+        report_lines.append(f"| {name} | " + ' | '.join(cells) + f" | {best_label} |")
+
+    if best_choice is None:
+        best_summary = {'window': 'N/A', 'direction': 'N/A'}
+    else:
+        best_summary = {
+            'window': f"{best_choice['window']}日",
+            'direction': '正向' if best_choice['icir'] >= 0 else '反向',
+            'factor': best_choice['factor'],
+            'ic_mean': best_choice['ic_mean'],
+            'icir': best_choice['icir'],
+        }
+
+    report_lines += [
+        '',
+        '## 结论',
+        f"- RPS因子有效信号周期: {best_summary['window']}",
+        f"- 信号方向: {best_summary['direction']}",
+        f"- 最佳组合: {best_summary.get('factor', 'N/A')} / IC={best_summary.get('ic_mean', 0.0):.4f} / ICIR={best_summary.get('icir', 0.0):.4f}" if best_choice is not None else '- 最佳组合: N/A',
+        f"- 策略二建议持仓周期: {best_summary['window']}",
         '',
         '## 补充验证',
         f'- sector_rps_approx 与 stock_rps composite 截面相关性: {sector_corr_value:.4f}' if sector_corr_value is not None else '- sector correlation: N/A',
@@ -184,11 +247,11 @@ def main() -> int:
         '',
         '## JSON Summary',
         '```json',
-        json.dumps({'results': results}, ensure_ascii=False, indent=2),
+        json.dumps({'results': results, 'rps_multi_window': rps_multi, 'best_summary': best_summary}, ensure_ascii=False, indent=2),
         '```',
     ]
     REPORT_PATH.write_text('\n'.join(report_lines) + '\n', encoding='utf-8')
-    print(json.dumps({'report_path': str(REPORT_PATH), 'results': results}, ensure_ascii=False, indent=2))
+    print(json.dumps({'report_path': str(REPORT_PATH), 'rps_multi_window': rps_multi, 'best_summary': best_summary}, ensure_ascii=False, indent=2))
     return 0
 
 
